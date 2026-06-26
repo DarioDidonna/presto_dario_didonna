@@ -25,7 +25,7 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link nav-link-custom" href="#">
+                    <a class="nav-link nav-link-custom" href="{{ route('article.index') }}">
                         <i class="bi bi-grid me-1"></i> Annunci
                     </a>
                 </li>
@@ -37,12 +37,16 @@
                     </a>
                     <ul class="dropdown-menu dropdown-menu-dark custom-dropdown-animate border-0 shadow-lg p-2"
                         aria-labelledby="categoriesDropdown">
-                        <li><a class="dropdown-menu-item-custom" href="#">Tech & Electronics</a></li>
-                        <li><a class="dropdown-menu-item-custom" href="#">Gaming & Media</a></li>
-                        <li><a class="dropdown-menu-item-custom" href="#">Design & Creative</a></li>
+                        @foreach ($categories as $category)
+                        <li><a class="dropdown-menu-item-custom" 
+                            href="{{route('byCategory', ['category' => $category])}}">{{ $category->name }}</a>
+                        </li>
+                        @if (!$loop->last)
                         <li>
                             <hr class="dropdown-divider border-secondary-subtle my-2">
                         </li>
+                        @endif
+                        @endforeach
                         <li><a class="dropdown-menu-item-custom text-neon-cyan fw-semibold" href="#"><i
                                     class="bi bi-arrow-right-short me-1"></i> Vedi tutti</a></li>
                     </ul>
@@ -110,7 +114,7 @@
 
                     <li class="nav-item me-lg-2">
                         <a class="btn btn-outline-neon-cyan btn-sm rounded-pill px-3 py-1-5 fw-semibold d-flex align-items-center gap-1 text-uppercase tracking-wide fs-7 transition-all"
-                            href="{{route('create.article')}}">
+                            href="{{ route('create.article') }}">
                             <i class="bi bi-plus-circle-fill"></i> Crea Annuncio
                         </a>
                     </li>
@@ -146,7 +150,7 @@
                                 <hr class="dropdown-divider border-secondary-subtle my-2">
                             </li>
                             <li>
-                                <form action="{{route('logout')}}" method="POST" class="m-0">
+                                <form action="{{ route('logout') }}" method="POST" class="m-0">
                                     @csrf
                                     <button type="submit"
                                         class="dropdown-menu-item-custom w-100 border-0 bg-transparent text-start text-danger-custom fw-semibold d-flex align-items-center">

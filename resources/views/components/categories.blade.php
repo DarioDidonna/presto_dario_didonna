@@ -17,146 +17,30 @@
             </div>
         </div>
 
-        <div id="categoriesCarousel" class="carousel slide" data-bs-ride="false" data-bs-interval="false">
-            <div class="carousel-inner px-1 py-2">
-                
-                <div class="carousel-item active">
-                    <div class="row g-4 justify-content-center">
+        <div class="row g-4 justify-content-center row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-xl-6">
+            
+            @foreach($categories as $category)
+                <div class="col d-flex">
+                    <a href="{{ route('byCategory', ['category' => $category]) }}" class="category-card-wrapper d-flex flex-column align-items-center justify-content-between text-decoration-none text-center p-4 w-100 transition-all">
                         
-                        <div class="col-6 col-sm-4 col-md-3 col-xl-2">
-                            <a href="#" class="category-card-wrapper d-block text-decoration-none text-center p-4 transition-all">
-                                <div class="category-icon-box mb-3 position-relative mx-auto d-flex align-items-center justify-content-center">
-                                    <i class="bi bi-laptop fs-2 text-neon-cyan transition-all"></i>
-                                    <div class="icon-glow-layer"></div>
-                                </div>
-                                <h5 class="category-title text-white fw-semibold mb-1 fs-7 text-uppercase tracking-wide truncate">Elettronica</h5>
-                                <span class="category-counter text-muted-custom fs-8 font-monospace">248 Annunci</span>
-                            </a>
+                        <div class="category-icon-box mb-3 position-relative mx-auto d-flex align-items-center justify-content-center">
+                            <i class="{{ $category->icon ?? 'bi bi-cpu' }} fs-2 text-neon-cyan transition-all"></i>
+                            <div class="icon-glow-layer"></div>
                         </div>
 
-                        <div class="col-6 col-sm-4 col-md-3 col-xl-2">
-                            <a href="#" class="category-card-wrapper d-block text-decoration-none text-center p-4 transition-all">
-                                <div class="category-icon-box mb-3 position-relative mx-auto d-flex align-items-center justify-content-center">
-                                    <i class="fa-solid fa-shirt fa-2x text-neon-cyan transition-all"></i>
-                                    <div class="icon-glow-layer"></div>
-                                </div>
-                                <h5 class="category-title text-white fw-semibold mb-1 fs-7 text-uppercase tracking-wide truncate">Abbigliamento</h5>
-                                <span class="category-counter text-muted-custom fs-8 font-monospace">192 Annunci</span>
-                            </a>
+                        <div>
+                            <h5 class="category-title text-white fw-semibold mb-1 fs-7 text-uppercase tracking-wide truncate" title="{{ $category->name }}">
+                                {{ $category->name }}
+                            </h5>
+                            
+                            <span class="category-counter text-muted-custom fs-8 font-monospace">
+                                {{ $category->articles->count() }} {{ $category->articles->count() == 1 ? 'Annuncio' : 'Annunci' }}
+                            </span>
                         </div>
 
-                        <div class="col-6 col-sm-4 col-md-3 col-xl-2">
-                            <a href="#" class="category-card-wrapper d-block text-decoration-none text-center p-4 transition-all">
-                                <div class="category-icon-box mb-3 position-relative mx-auto d-flex align-items-center justify-content-center">
-                                    <i class="bi bi-palette fs-2 text-neon-cyan transition-all"></i>
-                                    <div class="icon-glow-layer"></div>
-                                </div>
-                                <h5 class="category-title text-white fw-semibold mb-1 fs-7 text-uppercase tracking-wide truncate">Salute e Bellezza</h5>
-                                <span class="category-counter text-muted-custom fs-8 font-monospace">115 Annunci</span>
-                            </a>
-                        </div>
-
-                        <div class="col-6 col-sm-4 col-md-3 col-xl-2">
-                            <a href="#" class="category-card-wrapper d-block text-decoration-none text-center p-4 transition-all">
-                                <div class="category-icon-box mb-3 position-relative mx-auto d-flex align-items-center justify-content-center">
-                                    <i class="fa-solid fa-seedling fa-2x text-neon-cyan transition-all"></i>
-                                    <div class="icon-glow-layer"></div>
-                                </div>
-                                <h5 class="category-title text-white fw-semibold mb-1 fs-7 text-uppercase tracking-wide truncate">Casa e Giardinaggio</h5>
-                                <span class="category-counter text-muted-custom fs-8 font-monospace">310 Annunci</span>
-                            </a>
-                        </div>
-
-                        <div class="col-6 col-sm-4 col-md-3 col-xl-2">
-                            <a href="#" class="category-card-wrapper d-block text-decoration-none text-center p-4 transition-all">
-                                <div class="category-icon-box mb-3 position-relative mx-auto d-flex align-items-center justify-content-center">
-                                    <i class="fa-solid fa-gamepad fa-2x text-neon-cyan transition-all"></i>
-                                    <div class="icon-glow-layer"></div>
-                                </div>
-                                <h5 class="category-title text-white fw-semibold mb-1 fs-7 text-uppercase tracking-wide truncate">Giocattoli</h5>
-                                <span class="category-counter text-muted-custom fs-8 font-monospace">85 Annunci</span>
-                            </a>
-                        </div>
-
-                        <div class="col-6 col-sm-4 col-md-3 col-xl-2">
-                            <a href="#" class="category-card-wrapper d-block text-decoration-none text-center p-4 transition-all">
-                                <div class="category-icon-box mb-3 position-relative mx-auto d-flex align-items-center justify-content-center">
-                                    <i class="bi bi-briefcase fs-2 text-neon-cyan transition-all"></i>
-                                    <div class="icon-glow-layer"></div>
-                                </div>
-                                <h5 class="category-title text-white fw-semibold mb-1 fs-7 text-uppercase tracking-wide truncate">Sport</h5>
-                                <span class="category-counter text-muted-custom fs-8 font-monospace">423 Annunci</span>
-                            </a>
-                        </div>
-
-                    </div>
+                    </a>
                 </div>
-
-                <div class="carousel-item">
-                    <div class="row g-4 justify-content-center">
-                        
-                        
-
-                        <div class="col-6 col-sm-4 col-md-3 col-xl-2">
-                            <a href="#" class="category-card-wrapper d-block text-decoration-none text-center p-4 transition-all">
-                                <div class="category-icon-box mb-3 position-relative mx-auto d-flex align-items-center justify-content-center">
-                                    <i class="fa-solid fa-paw fa-2x text-neon-cyan transition-all"></i>
-                                    <div class="icon-glow-layer"></div>
-                                </div>
-                                <h5 class="category-title text-white fw-semibold mb-1 fs-7 text-uppercase tracking-wide truncate">Animali Domestici</h5>
-                                <span class="category-counter text-muted-custom fs-8 font-monospace">96 Annunci</span>
-                            </a>
-                        </div>
-
-                        
-
-                        <div class="col-6 col-sm-4 col-md-3 col-xl-2">
-                            <a href="#" class="category-card-wrapper d-block text-decoration-none text-center p-4 transition-all">
-                                <div class="category-icon-box mb-3 position-relative mx-auto d-flex align-items-center justify-content-center">
-                                    <i class="bi bi-journal-bookmark-fill fs-2 text-neon-cyan transition-all"></i>
-                                    <div class="icon-glow-layer"></div>
-                                </div>
-                                <h5 class="category-title text-white fw-semibold mb-1 fs-7 text-uppercase tracking-wide truncate">Libri e Riviste</h5>
-                                <span class="category-counter text-muted-custom fs-8 font-monospace">183 Annunci</span>
-                            </a>
-                        </div>
-
-                        <div class="col-6 col-sm-4 col-md-3 col-xl-2">
-                            <a href="#" class="category-card-wrapper d-block text-decoration-none text-center p-4 transition-all">
-                                <div class="category-icon-box mb-3 position-relative mx-auto d-flex align-items-center justify-content-center">
-                                    <i class="fa-solid fa-glasses fa-2x text-neon-cyan transition-all"></i>
-                                    <div class="icon-glow-layer"></div>
-                                </div>
-                                <h5 class="category-title text-white fw-semibold mb-1 fs-7 text-uppercase tracking-wide truncate">Accessori</h5>
-                                <span class="category-counter text-muted-custom fs-8 font-monospace">214 Annunci</span>
-                            </a>
-                        </div>
-
-                        <div class="col-6 col-sm-4 col-md-3 col-xl-2">
-                            <a href="#" class="category-card-wrapper d-block text-decoration-none text-center p-4 transition-all">
-                                <div class="category-icon-box mb-3 position-relative mx-auto d-flex align-items-center justify-content-center">
-                                    <i class="fa-solid fa-car-side fa-2x text-neon-cyan transition-all"></i>
-                                    <div class="icon-glow-layer"></div>
-                                </div>
-                                <h5 class="category-title text-white fw-semibold mb-1 fs-7 text-uppercase tracking-wide truncate">Motori</h5>
-                                <span class="category-counter text-muted-custom fs-8 font-monospace">142 Annunci</span>
-                            </a>
-                        </div>
-
-                    </div>
-                </div>
-
-            </div>
-            <div class="d-flex justify-content-center gap-3 mt-4">
-                <button class="btn btn-outline-neon-cyan rounded-circle p-0 d-flex align-items-center justify-content-center" 
-                        type="button" data-bs-target="#categoriesCarousel" data-bs-slide="prev" style="width: 40px; height: 40px;">
-                    <i class="bi bi-chevron-left fs-5"></i>
-                </button>
-                <button class="btn btn-outline-neon-cyan rounded-circle p-0 d-flex align-items-center justify-content-center" 
-                        type="button" data-bs-target="#categoriesCarousel" data-bs-slide="next" style="width: 40px; height: 40px;">
-                    <i class="bi bi-chevron-right fs-5"></i>
-                </button>
-            </div>
+            @endforeach
 
         </div>
     </div>

@@ -1,5 +1,5 @@
 /* ==========================================================================
-   1. CORE TOKENS & SYSTEM VARIABLES (Variabili Globali e Proprietà Base)
+   1. CORE TOKENS & GLOBAL STYLES
    ========================================================================== */
 
 :root {
@@ -15,7 +15,7 @@
     --border-color-alpha: rgba(255, 255, 255, 0.08);
 }
 
-html, 
+html,
 body {
     background-color: var(--bg-navbar) !important;
     min-height: 100vh !important;
@@ -26,88 +26,40 @@ body {
     box-sizing: border-box;
 }
 
-/* Utilities Globali e Tipografia */
-.transition-all {
-    transition: all 0.3s ease-in-out !important;
-}
+/* Utilities & Tipografia */
+.transition-all { transition: all 0.3s ease-in-out !important; }
+.tracking-wider { letter-spacing: 0.07em; }
+.fs-7 { font-size: 0.825rem !important; }
+.fs-8 { font-size: 0.7rem !important; }
+.fs-9 { font-size: 0.7rem !important; }
+.fw-black { font-weight: 900; }
+.z-index-2 { z-index: 2; }
+.py-2-5 { padding-top: 0.65rem; padding-bottom: 0.65rem; }
+.truncate { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.max-w-120 { max-width: 120px; }
+.max-w-540 { max-width: 540px; }
+.max-w-600 { max-width: 600px; }
+.max-w-620 { max-width: 620px; }
 
-.tracking-wider {
-    letter-spacing: 0.07em;
-}
-
-.fs-7 {
-    font-size: 0.825rem !important;
-}
-
-.fs-8 {
-    font-size: 0.7rem !important;
-}
-
-.fw-black {
-    font-weight: 900;
-}
-
-.z-index-2 {
-    z-index: 2;
-}
-
-.py-2-5 {
-    padding-top: 0.65rem;
-    padding-bottom: 0.65rem;
-}
-
-.truncate {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.max-w-120 {
-    max-width: 120px;
-}
-
-/* Effetti Glow e Neon Generici */
-.text-glow {
-    text-shadow: 0 0 10px rgba(255, 255, 255, 0.15), 0 0 20px var(--accent-glow);
-}
-
-.text-neon-cyan {
-    color: var(--accent-cyan) !important;
-}
-
-.text-neon-amber {
-    color: var(--accent-amber) !important;
-}
-
-.bg-neon-amber {
-    background-color: var(--accent-amber) !important;
-}
+/* Neon Glow Effects */
+.text-glow { text-shadow: 0 0 10px rgba(255, 255, 255, 0.15), 0 0 20px var(--accent-glow); }
+.text-glow-amber { text-shadow: 0 0 12px rgba(245, 158, 11, 0.4); }
+.text-neon-cyan { color: var(--accent-cyan) !important; }
+.text-neon-amber { color: var(--accent-amber) !important; }
+.bg-neon-amber { background-color: var(--accent-amber) !important; }
+.shadow-cyan { box-shadow: 0 4px 14px var(--accent-glow); }
+.shadow-amber { box-shadow: 0 4px 14px rgba(245, 158, 11, 0.25); }
+.text-muted-custom { color: var(--text-muted-custom) !important; }
 
 @keyframes pulseGlow {
-
-    0%,
-    100% {
-        opacity: 1;
-        transform: scale(1);
-    }
-
-    50% {
-        opacity: 0.7;
-        transform: scale(0.96);
-    }
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.7; transform: scale(0.96); }
 }
-
-.animate-pulse {
-    animation: pulseGlow 2s infinite ease-in-out;
-}
-
-.text-muted-custom {
-    color: var(--text-muted-custom) !important;
-}
+.animate-pulse { animation: pulseGlow 2s infinite ease-in-out; }
 
 
 /* ==========================================================================
-   2. NAVBAR COMPONENT (Elementi di Navigazione Fissi)
+   2. NAVBAR COMPONENT
    ========================================================================== */
 
 .bg-custom-dark {
@@ -141,11 +93,9 @@ body {
     border-bottom-right-radius: 0;
 }
 
-.hover-white:hover {
-    color: var(--text-hover-white) !important;
-}
+.hover-white:hover { color: var(--text-hover-white) !important; }
 
-/* Input di Ricerca in Navbar */
+/* Navbar Search Input */
 .search-group-custom {
     background-color: var(--bg-search);
     border: 1px solid var(--border-color-alpha);
@@ -159,9 +109,7 @@ body {
     box-shadow: 0 0 12px var(--accent-glow);
 }
 
-.bg-search-input {
-    background-color: transparent !important;
-}
+.bg-search-input { background-color: transparent !important; }
 
 .search-input-custom:focus {
     box-shadow: none !important;
@@ -179,7 +127,7 @@ body {
     color: #ffffff;
 }
 
-/* Selettore Lingua e Area Utente */
+/* User Area & Dropdown Menu */
 .lang-selector-link {
     color: var(--text-muted-custom) !important;
     text-decoration: none;
@@ -193,19 +141,9 @@ body {
     background-color: rgba(6, 182, 212, 0.05);
 }
 
-.min-w-xs {
-    min-width: 130px !important;
-}
+.min-w-xs { min-width: 130px !important; }
+.avatar-container { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; }
 
-.avatar-container {
-    width: 32px;
-    height: 32px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-/* Menu Dropdown Animato */
 .custom-dropdown-animate {
     display: block;
     opacity: 0;
@@ -239,7 +177,7 @@ body {
     padding-left: 1.25rem;
 }
 
-/* Pulsanti Avanzati Navbar e Tasti Revisore */
+/* Action Buttons */
 .btn-gradient-primary {
     background: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
     color: #ffffff !important;
@@ -276,15 +214,9 @@ body {
     box-shadow: 0 0 8px rgba(245, 158, 11, 0.25);
 }
 
-/* Hamburger Responsive (Icon Transformation) */
-.custom-toggler {
-    padding: 0.25rem 0.5rem;
-}
-
-.custom-toggler:focus {
-    box-shadow: none !important;
-    outline: none !important;
-}
+/* Responsive Navbar (Hamburger Icon Transformation) */
+.custom-toggler { padding: 0.25rem 0.5rem; }
+.custom-toggler:focus { box-shadow: none !important; outline: none !important; }
 
 .toggler-icon {
     display: block;
@@ -295,19 +227,10 @@ body {
     transition: all 0.2s ease-in-out;
 }
 
-.custom-toggler[aria-expanded="true"] .top-bar {
-    transform: rotate(45deg) translate(5px, 5px);
-}
+.custom-toggler[aria-expanded="true"] .top-bar { transform: rotate(45deg) translate(5px, 5px); }
+.custom-toggler[aria-expanded="true"] .middle-bar { opacity: 0; }
+.custom-toggler[aria-expanded="true"] .bottom-bar { transform: rotate(-45deg) translate(5px, -5px); }
 
-.custom-toggler[aria-expanded="true"] .middle-bar {
-    opacity: 0;
-}
-
-.custom-toggler[aria-expanded="true"] .bottom-bar {
-    transform: rotate(-45deg) translate(5px, -5px);
-}
-
-/* Responsive Navbar Mobile Breakpoints */
 @media (max-width: 991.98px) {
     .navbar-collapse {
         background-color: var(--bg-navbar);
@@ -334,25 +257,17 @@ body {
         box-shadow: none !important;
     }
 
-    .dropdown.show .custom-dropdown-animate {
-        display: block;
-    }
+    .dropdown.show .custom-dropdown-animate { display: block; }
 }
 
 
 /* ==========================================================================
-   3. AUTH VISTAS (Pagine Dedicate a LOGIN.BLADE.PHP e REGISTER.BLADE.PHP)
+   3. AUTHENTICATION VIEWS (Login / Register)
    ========================================================================== */
 
-.presto-auth-wrapper {
-    background-color: var(--bg-navbar);
-}
+.presto-auth-wrapper { background-color: var(--bg-navbar); }
+.text-accent-cyan { color: var(--accent-cyan) !important; }
 
-.text-accent-cyan {
-    color: var(--accent-cyan) !important;
-}
-
-/* Card Principale di Autenticazione */
 .presto-auth-card {
     background-color: var(--bg-navbar);
     border: 1px solid var(--border-color-alpha);
@@ -361,6 +276,7 @@ body {
     position: relative;
 }
 
+/* Sfondo radiale decorativo sfocato */
 .presto-card-glow {
     position: absolute;
     top: -50%;
@@ -383,7 +299,7 @@ body {
     border-radius: 50%;
 }
 
-/* Campi di Input del Form */
+/* Form Input Elements */
 .presto-input-group {
     background-color: var(--bg-search);
     border: 1px solid var(--border-color-alpha);
@@ -397,9 +313,7 @@ body {
     box-shadow: 0 0 10px var(--accent-glow);
 }
 
-.bg-presto-input {
-    background-color: transparent !important;
-}
+.bg-presto-input { background-color: transparent !important; }
 
 .presto-input:focus {
     box-shadow: none !important;
@@ -412,16 +326,10 @@ body {
     transition: color 0.2s ease;
 }
 
-.btn-toggle-password:hover {
-    color: var(--accent-cyan) !important;
-}
+.btn-toggle-password:hover { color: var(--accent-cyan) !important; }
+.presto-link-login:hover { color: var(--text-hover-white) !important; text-shadow: 0 0 8px var(--accent-glow); }
 
-.presto-link-login:hover {
-    color: var(--text-hover-white) !important;
-    text-shadow: 0 0 8px var(--accent-glow);
-}
-
-/* Controllo Stati di Errore (Laravel Validation Framework) */
+/* Controllo Stati di Errore Nativi di Laravel */
 .presto-input-group:has(.is-invalid-custom),
 .presto-input-group.is-invalid-group {
     border-color: #ef4444 !important;
@@ -435,7 +343,6 @@ body {
     align-items: center;
 }
 
-/* Pulsanti d'Azione Autenticazione */
 .btn-custom-cyan {
     background-color: var(--accent-cyan);
     color: var(--bg-navbar) !important;
@@ -447,11 +354,9 @@ body {
     transform: translateY(-1px);
 }
 
-.btn-custom-cyan:active {
-    transform: translateY(0);
-}
+.btn-custom-cyan:active { transform: translateY(0); }
 
-/* Customizzazione Elemento Checkbox (Remember Me) */
+/* Custom Checkbox Dark Theme */
 .presto-checkbox {
     background-color: var(--bg-search) !important;
     border: 1px solid var(--border-color-alpha) !important;
@@ -468,12 +373,9 @@ body {
     box-shadow: 0 0 8px var(--accent-glow) !important;
 }
 
-.presto-checkbox:focus {
-    box-shadow: none !important;
-    border-color: var(--accent-cyan) !important;
-}
+.presto-checkbox:focus { box-shadow: none !important; border-color: var(--accent-cyan) !important; }
 
-/* Override Autocompilazione del Browser Scuro */
+/* Override Autocompilazione Browser Gialla/Bianca */
 .presto-input:-webkit-autofill,
 .presto-input:-webkit-autofill:hover,
 .presto-input:-webkit-autofill:focus {
@@ -483,24 +385,14 @@ body {
 }
 
 @keyframes authFadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(-3px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+    from { opacity: 0; transform: translateY(-3px); }
+    to { opacity: 1; transform: translateY(0); }
 }
-
-.animate-fade-in {
-    animation: authFadeIn 0.3s ease-out;
-}
+.animate-fade-in { animation: authFadeIn 0.3s ease-out; }
 
 
 /* ==========================================================================
-   4. INDEX VIEW (Componenti Esclusivi della Homepage di Presto)
+   4. INDEX & HOMEPAGE VIEW
    ========================================================================== */
 
 /* --- SEZIONE 4A: HERO AREA --- */
@@ -510,6 +402,7 @@ body {
     padding-top: 100px;
 }
 
+/* Griglia Tech di Sfondo */
 .hero-grid-overlay {
     position: absolute;
     inset: 0;
@@ -568,18 +461,10 @@ body {
     box-shadow: 0 0 10px var(--accent-glow);
 }
 
-.shadow-cyan {
-    box-shadow: 0 4px 14px var(--accent-glow);
-}
-
-.max-w-540 {
-    max-width: 540px;
-}
-
-/* Card Fluttuante Lato Destro Hero */
+/* Card Isometria Fluttuante (Hero Visual) */
 .hero-visual-container {
     width: 100%;
-    max-w: 420px;
+    max-width: 420px;
     perspective: 1000px;
 }
 
@@ -627,76 +512,29 @@ body {
 }
 
 @keyframes badgePulse {
-
-    0%,
-    100% {
-        opacity: 0.4;
-        transform: scale(0.9);
-    }
-
-    50% {
-        opacity: 1;
-        transform: scale(1.1);
-    }
+    0%, 100% { opacity: 0.4; transform: scale(0.9); }
+    50% { opacity: 1; transform: scale(1.1); }
 }
-
 @keyframes floatingEffect {
-
-    0%,
-    100% {
-        transform: rotateY(-8deg) rotateX(4deg) translateY(0);
-    }
-
-    50% {
-        transform: rotateY(-6deg) rotateX(3deg) translateY(-8px);
-    }
+    0%, 100% { transform: rotateY(-8deg) rotateX(4deg) translateY(0); }
+    50% { transform: rotateY(-6deg) rotateX(3deg) translateY(-8px); }
 }
-
 @keyframes heroFadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(15px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+    from { opacity: 0; transform: translateY(15px); }
+    to { opacity: 1; transform: translateY(0); }
 }
-
 @keyframes fadeInRight {
-    from {
-        opacity: 0;
-        transform: translateX(20px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
+    from { opacity: 0; transform: translateX(20px); }
+    to { opacity: 1; transform: translateX(0); }
 }
-
 @keyframes movingBar {
-    0% {
-        transform: translateX(-100%);
-    }
-
-    100% {
-        transform: translateX(250%);
-    }
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(250%); }
 }
 
-.animate-fade-in-up {
-    animation: heroFadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-
-.animate-fade-in-right {
-    animation: fadeInRight 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-
-.animate-loading-bar {
-    animation: movingBar 2.5s infinite linear;
-}
+.animate-fade-in-up { animation: heroFadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+.animate-fade-in-right { animation: fadeInRight 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+.animate-loading-bar { animation: movingBar 2.5s infinite linear; }
 
 
 /* --- SEZIONE 4B: MACRO CATEGORIE --- */
@@ -736,9 +574,7 @@ body {
     z-index: -1;
 }
 
-.category-title {
-    transition: color 0.25s ease;
-}
+.category-title { transition: color 0.25s ease; }
 
 .category-counter {
     display: inline-block;
@@ -748,29 +584,22 @@ body {
     border: 1px solid rgba(255, 255, 255, 0.03);
 }
 
+/* Hover Effects Categoria */
 .category-card-wrapper:hover {
     transform: translateY(-5px);
     border-color: var(--accent-cyan);
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
 }
-
 .category-card-wrapper:hover .category-icon-box {
     border-color: var(--accent-cyan);
     box-shadow: 0 0 12px var(--accent-glow);
 }
-
 .category-card-wrapper:hover .bi {
     color: var(--text-hover-white) !important;
     transform: scale(1.1);
 }
-
-.category-card-wrapper:hover .icon-glow-layer {
-    opacity: 1;
-}
-
-.category-card-wrapper:hover .category-title {
-    color: var(--accent-cyan) !important;
-}
+.category-card-wrapper:hover .icon-glow-layer { opacity: 1; }
+.category-card-wrapper:hover .category-title { color: var(--accent-cyan) !important; }
 
 
 /* --- SEZIONE 4C: LIVE ACTIVITY RADAR NETWORK --- */
@@ -793,6 +622,7 @@ body {
     animation: livePulse 1.5s infinite ease-in-out;
 }
 
+/* Radar Layout & Scansione */
 .radar-container {
     width: 100%;
     max-width: 500px;
@@ -812,20 +642,9 @@ body {
     transform: translate(-50%, -50%);
 }
 
-.circle-1 {
-    width: 120px;
-    height: 120px;
-}
-
-.circle-2 {
-    width: 260px;
-    height: 260px;
-}
-
-.circle-3 {
-    width: 400px;
-    height: 400px;
-}
+.circle-1 { width: 120px; height: 120px; }
+.circle-2 { width: 260px; height: 260px; }
+.circle-3 { width: 400px; height: 400px; }
 
 .radar-sweep {
     position: absolute;
@@ -839,6 +658,7 @@ body {
     pointer-events: none;
 }
 
+/* Nodi di Rete Interattivi sul Radar */
 .network-node {
     position: absolute;
     width: 24px;
@@ -869,26 +689,12 @@ body {
     pointer-events: none;
 }
 
-.dot-amber {
-    background-color: var(--accent-amber);
-    box-shadow: 0 0 10px var(--accent-amber);
-}
+.dot-amber { background-color: var(--accent-amber); box-shadow: 0 0 10px var(--accent-amber); }
+.ripple-amber { border-color: var(--accent-amber); }
 
-.ripple-amber {
-    border-color: var(--accent-amber);
-}
-
-.delay-1 .node-ripple {
-    animation-delay: 0.5s;
-}
-
-.delay-2 .node-ripple {
-    animation-delay: 1s;
-}
-
-.delay-3 .node-ripple {
-    animation-delay: 1.5s;
-}
+.delay-1 .node-ripple { animation-delay: 0.5s; }
+.delay-2 .node-ripple { animation-delay: 1s; }
+.delay-3 .node-ripple { animation-delay: 1.5s; }
 
 .radar-log-panel {
     position: absolute;
@@ -902,48 +708,16 @@ body {
 }
 
 @keyframes livePulse {
-
-    0%,
-    100% {
-        opacity: 0.3;
-        transform: scale(0.9);
-    }
-
-    50% {
-        opacity: 1;
-        transform: scale(1.2);
-    }
+    0%, 100% { opacity: 0.3; transform: scale(0.9); }
+    50% { opacity: 1; transform: scale(1.2); }
 }
+@keyframes radarSweep { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+@keyframes rippleOut { 0% { transform: scale(0.5); opacity: 1; } 100% { transform: scale(2.5); opacity: 0; } }
 
-@keyframes radarSweep {
-    from {
-        transform: rotate(0deg);
-    }
-
-    to {
-        transform: rotate(360deg);
-    }
-}
-
-@keyframes rippleOut {
-    0% {
-        transform: scale(0.5);
-        opacity: 1;
-    }
-
-    100% {
-        transform: scale(2.5);
-        opacity: 0;
-    }
-}
-
-.network-node:hover .node-dot {
-    transform: scale(1.4);
-    background-color: #ffffff;
-}
+.network-node:hover .node-dot { transform: scale(1.4); background-color: #ffffff; }
 
 
-/* --- SEZIONE 4D: COME FUNZIONA --- */
+/* --- SEZIONE 4D: HOW IT WORKS --- */
 .presto-how-section {
     background-color: var(--bg-navbar);
     border-top: 1px solid var(--border-color-alpha);
@@ -954,6 +728,7 @@ body {
     border: 1px solid var(--border-color-alpha);
 }
 
+/* Linea laser di connessione tra i passi */
 .laser-connection-line {
     position: absolute;
     top: 61%;
@@ -990,41 +765,18 @@ body {
     border-radius: 50%;
 }
 
-.step-card:has(.text-neon-amber) .step-icon-wrapper {
-    border-color: rgba(245, 158, 11, 0.2);
-}
+/* Selettori complessi basati sullo stato delle card figlie (:has) */
+.step-card:has(.text-neon-amber) .step-icon-wrapper { border-color: rgba(245, 158, 11, 0.2); }
 
-.step-card:hover {
-    border-color: var(--accent-cyan);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.25);
-    transform: translateY(-4px);
-}
-
-.step-card:has(.text-neon-amber):hover {
-    border-color: var(--accent-amber);
-    box-shadow: 0 10px 20px rgba(245, 158, 11, 0.15);
-}
-
-.step-card:hover .step-icon-wrapper {
-    border-color: var(--accent-cyan);
-    box-shadow: 0 0 10px var(--accent-glow);
-}
-
-.step-card:has(.text-neon-amber):hover .step-icon-wrapper {
-    border-color: var(--accent-amber);
-    box-shadow: 0 0 10px rgba(245, 158, 11, 0.3);
-}
-
-.step-card:hover .step-number-badge {
-    color: rgba(6, 182, 212, 0.12);
-}
-
-.step-card:has(.text-neon-amber):hover .step-number-badge {
-    color: rgba(245, 158, 11, 0.12);
-}
+.step-card:hover { border-color: var(--accent-cyan); box-shadow: 0 10px 20px rgba(0, 0, 0, 0.25); transform: translateY(-4px); }
+.step-card:has(.text-neon-amber):hover { border-color: var(--accent-amber); box-shadow: 0 10px 20px rgba(245, 158, 11, 0.15); }
+.step-card:hover .step-icon-wrapper { border-color: var(--accent-cyan); box-shadow: 0 0 10px var(--accent-glow); }
+.step-card:has(.text-neon-amber):hover .step-icon-wrapper { border-color: var(--accent-amber); box-shadow: 0 0 10px rgba(245, 158, 11, 0.3); }
+.step-card:hover .step-number-badge { color: rgba(6, 182, 212, 0.12); }
+.step-card:has(.text-neon-amber):hover .step-number-badge { color: rgba(245, 158, 11, 0.12); }
 
 
-/* --- SEZIONE 4E: REVISOR CALL TO ACTION --- */
+/* --- SEZIONE 4E: REVISOR CTA --- */
 .presto-revisor-cta {
     background-color: var(--bg-navbar);
     border-top: 1px solid var(--border-color-alpha);
@@ -1047,8 +799,10 @@ body {
     border-color: var(--border-color-alpha) !important;
     position: relative;
     overflow: hidden;
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease;
 }
 
+/* Barra verticale arancione al neon sul bordo sinistro */
 .revisor-card::before {
     content: '';
     position: absolute;
@@ -1065,54 +819,22 @@ body {
     border: 1px solid rgba(245, 158, 11, 0.15);
 }
 
-.text-glow-amber {
-    text-shadow: 0 0 12px rgba(245, 158, 11, 0.4);
-}
-
-.max-w-620 {
-    max-width: 620px;
-}
-
 .btn-gradient-amber {
     background: linear-gradient(135deg, var(--accent-amber) 0%, #d97706 100%);
     color: #0a0f1d !important;
 }
 
-.shadow-amber {
-    box-shadow: 0 4px 14px rgba(245, 158, 11, 0.25);
-}
-
-.revisor-card {
-    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease;
-}
-
-.revisor-card:hover {
-    transform: translateY(-2px);
-    border-color: rgba(245, 158, 11, 0.2) !important;
-}
-
-.btn-gradient-amber:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(245, 158, 11, 0.4);
-    filter: brightness(1.08);
-}
-
-.btn-gradient-amber:active {
-    transform: translateY(0);
-}
+.revisor-card:hover { transform: translateY(-2px); border-color: rgba(245, 158, 11, 0.2) !important; }
+.btn-gradient-amber:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(245, 158, 11, 0.4); filter: brightness(1.08); }
+.btn-gradient-amber:active { transform: translateY(0); }
 
 
 /* ==========================================================================
-   5. FOOTER COMPONENT (Chiusura Grafica del Layout)
+   5. FOOTER COMPONENT
    ========================================================================== */
 
-.bg-footer-dark {
-    background-color: #070b16;
-}
-
-.border-top-alpha {
-    border-top: 1px solid rgba(255, 255, 255, 0.05);
-}
+.bg-footer-dark { background-color: #070b16; }
+.border-top-alpha { border-top: 1px solid rgba(255, 255, 255, 0.05); }
 
 .border-bottom-cyan {
     border-bottom: 2px solid var(--accent-cyan);
@@ -1120,16 +842,8 @@ body {
     padding-bottom: 4px;
 }
 
-.footer-static-info {
-    color: #64748b;
-    display: inline-flex;
-    align-items: center;
-    font-size: 0.825rem;
-}
-
-.footer-system-status {
-    color: #475569;
-}
+.footer-static-info { color: #64748b; display: inline-flex; align-items: center; font-size: 0.825rem; }
+.footer-system-status { color: #475569; }
 
 .status-indicator-green {
     width: 8px;
@@ -1153,7 +867,6 @@ body {
     transform: translateX(3px);
 }
 
-/* Collegamenti ai Profili Social */
 .social-icon-link {
     width: 34px;
     height: 34px;
@@ -1177,60 +890,37 @@ body {
 
 
 /* ==========================================================================
-   6. FORM & CONTENT CREATION VISTAS (Articoli, Form di Inserimento & Livewire)
+   6. ARTICLE CRUD & LIVEWIRE FORMS
    ========================================================================== */
 
-/* Container Generale della pagina di creazione */
-.article-create-wrapper {
-    background-color: var(--bg-navbar);
-    min-height: 85vh;
-}
-
-/* Override delle Card generiche per i Form di Inserimento */
-.card.bg-navbar {
-    background-color: var(--bg-navbar) !important;
-    border: 1px solid var(--border-color-alpha) !important;
-}
-
-.card.border-neon-cyan {
-    border-color: var(--accent-cyan) !important;
-    box-shadow: 0 0 15px rgba(6, 182, 212, 0.15) !important;
-}
-
-/* Container a tutto schermo per centrare il form */
-/* Container a tutto schermo con protezione per la Navbar */
+/* Layout per la pagina di creazione (Protegge da sovrapposizioni Navbar/Footer) */
 .article-create-wrapper {
     background-color: var(--bg-navbar) !important;
-    
-    /* Occupa l'intera altezza visibile del browser al netto di navbar e footer */
-    min-height: calc(100vh - 76px - 92px); 
-    
+    min-height: calc(100vh - 76px - 92px);
     display: flex;
     flex-direction: column;
-    
-    /* 1. Questo padding-top protegge il form: la navbar non lo sormonterà MAI */
-    padding-top: 100px !important; 
+    padding-top: 100px !important;
     padding-bottom: 60px !important;
     padding-left: 1rem;
     padding-right: 1rem;
-    
     margin: 0 !important;
     box-sizing: border-box;
 }
 
-/* 2. Nuovo allineamento per la card interna */
 .article-create-wrapper .card {
     width: 100%;
     max-width: 650px;
-    
-    /* Centra la card orizzontalmente e gestisce lo spazio verticale in modo sicuro */
     margin-left: auto !important;
     margin-right: auto !important;
-    margin-top: 0 !important; 
-    margin-bottom: auto !important; 
+    margin-top: 0 !important;
+    margin-bottom: auto !important;
 }
 
-/* Inputs, Selects e Textarea all'interno dei Form di Creazione */
+/* Card Overrides */
+.card.bg-navbar { background-color: var(--bg-navbar) !important; border: 1px solid var(--border-color-alpha) !important; }
+.card.border-neon-cyan { border-color: var(--accent-cyan) !important; box-shadow: 0 0 15px rgba(6, 182, 212, 0.15) !important; }
+
+/* Form Control Stylings */
 .card-body form .form-control,
 .card-body form .form-select {
     background-color: var(--bg-search) !important;
@@ -1241,7 +931,6 @@ body {
     transition: all 0.25s ease-in-out;
 }
 
-/* Effetti di Focus (Neon Glow Cyan) */
 .card-body form .form-control:focus,
 .card-body form .form-select:focus {
     border-color: var(--accent-cyan) !important;
@@ -1250,38 +939,76 @@ body {
     outline: none;
 }
 
-/* Placeholder personalizzati per tema scuro */
-.card-body form .form-control::placeholder {
-    color: #475569 !important;
-    opacity: 1;
-}
+.card-body form .form-control::placeholder { color: #475569 !important; opacity: 1; }
+.card-body form .input-group-text { background-color: var(--bg-navbar) !important; border: 1px solid var(--border-color-alpha) !important; color: var(--text-muted-custom) !important; }
 
-/* Stile per l'Input Group del Prezzo */
-.card-body form .input-group-text {
-    background-color: var(--bg-navbar) !important;
-    border: 1px solid var(--border-color-alpha) !important;
-    color: var(--text-muted-custom) !important;
-}
-
-/* Integrazione degli stati di Errore Nativi di Bootstrap generati da Livewire */
+/* Livewire Validation Overrides */
 .card-body form .form-control.is-invalid,
 .card-body form .form-select.is-invalid,
 .card-body form .input-group:has(.is-invalid) {
     border-color: #ef4444 !important;
     box-shadow: 0 0 8px rgba(239, 68, 68, 0.25) !important;
     background-image: none !important;
-    /* Rimuove l'icona di default di Bootstrap se disturba il layout */
 }
 
-.card-body form .invalid-feedback {
-    color: #f87171 !important;
-    font-size: 0.775rem;
-    margin-top: 0.25rem;
+.card-body form .invalid-feedback { color: #f87171 !important; font-size: 0.775rem; margin-top: 0.25rem; }
+.card-body form .form-select option { background-color: var(--bg-navbar) !important; color: #ffffff !important; }
+
+
+/* ==========================================================================
+   7. ARCHIVE & CATALOG VIEWS (Index / Category Lists)
+   ========================================================================== */
+
+.article-index-wrapper { background-color: var(--bg-navbar) !important; min-height: 50vh; }
+.bg-navbar-dark { background-color: #0d1424 !important; }
+.bg-glow-radial { background: radial-gradient(circle, rgba(6, 182, 212, 0.4) 0%, rgba(0, 0, 0, 0) 70%); filter: blur(20px); }
+.border-dashed { border-style: dashed !important; }
+.bg-main-dark { background-color: var(--bg-navbar) !important; min-height: 60vh; }
+
+/* Cyber Spacing Background Lights */
+.cyber-glow-1 {
+    position: absolute;
+    top: -10%;
+    right: -10%;
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle, rgba(6, 182, 212, 0.15) 0%, rgba(0, 0, 0, 0) 70%);
+    filter: blur(40px);
+    pointer-events: none;
 }
 
-/* Fix per le opzioni del tag Select nei sistemi operativi scuri */
-.card-body form .form-select option {
-    background-color: var(--bg-navbar) !important;
-    color: #ffffff !important;
+/* Article Cards Structure */
+.card-hover { transition: transform 0.25s ease-in-out, box-shadow 0.25s ease-in-out !important; }
+.card-hover:hover { transform: translateY(-5px); box-shadow: 0 10px 25px rgba(6, 182, 212, 0.25) !important; }
+
+.text-truncate-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
 }
 
+.hover-glow-amber:hover {
+    background-color: var(--accent-amber) !important;
+    color: #0a0f1d !important;
+    box-shadow: 0 0 10px var(--accent-amber);
+}
+
+/* Bootstrap Pagination Dark Styling Override */
+.pagination-cyber .page-link {
+    background-color: #131b2e !important;
+    border-color: rgba(6, 182, 212, 0.2) !important;
+    color: #cbd5e1 !important;
+}
+
+.pagination-cyber .page-item.active .page-link {
+    background: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%) !important;
+    border-color: #06b6d4 !important;
+    color: #0a0f1d !important;
+    font-weight: bold;
+}
+
+.pagination-cyber .page-link:hover {
+    border-color: #06b6d4 !important;
+    box-shadow: 0 0 10px rgba(6, 182, 212, 0.3);
+}
