@@ -11,11 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('categories', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->string('icon')->nullable();
-            $table->timestamps();
+        Schema::table('articles', function (Blueprint $table) {
+            $table->boolean('is_accepted')->nullable()->after('user_id');
         });
     }
 
@@ -24,6 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('categories');
+        Schema::table('articles', function (Blueprint $table) {
+            $table->dropColumn('is_accepted');
+        });
     }
 };

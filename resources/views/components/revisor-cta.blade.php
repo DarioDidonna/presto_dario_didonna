@@ -29,7 +29,7 @@
                         </div>
 
                         <div class="col-12 col-md-4 text-center text-md-end">
-                            <a href="#"
+                            <a href="{{route('become.revisor')}}"
                                 class="btn btn-gradient-amber border-0 rounded-pill px-4 py-3 fw-bold text-uppercase tracking-wider fs-7 shadow shadow-amber transition-all"
                                 id="btnBecomeRevisor">
                                 <i class="bi bi-file-earmark-person-fill me-2"></i> Invia Candidatura

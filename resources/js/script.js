@@ -105,12 +105,12 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                 element.textContent = startValue;
             }
-        }, Math.max(stepTime, 15)); 
+        }, Math.max(stepTime, 15));
     };
 
     setTimeout(() => {
-        animateCounter(announcementCounter, 1420, 1500); 
-        animateCounter(userCounter, 84, 1200);        
+        animateCounter(announcementCounter, 1420, 1500);
+        animateCounter(userCounter, 84, 1200);
     }, 400);
 
     if (exploreBtn) {
@@ -176,7 +176,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     setTimeout(() => {
                         entry.target.style.opacity = '1';
                         entry.target.style.transform = 'translateY(0)';
-                    }, index * 120); 
+                    }, index * 120);
                     observer.unobserve(entry.target);
                 }
             });
@@ -257,7 +257,7 @@ document.addEventListener('DOMContentLoaded', () => {
 function togglePasswordVisibility(inputId, button) {
     const input = document.getElementById(inputId);
     const icon = button.querySelector('i');
-    
+
     if (input.type === 'password') {
         input.type = 'text';
         icon.classList.replace('bi-eye-slash', 'bi-eye');
@@ -266,3 +266,4 @@ function togglePasswordVisibility(inputId, button) {
         icon.classList.replace('bi-eye', 'bi-eye-slash');
     }
 }
+

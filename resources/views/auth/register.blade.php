@@ -1,19 +1,15 @@
-<!-- resources/views/auth/register.blade.php -->
-<x-layout> {{-- O il tuo tag di layout principale --}}
+<x-layout> 
     <div
         class="presto-auth-wrapper min-vh-100 d-flex align-items-center justify-content-center position-relative overflow-hidden py-5 my-5 mb-0">
 
-        <!-- Il bagliore radiale ciano di sfondo che hai definito nel CSS -->
         <div class="presto-card-glow"></div>
 
         <div class="container position-relative z-index-2">
             <div class="row justify-content-center">
                 <div class="col-12 col-sm-10 col-md-8 col-lg-6 col-xl-5">
 
-                    <!-- Card Contenitore Presto (Usa var(--bg-navbar) internamente) -->
                     <div class="presto-auth-card p-4 p-sm-5 shadow-lg">
 
-                        <!-- Header della Card -->
                         <div class="text-center mb-4">
                             <div class="presto-icon-wrapper mb-3">
                                 <i class="bi bi-person-plus-fill text-accent-cyan fs-3"></i>
@@ -24,11 +20,9 @@
                             <p class="text-muted-custom fs-7 mb-0">Unisciti alla community di Presto</p>
                         </div>
 
-                        <!-- Form di Registrazione -->
                         <form method="POST" action="{{ route('register') }}" novalidate>
                             @csrf
 
-                            <!-- Campo Nome -->
                             <div class="mb-3">
                                 <label for="name"
                                     class="form-label text-white-50 fs-7 text-uppercase tracking-wider fw-bold">Nome
@@ -47,7 +41,6 @@
                                 @enderror
                             </div>
 
-                            <!-- Campo Email -->
                             <div class="mb-3">
                                 <label for="email"
                                     class="form-label text-white-50 fs-7 text-uppercase tracking-wider fw-bold">Indirizzo
@@ -66,7 +59,6 @@
                                 @enderror
                             </div>
 
-                            <!-- Campo Password -->
                             <div class="mb-3">
                                 <label for="password"
                                     class="form-label text-white-50 fs-7 text-uppercase tracking-wider fw-bold">Password</label>
@@ -88,7 +80,6 @@
                                 @enderror
                             </div>
 
-                            <!-- Campo Conferma Password -->
                             <div class="mb-4">
                                 <label for="password_confirmation"
                                     class="form-label text-white-50 fs-7 text-uppercase tracking-wider fw-bold">Conferma
@@ -105,13 +96,11 @@
                                 </div>
                             </div>
 
-                            <!-- Pulsante Registrati -->
                             <button type="submit"
-                                class="btn btn-custom-cyan w-100 rounded-pill py-2-5 fw-bold text-uppercase tracking-wider fs-7 mb-3 transition-all">
+                                class="btn btn-info text-dark w-100 rounded-pill py-2 fw-bold text-uppercase tracking-wider fs-7 mb-3 shadow">
                                 Registrati <i class="bi bi-arrow-right-short ms-1"></i>
                             </button>
 
-                            <!-- Link di Switch alla Login -->
                             <div class="text-center">
                                 <span class="fs-8 text-white-50">Hai già un account?</span>
                                 <a href="{{ route('login') }}"

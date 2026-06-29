@@ -93,8 +93,15 @@
                             </span>
                         </div>
 
-                        <h1 class="h2 fw-black text-white text-uppercase tracking-tight mb-3">
+                        {{-- <h1 class="h2 fw-black text-white text-uppercase tracking-tight mb-3">
                             {{ $article->title }}
+                        </h1> --}}
+
+                        <h1 class="h2 fw-black text-white text-uppercase tracking-tight mb-3 d-flex flex-wrap align-items-baseline gap-2">
+                            <span>{{ $article->title }}</span>
+                            <span class="fs-7 text-neon-cyan font-monospace fw-normal text-none-transform">
+                                <i class="bi bi-person-fill me-1"></i>Pubblicato da: {{ $article->user->name ?? 'Utente Anonimo' }}
+                            </span>
                         </h1>
 
                         <div
@@ -108,7 +115,7 @@
 
                         <div class="flex-grow-1 mb-4">
                             <h6 class="text-white text-uppercase tracking-wide fs-7 fw-bold mb-2">
-                                <i class="bi bi-file-text me-2 text-neon-cyan"></i>Descrizione Commissione
+                                <i class="bi bi-file-text me-2 text-neon-cyan"></i>Descrizione Articolo
                             </h6>
                             <p class="text-muted-custom fs-6 lh-base text-pre-wrap">{{ $article->description }}</p>
                         </div>

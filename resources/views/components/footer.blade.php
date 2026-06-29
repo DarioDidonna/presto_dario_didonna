@@ -30,12 +30,12 @@
                         </a>
                     </li>
                     <li>
-                        <a href="#" class="footer-link-custom">
+                        <a href="{{ route('article.index') }}" class="footer-link-custom">
                             <i class="bi bi-chevron-right fs-8 me-1"></i> Annunci
                         </a>
                     </li>
                     <li>
-                        <a href="#" class="footer-link-custom">
+                        <a href="{{ route('create.article') }}" class="footer-link-custom">
                             <i class="bi bi-chevron-right fs-8 me-1"></i> Nuovo Annuncio
                         </a>
                     </li>
@@ -48,7 +48,7 @@
                 </h6>
                 <ul class="list-unstyled d-flex flex-column gap-2 fs-7">
                     <li>
-                        <a href="#" class="footer-link-custom d-flex align-items-center gap-1">
+                        <a href="{{ route('revisor.index') }}" class="footer-link-custom d-flex align-items-center gap-1">
                             <i class="bi bi-shield-lock-fill text-neon-amber"></i> Area Revisore
                         </a>
                     </li>

@@ -46,7 +46,7 @@
                         <h4 class="text-white fw-bold text-uppercase tracking-wide mb-2">Nessun annuncio trovato</h4>
                         <p class="text-muted-custom fs-7 mb-4">Non ci sono ancora articoli pubblicati in questa sezione.
                             Sii il primo a inserirne uno!</p>
-                        <a href="{{ route('articles.create') }}"
+                        <a href="{{ route('create.article') }}"
                             class="btn btn-outline-neon-cyan text-uppercase tracking-wider fs-7 fw-bold px-4 py-2">
                             <i class="bi bi-plus-circle me-2"></i> Crea Annuncio
                         </a>
