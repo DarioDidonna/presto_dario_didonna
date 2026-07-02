@@ -26,17 +26,17 @@
                 <ul class="list-unstyled d-flex flex-column gap-2 fs-7">
                     <li>
                         <a href="{{ route('homepage') }}" class="footer-link-custom">
-                            <i class="bi bi-chevron-right fs-8 me-1"></i> Home
+                            <i class="bi bi-chevron-right fs-8 me-1"></i> {{ __('ui.home') }}
                         </a>
                     </li>
                     <li>
                         <a href="{{ route('article.index') }}" class="footer-link-custom">
-                            <i class="bi bi-chevron-right fs-8 me-1"></i> Annunci
+                            <i class="bi bi-chevron-right fs-8 me-1"></i> {{ __('ui.announcements') }}
                         </a>
                     </li>
                     <li>
                         <a href="{{ route('create.article') }}" class="footer-link-custom">
-                            <i class="bi bi-chevron-right fs-8 me-1"></i> Nuovo Annuncio
+                            <i class="bi bi-chevron-right fs-8 me-1"></i> {{ __('ui.new_ad') }}
                         </a>
                     </li>
                 </ul>
@@ -49,7 +49,7 @@
                 <ul class="list-unstyled d-flex flex-column gap-2 fs-7">
                     <li>
                         <a href="{{ route('revisor.index') }}" class="footer-link-custom d-flex align-items-center gap-1">
-                            <i class="bi bi-shield-lock-fill text-neon-amber"></i> Area Revisore
+                            <i class="bi bi-shield-lock-fill text-neon-amber"></i> {{ __('ui.revisor_area') }}
                         </a>
                     </li>
                     <li>
@@ -74,10 +74,10 @@
                 <h6 class="text-white fw-bold text-uppercase tracking-wider fs-7 mb-3 border-bottom-cyan pb-2">
                     Resta Aggiornato
                 </h6>
-                <p class="fs-7 mb-3">Ricevi notifiche in tempo reale appena vengono pubblicati annunci di tuo interesse.</p>
+                <p class="fs-7 mb-3">{{ __('ui.newsletter_text') }}</p>
                 <form class="footer-newsletter-form" id="newsletterForm">
                     <div class="input-group search-group-custom">
-                        <input type="email" class="form-control bg-search-input border-0 text-white search-input-custom ps-3 py-2 fs-7" placeholder="Inserisci la tua email" aria-label="Email" required>
+                        <input type="email" class="form-control bg-search-input border-0 text-white search-input-custom ps-3 py-2 fs-7" placeholder="{{ __('ui.email_placeholder') }}" aria-label="Email" required>
                         <button class="btn btn-search-submit border-0 px-3 transition-all" type="submit">
                             <i class="bi bi-send-fill fs-7"></i>
                         </button>

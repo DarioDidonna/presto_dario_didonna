@@ -9,7 +9,7 @@
                 </a>
             @else
                 <span class="badge bg-transparent border border-secondary text-muted fs-9 text-uppercase tracking-wider">
-                    Senza Categoria
+                    {{ __('ui.no_category') }}
                 </span>
             @endif
         </div>
@@ -28,7 +28,7 @@
             </span>
             
             <a href="{{ route('article.show', compact('article')) }}" class="btn btn-sm btn-outline-neon-cyan text-uppercase tracking-wide fs-8 fw-bold transition-all">
-                Dettaglio <i class="bi bi-arrow-right-short ms-1"></i>
+                {{ __('ui.details') }} <i class="bi bi-arrow-right-short ms-1"></i>
             </a>
         </div>
     </div>

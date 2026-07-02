@@ -1493,3 +1493,14 @@ body {
     transform: translateY(-5px);
     box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .15) !important;
 }
+
+
+
+.flag-hover {
+    transition: transform 0.2s ease, filter 0.2s ease;
+}
+
+.flag-hover:hover {
+    transform: scale(1.1);
+    filter: brightness(1.1);
+}

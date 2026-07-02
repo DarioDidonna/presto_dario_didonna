@@ -6,10 +6,10 @@
             
             <div class="card-header border-0 bg-transparent pb-0">
                 <h3 class="fw-black text-white text-uppercase tracking-tight mb-1">
-                    Inserisci <span class="text-glow text-neon-cyan">Annuncio</span>
+                    {{ __('ui.insert') }} <span class="text-glow text-neon-cyan">{{ __('ui.ad') }}</span>
                 </h3>
                 <p class="text-muted-custom fs-7 mb-0">
-                    Compila i campi sottostanti per pubblicare la tua commissione su Presto.it
+                    {{ __('ui.create_ad_description') }}
                 </p>
             </div>
 

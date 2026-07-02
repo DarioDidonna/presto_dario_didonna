@@ -13,11 +13,10 @@
     <form wire:submit.prevent="store">
 
         <div class="mb-3">
-            <label for="title" class="form-label text-uppercase tracking-wide fs-8 fw-semibold text-white-50">Titolo
-                Annuncio</label>
+            <label for="title" class="form-label text-uppercase tracking-wide fs-8 fw-semibold text-white-50">{{ __('ui.title') }}</label>
             <input type="text" wire:model.blur="title" id="title"
                 class="form-control bg-dark border-secondary text-white @error('title') is-invalid @enderror"
-                placeholder="Es. iPhone 15 Pro Max 256GB">
+                placeholder="{{ __('ui.placeholder_title') }}">
             @error('title')
                 <div class="invalid-feedback font-monospace fs-8">{{ $message }}</div>
             @enderror
@@ -26,8 +25,7 @@
         <div class="row">
             <div class="col-12 col-md-6 mb-3">
                 <label for="price"
-                    class="form-label text-uppercase tracking-wide fs-8 fw-semibold text-white-50">Prezzo
-                    (€)</label>
+                    class="form-label text-uppercase tracking-wide fs-8 fw-semibold text-white-50">{{ __('ui.price_label') }}</label>
                 <div class="input-group">
                     <span class="input-group-text bg-dark border-secondary text-white-50">€</span>
                     <input type="number" step="0.01" wire:model.blur="price" id="price"
@@ -41,10 +39,10 @@
 
             <div class="col-12 col-md-6 mb-3">
                 <label for="category"
-                    class="form-label text-uppercase tracking-wide fs-8 fw-semibold text-white-50">Categoria</label>
+                    class="form-label text-uppercase tracking-wide fs-8 fw-semibold text-white-50">{{ __('ui.category') }}</label>
                 <select wire:model.blur="category" id="category"
                     class="form-select bg-dark border-secondary text-white @error('category') is-invalid @enderror">
-                    <option value="">Seleziona una categoria</option>
+                    <option value="">{{ __('ui.select_category') }}</option>
 
                     @foreach ($categories as $cat)
                         <option value="{{ $cat->id }}">{{ $cat->name }}</option>
@@ -58,11 +56,10 @@
 
         <div class="mb-4">
             <label for="description"
-                class="form-label text-uppercase tracking-wide fs-8 fw-semibold text-white-50">Descrizione del
-                servizio o prodotto</label>
+                class="form-label text-uppercase tracking-wide fs-8 fw-semibold text-white-50">{{ __('ui.description_label') }}</label>
             <textarea wire:model.blur="description" id="description" rows="5"
                 class="form-control bg-dark border-secondary text-white @error('description') is-invalid @enderror"
-                placeholder="Fornisci quanti più dettagli possibili..."></textarea>
+                placeholder="{{ __('ui.description_placeholder') }}"></textarea>
             @error('description')
                 <div class="invalid-feedback font-monospace fs-8">{{ $message }}</div>
             @enderror
@@ -72,11 +69,11 @@
             <button type="submit"
                 class="btn btn-outline-neon-cyan px-4 py-2 text-uppercase tracking-wider fs-7 fw-bold transition-all">
                 <span wire:loading.remove wire:target="store">
-                    <i class="bi bi-plus-circle me-2"></i> Pubblica Annuncio
+                    <i class="bi bi-plus-circle me-2"></i> {{ __('ui.publish_ad') }}
                 </span>
                 <span wire:loading wire:target="store">
                     <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                    Elaborazione...
+                    {{ __('ui.processing') }}
                 </span>
             </button>
         </div>

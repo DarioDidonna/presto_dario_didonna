@@ -4,7 +4,7 @@
         <div class="row py-5 justify-content-center align-items-center text-center">
             <div class="col-12 pt-5">
                 <h1 class="display-2 fw-black text-white text-uppercase tracking-tight">
-                    Articoli della categoria
+                    {{ __('ui.category_articles') }}
                     <span class="fst-italic fw-bold text-glow text-neon-cyan">{{ $category->name }}</span>
                 </h1>
             </div>
@@ -24,13 +24,13 @@
                         <i class="bi bi-tag-fill text-neon-amber"></i>
                     </div>
                     <h3 class="text-white fw-bold text-uppercase tracking-wide">
-                        Non sono ancora stati creati articoli per questa categoria!
+                        {{ __('ui.no_articles_in_category') }}
                     </h3>
 
                     @auth
                         <a class="btn btn-cyber-gradient my-5 text-uppercase tracking-wider fs-7 fw-bold"
                             href="{{ route('create.article') }}">
-                            <i class="bi bi-plus-circle me-2"></i>Pubblica un articolo
+                            <i class="bi bi-plus-circle me-2"></i>{{ __('ui.publish_article') }}
                         </a>
                     @endauth
                 </div>

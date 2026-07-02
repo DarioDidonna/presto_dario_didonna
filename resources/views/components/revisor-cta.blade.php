@@ -13,18 +13,15 @@
                             <div
                                 class="d-inline-flex align-items-center gap-2 revisor-badge px-3 py-1 rounded-pill mb-3 mx-auto mx-md-0">
                                 <i class="bi bi-shield-fill text-neon-amber fs-7 animate-pulse"></i>
-                                <span class="text-uppercase tracking-wider fs-8 fw-bold text-white">Unisciti alla
-                                    Community</span>
+                                <span class="text-uppercase tracking-wider fs-8 fw-bold text-white">{{ __('ui.join_community_badge') }}</span>
                             </div>
 
                             <h2 class="fw-black text-white text-uppercase tracking-tight display-6 mb-3">
-                                Diventa un <span class="text-glow-amber text-neon-amber">Revisore</span> di Presto
+                                {{ __('ui.become_revisor_title') }} <span class="text-glow-amber text-neon-amber">{{ __('ui.revisor') }}</span> {{ __('ui.of_presto') }}
                             </h2>
 
                             <p class="text-muted-custom fs-6 mb-0 max-w-620">
-                                Aiutaci a mantenere il nostro marketplace sicuro, affidabile e libero dallo spam. Entra
-                                a far parte del team di controllo: potrai esaminare gli annunci in entrata e approvarli
-                                o rifiutarli in tempo reale direttamente dalla tua dashboard personale.
+                                {{ __('ui.become_revisor_description') }}
                             </p>
                         </div>
 
@@ -32,7 +29,7 @@
                             <a href="{{route('become.revisor')}}"
                                 class="btn btn-gradient-amber border-0 rounded-pill px-4 py-3 fw-bold text-uppercase tracking-wider fs-7 shadow shadow-amber transition-all"
                                 id="btnBecomeRevisor">
-                                <i class="bi bi-file-earmark-person-fill me-2"></i> Invia Candidatura
+                                <i class="bi bi-file-earmark-person-fill me-2"></i> {{ __('ui.apply_now') }}
                             </a>
                         </div>
 

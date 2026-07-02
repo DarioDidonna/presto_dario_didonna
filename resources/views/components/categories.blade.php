@@ -5,14 +5,13 @@
             <div class="col-12 col-md-8 text-center">
                 <div class="d-inline-flex align-items-center gap-2 category-pre-title px-3 py-1 rounded-pill mb-2">
                     <i class="bi bi-tags-fill text-neon-cyan fs-7"></i>
-                    <span class="text-uppercase tracking-wider fs-8 fw-bold text-white-50">Sfoglia il catalogo</span>
+                    <span class="text-uppercase tracking-wider fs-8 fw-bold text-white-50">{{ __('ui.browse_catalog') }}</span>
                 </div>
                 <h2 class="fw-black text-white text-uppercase tracking-tight display-6 mb-3">
-                    Macro <span class="text-glow text-neon-cyan">Categorie</span>
+                    {{ __('ui.main_categories') }} <span class="text-glow text-neon-cyan">{{ __('ui.categories') }}</span>
                 </h2>
                 <p class="text-muted-custom fs-6 max-w-540 mx-auto">
-                    Seleziona una delle aree principali del nostro portale per trovare in pochi istanti gli annunci e le
-                    commissioni più rilevanti per te.
+                    {{ __('ui.categories_description') }}
                 </p>
             </div>
         </div>
@@ -34,7 +33,7 @@
                             </h5>
                             
                             <span class="category-counter text-muted-custom fs-8 font-monospace">
-                                {{ $category->articles->count() }} {{ $category->articles->count() == 1 ? 'Annuncio' : 'Annunci' }}
+                                {{ $category->articles->count() }} {{ $category->articles->count() == 1 ? __('ui.single_ad') : __('ui.ads') }}
                             </span>
                         </div>
 

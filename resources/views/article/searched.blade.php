@@ -3,14 +3,14 @@
         <div class="container">
             <div class="row align-items-center my-5">
                 <div class="col-12 col-md-8 text-center text-md-start">
-                    <p class="text-uppercase text-muted fw-bold small mb-1">Esplora il Marketplace</p>
+                    <p class="text-uppercase text-muted fw-bold small mb-1">{{ __('ui.explore_marketplace') }}</p>
                     <h1 class="fw-bold display-5 mb-2">
-                        Risultati per: <span class="text-primary">"{{ $query }}"</span>
+                        {{ __('ui.results_for') }}: <span class="text-primary">"{{ $query }}"</span>
                     </h1>
                 </div>
                 <div class="col-12 col-md-4 text-center text-md-end mt-3 mt-md-0">
                     <span class="badge bg-dark rounded-pill px-3 py-2 fs-6">
-                        {{ $articles->total() }} {{ $articles->total() == 1 ? 'annuncio trovato' : 'annunci trovati' }}
+                        {{ $articles->total() }} {{ $articles->total() == 1 ? __('ui.single_result') : __('ui.results_found') }}
                     </span>
                 </div>
             </div>
@@ -30,10 +30,10 @@
                     <div class="mb-4">
                         <i class="bi bi-search-heart text-muted display-1"></i>
                     </div>
-                    <h2 class="fw-bold text-secondary">Nessun articolo corrisponde alla tua ricerca</h2>
-                    <p class="text-muted mb-4">Controlla se ci sono errori di battitura o prova a cercare un termine diverso.</p>
+                    <h2 class="fw-bold text-secondary">{{ __('ui.no_articles_match') }}</h2>
+                    <p class="text-muted mb-4">{{ __('ui.search_tip') }}</p>
                     <a href="{{ route('article.index') }}" class="btn btn-primary px-4 py-2 rounded-pill shadow-sm">
-                        <i class="bi bi-arrow-left me-2"></i>Torna a tutti gli annunci
+                        <i class="bi bi-arrow-left me-2"></i>{{ __('ui.back_to_all_ads') }}
                     </a>
                 </div>
             @endforelse

@@ -8,30 +8,27 @@
             <div class="col-12 col-lg-6 text-center text-lg-start animate-fade-in-up">
                 <div class="d-inline-flex align-items-center gap-2 hero-badge px-3 py-1 rounded-pill mb-3">
                     <span class="badge-pulse-dot"></span>
-                    <span class="text-uppercase tracking-wider fs-8 fw-bold text-neon-cyan">La rivoluzione degli
-                        annunci</span>
+                    <span class="text-uppercase tracking-wider fs-8 fw-bold text-neon-cyan">{{ __('ui.hero_badge') }}</span>
                 </div>
 
                 <h1 class="display-4 fw-black text-white text-uppercase tracking-tight mb-3">
-                    Vendi e Compra <br class="d-none d-sm-inline">
-                    <span class="text-glow text-gradient-cyan-amber">In Un Lampo</span>
+                    {{ __('ui.hero_title_line1') }} <br class="d-none d-sm-inline">
+                    <span class="text-glow text-gradient-cyan-amber">{{ __('ui.hero_title_line2') }}</span>
                 </h1>
 
                 <p class="lead text-muted-custom mb-4 fs-5 lh-base max-w-540 mx-auto mx-lg-0">
-                    Benvenuto su <strong class="text-white">Presto.it</strong>, la piattaforma di annunci di nuova
-                    generazione ottimizzata, ultra-veloce e sicura. Pubblica subito le tue commissioni o trova l'affare
-                    che stai cercando.
+                    {{ __('ui.hero_description') }}
                 </p>
 
                 <div class="d-flex flex-column flex-sm-row justify-content-center justify-content-lg-start gap-3">
                     <a href="{{route('create.article')}}"
                         class="btn btn-gradient-primary border-0 rounded-pill px-4 py-2-5 fw-bold text-uppercase tracking-wider fs-7 shadow shadow-cyan transition-all">
-                        <i class="bi bi-plus-circle-fill me-2"></i> Pubblica Annuncio
+                        <i class="bi bi-plus-circle-fill me-2"></i> {{ __('ui.publish_ad') }}
                     </a>
                     <a href="#"
                         class="btn btn-outline-custom text-light rounded-pill px-4 py-2-5 fw-bold text-uppercase tracking-wider fs-7 transition-all"
                         id="heroExploreBtn">
-                        <i class="bi bi-grid-3x3-gap-fill me-2 text-neon-cyan"></i> Esplora Categorie
+                        <i class="bi bi-grid-3x3-gap-fill me-2 text-neon-cyan"></i> {{ __('ui.explore_categories') }}
                     </a>
                 </div>
             </div>

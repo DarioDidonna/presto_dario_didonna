@@ -29,18 +29,18 @@
                 <div class="col-12 col-md-4 ps-md-4 d-flex flex-column justify-content-between">
                     <div>
                         <span class="badge bg-dark text-neon-cyan text-uppercase mb-2 font-monospace tracking-wide">
-                            <i class="bi bi-hourglass-split me-1 animate-pulse"></i>In Fase di Revisione
+                            <i class="bi bi-hourglass-split me-1 animate-pulse"></i>{{ __('ui.review_phase') }}
                         </span>
                         <h1 class="text-white fw-bold mb-2">{{ $article_to_check->title }}</h1>
                         <h3 class="fs-5 text-muted-custom mb-3">
-                            <i class="bi bi-person me-1"></i>Autore: <span
+                            <i class="bi bi-person me-1"></i>{{ __('ui.author') }}: <span
                                 class="text-white">{{ $article_to_check->user->name }}</span>
                         </h3>
                         <h4 class="text-neon-cyan fw-semibold mb-3 font-monospace fs-3">
                             {{ $article_to_check->price }}€
                         </h4>
                         <h4 class="fst-italic text-light mb-4 fs-6">
-                            <i class="bi bi-tag me-1"></i>#{{ $article_to_check->category->name }}
+                            <i class="bi bi-tag me-1"></i>#{{ __($article_to_check->category->name) }}
                         </h4>
 
                         <div class="p-3 bg-dark rounded border border-secondary mb-4">
@@ -67,7 +67,7 @@
                             @csrf
                             @method('PATCH')
                             <button type="submit" class="btn btn-danger py-2 w-100 fw-bold shadow-sm">
-                                <i class="bi bi-x-circle me-2"></i>Rifiuta
+                                <i class="bi bi-x-circle me-2"></i>{{ __('ui.reject') }}
                             </button>
                         </form>
 
@@ -76,7 +76,7 @@
                             @csrf
                             @method('PATCH')
                             <button type="submit" class="btn btn-success py-2 w-100 fw-bold shadow-sm">
-                                <i class="bi bi-check-circle me-2"></i>Accetta
+                                <i class="bi bi-check-circle me-2"></i>{{ __('ui.accept') }}
                             </button>
                         </form>
                     </div>
@@ -90,11 +90,11 @@
                         <div class="mb-4">
                             <i class="bi bi-clipboard-check text-success display-1"></i>
                         </div>
-                        <h1 class="fst-italic display-6 text-white mb-3">Ottimo lavoro!</h1>
-                        <p class="text-muted-custom mb-4">Non ci sono nuovi articoli in coda da revisionare al momento.
+                        <h1 class="fst-italic display-6 text-white mb-3">{{ __('ui.great_job') }}</h1>
+                        <p class="text-muted-custom mb-4">{{ __('ui.no_new_articles') }}
                         </p>
                         <a href="{{ route('homepage') }}" class="btn btn-success px-4 py-2 fw-bold shadow">
-                            <i class="bi bi-house-door me-2"></i>Torna all'homepage
+                            <i class="bi bi-house-door me-2"></i>{{ __('ui.go_homepage') }}
                         </a>
                     </div>
                 </div>

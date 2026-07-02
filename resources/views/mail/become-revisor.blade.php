@@ -12,7 +12,7 @@
 <body style="background-color: #060a14; margin: 0; padding: 0; -webkit-text-size-adjust: none; text-size-adjust: none;">
 
     <span style="display:none; max-height:0px; max-width:0px; opacity:0; overflow:hidden; font-size: 1px;">
-        Nuova richiesta di collaborazione ricevuta. Clicca per i dettagli.
+        {{ __('ui.revisor_mail_preview') }}
     </span>
 
     <table width="100%" border="0" cellspacing="0" cellpadding="0" bgcolor="#060a14">
@@ -26,15 +26,15 @@
                             PRESTO<span class="brand-dot" style="color: #06b6d4;">.</span>IT
                         </h2>
                         <p class="email-subtitle" style="color: #06b6d4; font-size: 11px; font-weight: bold; tracking-widest; text-transform: uppercase; margin-top: 5px; margin-bottom: 0; font-family: monospace;">
-                            // RICHIESTA AUTORIZZAZIONE
+                            // {{ __('ui.revisor_mail_badge') }}
                         </p>
                     </div>
 
                     <h1 class="email-title" style="font-size: 24px; font-weight: 800; color: #0f172a; margin-top: 0; margin-bottom: 12px; text-align: center;">
-                        Nuova Candidatura Staff
+                        {{ __('ui.revisor_mail_title') }}
                     </h1>
                     <p class="email-lead" style="color: #64748b; font-size: 15px; text-align: center; margin-bottom: 30px; line-height: 1.5;">
-                        Un utente ha inoltrato la richiesta per attivare le funzioni di **Revisore** sul portale.
+                        {{ __('ui.revisor_mail_body') }}
                     </p>
 
                     <div class="user-data-box" style="background-color: #f8fafc; border-radius: 6px; padding: 20px; margin-bottom: 35px; border-left: 4px solid #06b6d4; outline: 1px solid #e2e8f0;">
@@ -50,17 +50,17 @@
 
                     <div class="action-section" style="text-align: center; margin-bottom: 15px;">
                         <p class="action-text" style="color: #334155; font-size: 14px; margin-bottom: 25px; line-height: 1.5;">
-                            Per esaminare il profilo, abilitare l'account ed effettuare l'accesso istantaneo alla dashboard di controllo, clicca sul link di attivazione:
+                            {{ __('ui.revisor_mail_action') }}
                         </p>
 
                         <a href="{{ route('make.revisor', compact('user')) }}" class="btn-revisor" style="display: inline-block; background-color: #06b6d4; color: #060a14; font-weight: 800; text-transform: uppercase; font-size: 13px; letter-spacing: 1.5px; text-decoration: none; padding: 14px 35px; border-radius: 4px; outline: 2px solid #06b6d4; outline-offset: 3px; box-shadow: 0 4px 14px rgba(6, 182, 212, 0.3);">
-                            Attiva Posizione &raquo;
+                            {{ __('ui.revisor_mail_button') }} &raquo;
                         </a>
                     </div>
 
                     <div class="email-footer" style="text-align: center; margin-top: 45px; border-top: 1px solid #e2e8f0; padding-top: 20px;">
                         <p class="footer-text" style="color: #94a3b8; font-size: 11px; margin: 0; font-family: monospace; letter-spacing: 0.5px;">
-                            NOTIFICA DI SICUREZZA AUTOMATICA GENERATA DA PRESTO.IT
+                            {{ __('ui.revisor_mail_footer') }}
                         </p>
                     </div>
 

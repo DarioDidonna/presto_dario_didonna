@@ -8,13 +8,13 @@
         <div class="container position-relative z-1 py-4 text-center">
             <span
                 class="badge bg-transparent border border-neon-cyan text-neon-cyan text-uppercase tracking-widest px-3 py-2 mb-3 fs-8 fw-semibold">
-                Bacheca Globale
+                {{ __('ui.global_board') }}
             </span>
             <h1 class="display-4 fw-black text-white text-uppercase tracking-tight mb-2">
-                Tutti gli <span class="text-glow text-neon-cyan">Annunci</span>
+                {{ __('ui.all_ads') }} <span class="text-glow text-neon-cyan">{{ __('ui.announcements') }}</span>
             </h1>
             <p class="text-muted-custom fs-5 max-w-600 mx-auto mb-0">
-                Esplora tutte le commissioni e i prodotti disponibili sulla piattaforma di Presto.it
+                {{ __('ui.explore_platform') }}
             </p>
         </div>
     </div>
@@ -43,12 +43,11 @@
                         <div class="fs-1 text-muted mb-3">
                             <i class="bi bi-folder-x text-neon-amber"></i>
                         </div>
-                        <h4 class="text-white fw-bold text-uppercase tracking-wide mb-2">Nessun annuncio trovato</h4>
-                        <p class="text-muted-custom fs-7 mb-4">Non ci sono ancora articoli pubblicati in questa sezione.
-                            Sii il primo a inserirne uno!</p>
+                        <h4 class="text-white fw-bold text-uppercase tracking-wide mb-2">{{ __('ui.no_ads_found') }}</h4>
+                        <p class="text-muted-custom fs-7 mb-4">{{ __('ui.no_ads_message') }}</p>
                         <a href="{{ route('create.article') }}"
                             class="btn btn-outline-neon-cyan text-uppercase tracking-wider fs-7 fw-bold px-4 py-2">
-                            <i class="bi bi-plus-circle me-2"></i> Crea Annuncio
+                            <i class="bi bi-plus-circle me-2"></i> {{ __('ui.create_ad') }}
                         </a>
                     </div>
                 </div>
