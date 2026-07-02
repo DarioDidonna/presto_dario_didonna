@@ -39,7 +39,7 @@
                         <h4 class="text-neon-cyan fw-semibold mb-3 font-monospace fs-3">
                             {{ $article_to_check->price }}€
                         </h4>
-                        <h4 class="fst-italic text-muted mb-4 fs-6">
+                        <h4 class="fst-italic text-light mb-4 fs-6">
                             <i class="bi bi-tag me-1"></i>#{{ $article_to_check->category->name }}
                         </h4>
 

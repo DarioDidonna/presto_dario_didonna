@@ -1300,7 +1300,6 @@ body {
     min-height: 60vh;
 }
 
-/* Cyber Spacing Background Lights */
 .cyber-glow-1 {
     position: absolute;
     top: -10%;
@@ -1312,7 +1311,6 @@ body {
     pointer-events: none;
 }
 
-/* Article Cards Structure */
 .card-hover {
     transition: transform 0.25s ease-in-out, box-shadow 0.25s ease-in-out !important;
 }
@@ -1335,7 +1333,6 @@ body {
     box-shadow: 0 0 10px var(--accent-amber);
 }
 
-/* Bootstrap Pagination Dark Styling Override */
 .pagination-cyber .page-link {
     background-color: #131b2e !important;
     border-color: rgba(6, 182, 212, 0.2) !important;
@@ -1357,7 +1354,6 @@ body {
 
 
 
-/* Struttura e Layout */
 body {
     background-color: #060a14;
     color: #ffffff;
@@ -1377,7 +1373,6 @@ body {
     box-shadow: 0 4px 20px rgba(6, 182, 212, 0.15);
 }
 
-/* Header e Brand */
 .email-header {
     text-align: center;
     margin-bottom: 30px;
@@ -1405,7 +1400,6 @@ body {
     margin-bottom: 0;
 }
 
-/* Contenuto e Dati */
 .email-title {
     font-size: 20px;
     font-weight: 600;
@@ -1445,7 +1439,6 @@ body {
     color: #ffffff;
 }
 
-/* Call to Action e Footer */
 .action-section {
     text-align: center;
 }
@@ -1482,4 +1475,21 @@ body {
     color: #475569;
     font-size: 11px;
     margin: 0;
+}
+
+
+
+
+
+.min-vh-50 {
+    min-vh: 50vh;
+}
+
+.card-hover-effect {
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.card-hover-effect:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .15) !important;
 }

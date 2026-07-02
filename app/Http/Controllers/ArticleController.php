@@ -40,4 +40,18 @@ class ArticleController extends Controller implements HasMiddleware
         $articles = $category->artcles->where('is_accepted', true);
         return view('article.byCategory', compact('articles', 'category'));
     }
+
+    public function search(Request $request)
+    {
+        $text = $request->input('query', $request->input('searched'));
+
+        $articles = Article::search($text)
+            ->query(function ($builder) {
+                return $builder->where('is_accepted', true);
+            })
+            ->get();
+
+        return view('article.index', compact('articles'));
+    }
+
 }

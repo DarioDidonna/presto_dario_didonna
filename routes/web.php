@@ -36,3 +36,6 @@ Route::get('/revisor/request', [RevisorController::class, 'becomeRevisor'])->mid
 
 // MAKE REVISOR
 Route::get('/make/revisor/{user}', [RevisorController::class, 'makeRevisor'])->name('make.revisor');
+
+// SEARCH
+Route::get('/search/article', [PublicController::class, 'searchArticles'])->name('article.search');

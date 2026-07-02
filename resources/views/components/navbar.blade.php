@@ -70,13 +70,13 @@
             </ul>
 
             <!-- Barra di Ricerca (Ridimensionata a col-xl-3 per lasciare spazio ai pulsanti utente) -->
-            <form class="d-flex mx-auto col-12 col-xl-3 px-0 px-xl-2 my-3 my-xl-0 position-relative" action="#" method="GET">
+            <form class="d-flex mx-auto col-12 col-xl-3 px-0 px-xl-2 my-3 my-xl-0 position-relative" action="{{ route('article.search') }}" method="GET">
                 <div class="input-group search-group-custom w-100 border border-secondary rounded overflow-hidden">
                     <span class="input-group-text bg-black border-0 text-muted ps-3">
                         <i class="bi bi-search text-neon-cyan"></i>
                     </span>
                     <input class="form-control border-0 text-white search-input-custom bg-black ps-2 py-1-5 fs-7"
-                        type="search" name="q" placeholder="Cerca un annuncio..." aria-label="Search">
+                        type="search" name="query" placeholder="Cerca un annuncio..." aria-label="Search">
                     <button class="btn btn-search-submit border-0 text-uppercase text-neon-cyan fw-bold bg-black px-3 transition-all"
                         type="submit">
                         <i class="bi bi-arrow-right"></i>

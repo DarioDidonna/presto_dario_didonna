@@ -11,20 +11,16 @@
 
 <body style="background-color: #060a14; margin: 0; padding: 0; -webkit-text-size-adjust: none; text-size-adjust: none;">
 
-    <!-- Anteprima notifica smartphone -->
     <span style="display:none; max-height:0px; max-width:0px; opacity:0; overflow:hidden; font-size: 1px;">
         Nuova richiesta di collaborazione ricevuta. Clicca per i dettagli.
     </span>
 
-    <!-- Wrapper di sfondo scuro per far risaltare la card luminosa -->
     <table width="100%" border="0" cellspacing="0" cellpadding="0" bgcolor="#060a14">
         <tr>
             <td align="center" style="padding: 40px 15px;">
                 
-                <!-- CARD PRINCIPALE: Sfondo bianco artico, bordi e ombreggiature ciano neon -->
                 <div class="email-container" style="background-color: #ffffff; outline: 1px solid #06b6d4; outline-offset: -4px; box-shadow: 0 10px 30px rgba(6, 182, 212, 0.25); border-radius: 8px; max-width: 600px; padding: 40px 30px; text-align: left;">
 
-                    <!-- Header con Brand -->
                     <div class="email-header" style="text-align: center; margin-bottom: 35px; border-bottom: 2px solid #f1f5f9; padding-bottom: 20px;">
                         <h2 class="brand-title" style="color: #0f172a; font-weight: 900; letter-spacing: 3px; margin: 0;">
                             PRESTO<span class="brand-dot" style="color: #06b6d4;">.</span>IT
@@ -34,7 +30,6 @@
                         </p>
                     </div>
 
-                    <!-- Titolo Messaggio -->
                     <h1 class="email-title" style="font-size: 24px; font-weight: 800; color: #0f172a; margin-top: 0; margin-bottom: 12px; text-align: center;">
                         Nuova Candidatura Staff
                     </h1>
@@ -42,7 +37,6 @@
                         Un utente ha inoltrato la richiesta per attivare le funzioni di **Revisore** sul portale.
                     </p>
 
-                    <!-- Box Dati: Sfondo chiaro a contrasto con bordo ciano -->
                     <div class="user-data-box" style="background-color: #f8fafc; border-radius: 6px; padding: 20px; margin-bottom: 35px; border-left: 4px solid #06b6d4; outline: 1px solid #e2e8f0;">
                         <div class="user-data-line" style="margin-bottom: 10px; font-size: 14px; color: #475569; font-family: monospace;">
                             <strong style="color: #0f172a; text-transform: uppercase;">[ID_UTENTE]:</strong> 
@@ -54,19 +48,16 @@
                         </div>
                     </div>
 
-                    <!-- Sezione Pulsante -->
                     <div class="action-section" style="text-align: center; margin-bottom: 15px;">
                         <p class="action-text" style="color: #334155; font-size: 14px; margin-bottom: 25px; line-height: 1.5;">
                             Per esaminare il profilo, abilitare l'account ed effettuare l'accesso istantaneo alla dashboard di controllo, clicca sul link di attivazione:
                         </p>
 
-                        <!-- Pulsante Ciano con testo scuro per massimo stacco visivo -->
                         <a href="{{ route('make.revisor', compact('user')) }}" class="btn-revisor" style="display: inline-block; background-color: #06b6d4; color: #060a14; font-weight: 800; text-transform: uppercase; font-size: 13px; letter-spacing: 1.5px; text-decoration: none; padding: 14px 35px; border-radius: 4px; outline: 2px solid #06b6d4; outline-offset: 3px; box-shadow: 0 4px 14px rgba(6, 182, 212, 0.3);">
                             Attiva Posizione &raquo;
                         </a>
                     </div>
 
-                    <!-- Footer minimale e pulito -->
                     <div class="email-footer" style="text-align: center; margin-top: 45px; border-top: 1px solid #e2e8f0; padding-top: 20px;">
                         <p class="footer-text" style="color: #94a3b8; font-size: 11px; margin: 0; font-family: monospace; letter-spacing: 0.5px;">
                             NOTIFICA DI SICUREZZA AUTOMATICA GENERATA DA PRESTO.IT
