@@ -1,5 +1,5 @@
 <div class="card bg-navbar border-neon-cyan shadow-lg h-100 transition-all card-hover">
-    <img src="https://picsum.photos/400/250" class="card-img-top border-bottom border-secondary-subtle" alt="{{ $article->title }}">
+    <img src="{{ $article->images->isNotEmpty() ? Storage::url($article->images->first()->path) : 'https://picsum.photos/300/200' }}" class="card-img-top border-bottom border-secondary-subtle" alt="{{ $article->title }}">
     
     <div class="card-body d-flex flex-column p-4">
         <div class="mb-2">

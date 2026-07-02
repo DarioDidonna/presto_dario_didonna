@@ -13,7 +13,8 @@
     <form wire:submit.prevent="store">
 
         <div class="mb-3">
-            <label for="title" class="form-label text-uppercase tracking-wide fs-8 fw-semibold text-white-50">{{ __('ui.title') }}</label>
+            <label for="title"
+                class="form-label text-uppercase tracking-wide fs-8 fw-semibold text-white-50">{{ __('ui.title') }}</label>
             <input type="text" wire:model.blur="title" id="title"
                 class="form-control bg-dark border-secondary text-white @error('title') is-invalid @enderror"
                 placeholder="{{ __('ui.placeholder_title') }}">
@@ -52,6 +53,56 @@
                     <div class="invalid-feedback font-monospace fs-8">{{ $message }}</div>
                 @enderror
             </div>
+
+            <div class="mb-3">
+                <label for="temporary_images"
+                    class="form-label text-uppercase tracking-wide fs-8 fw-semibold text-white-50">Immagini
+                    dell'annuncio</label>
+                <input type="file" name="images" wire:model.live="temporary_images" multiple
+                    class="form-control shadow @error('temporary_images.*') is-invalid @enderror @error('temporary_images') is-invalid @enderror"
+                    placeholder="Img/">
+
+                @error('temporary_images.*')
+                    <p class="fst-italic text-danger small mt-1">{{ $message }}</p>
+                @enderror
+
+                @error('temporary_images')
+                    <p class="fst-italic text-danger small mt-1">{{ $message }}</p>
+                @enderror
+            </div>
+
+            @if (!empty($images))
+                <div class="col-12 mt-4">
+                    <p class="text-uppercase tracking-wide fs-8 fw-semibold text-white-50 mb-2">
+                        <i class="bi bi-cpu text-neon-cyan me-1"></i> Photo preview:
+                    </p>
+
+                    <div
+                        class="row border border-secondary rounded shadow-lg py-4 bg-black bg-opacity-50 mx-0 justify-content-start align-items-center">
+                        @foreach ($images as $key => $image)
+                            <div
+                                class="col-6 col-sm-4 col-md-3 d-flex flex-column align-items-center my-3 position-relative preview-container">
+
+                                <div class="img-preview shadow rounded border border-secondary position-relative overflow-hidden"
+                                    style="background-image: url({{ $image->temporaryUrl() }}); width: 110px; height: 110px; background-size: cover; background-position: center; transition: all 0.3s ease;">
+
+                                    <button type="button"
+                                        class="btn btn-danger btn-sm p-0 d-flex align-items-center justify-content-center border-0 position-absolute top-0 end-0 m-1 rounded-circle btn-remove-preview"
+                                        style="width: 24px; height: 24px; font-size: 11px; font-weight: bold; opacity: 0.8; transition: all 0.2s;"
+                                        wire:click="removeImage({{ $key }})" title="Rimuovi">
+                                        <i class="bi bi-x-lg"></i>
+                                    </button>
+                                </div>
+
+                                <span class="font-monospace text-light mt-2">
+                                    [img_0{{ $key }}]
+                                </span>
+
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+            @endif
         </div>
 
         <div class="mb-4">

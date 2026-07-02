@@ -7,9 +7,15 @@ use App\Models\Category;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
+use Livewire\WithFileUploads;
 
 class CreateArticleForm extends Component
 {
+    use WithFileUploads;
+
+    public $images = [];
+    
+    public $temporary_images = []; 
 
     #[Validate('required', message: 'Il titolo dell\'annuncio è obbligatorio.')]
     #[Validate('min:5', message: 'Il titolo deve contenere almeno 5 caratteri.')]
@@ -41,9 +47,38 @@ class CreateArticleForm extends Component
             'user_id' => Auth::id()
         ]);
 
-        session()->flash('message', 'Annuncio pubblicato con successo nel sistema!');
+        if (count($this->images) > 0) {
+            foreach ($this->images as $image) {
+                $this->article->images()->create([
+                    'path' => $image->store('articles', 'public')
+                ]);
+            }
+        }
 
-        $this->reset(['title', 'price', 'description', 'category']);
+        session()->flash('message', 'Annuncio pubblicato con successo!');
+
+        $this->reset(['title', 'price', 'description', 'category', 'images', 'temporary_images']);
+    }
+
+    public function updatedTemporaryImages()
+    {
+        $this->validate([
+            'temporary_images.*' => 'image|max:5120', 
+        ]);
+
+        foreach ($this->temporary_images as $image) {
+            $this->images[] = $image;
+        }
+
+        $this->temporary_images = [];
+    }
+
+    public function removeImage($key)
+    {
+        if (in_array($key, array_keys($this->images))) {
+            unset($this->images[$key]);
+            $this->images = array_values($this->images);
+        }
     }
 
     public function render()

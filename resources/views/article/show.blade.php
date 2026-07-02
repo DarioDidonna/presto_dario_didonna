@@ -12,62 +12,61 @@
             <div class="row g-5">
 
                 <div class="col-12 col-lg-7">
-                    <div id="articleCarousel"
-                        class="carousel slide border border-neon-cyan shadow-lg rounded-3 overflow-hidden bg-navbar"
-                        data-bs-ride="false">
+                    @if ($article->images->count() > 0)
+                        <div id="articleCarousel"
+                            class="carousel slide border border-neon-cyan shadow-lg rounded-3 overflow-hidden bg-navbar"
+                            data-bs-ride="false">
 
-                        <div class="carousel-indicators">
-                            <button type="button" data-bs-target="#articleCarousel" data-bs-slide-to="0" class="active"
-                                aria-current="true" aria-label="Slide 1"></button>
-                            <button type="button" data-bs-target="#articleCarousel" data-bs-slide-to="1"
-                                aria-label="Slide 2"></button>
-                            <button type="button" data-bs-target="#articleCarousel" data-bs-slide-to="2"
-                                aria-label="Slide 3"></button>
+                            @if ($article->images->count() > 1)
+                                <div class="carousel-indicators">
+                                    @foreach ($article->images as $key => $image)
+                                        <button type="button" data-bs-target="#articleCarousel"
+                                            data-bs-slide-to="{{ $key }}"
+                                            class="{{ $loop->first ? 'active' : '' }}"
+                                            aria-current="{{ $loop->first ? 'true' : 'false' }}"
+                                            aria-label="Slide {{ $key + 1 }}"></button>
+                                    @endforeach
+                                </div>
+                            @endif
+
+                            <div class="carousel-inner">
+                                @foreach ($article->images as $key => $image)
+                                    <div class="carousel-item {{ $loop->first ? 'active' : '' }}">
+                                        <img src="{{ Storage::url($image->path) }}"
+                                            class="d-block w-100 img-fluid object-fit-cover" style="height: 450px;"
+                                            alt="Immagine {{ $key + 1 }} dell'articolo {{ $article->title }}">
+                                    </div>
+                                @endforeach
+                            </div>
+
+                            @if ($article->images->count() > 1)
+                                <button class="carousel-control-prev" type="button" data-bs-target="#articleCarousel"
+                                    data-bs-slide="prev">
+                                    <span
+                                        class="carousel-control-prev-icon bg-cyber-dark p-3 rounded-circle border border-neon-cyan"
+                                        aria-hidden="true"></span>
+                                    <span class="visually-hidden">{{ __('ui.previous') }}</span>
+                                </button>
+                                <button class="carousel-control-next" type="button" data-bs-target="#articleCarousel"
+                                    data-bs-slide="next">
+                                    <span
+                                        class="carousel-control-next-icon bg-cyber-dark p-3 rounded-circle border border-neon-cyan"
+                                        aria-hidden="true"></span>
+                                    <span class="visually-hidden">{{ __('ui.next') }}</span>
+                                </button>
+                            @endif
                         </div>
-
-                        <div class="carousel-inner">
-                            <div class="carousel-item active">
-                                <img src="https://picsum.photos/800/500?random=1"
-                                    class="d-block w-100 img-fluid object-fit-cover" style="max-height: 450px;"
-                                    alt="Placeholder 1">
-                                <div class="carousel-caption d-none d-md-block bg-dark-translucent rounded-3 py-1">
-                                    <p class="fs-8 text-neon-cyan tracking-wider text-uppercase m-0">{{ __('ui.main_view') }}
-                                    </p>
-                                </div>
-                            </div>
-                            <div class="carousel-item">
-                                <img src="https://picsum.photos/800/500?random=2"
-                                    class="d-block w-100 img-fluid object-fit-cover" style="max-height: 450px;"
-                                    alt="Placeholder 2">
-                                <div class="carousel-caption d-none d-md-block bg-dark-translucent rounded-3 py-1">
-                                    <p class="fs-8 text-neon-amber tracking-wider text-uppercase m-0">{{ __('ui.component_detail') }}</p>
-                                </div>
-                            </div>
-                            <div class="carousel-item">
-                                <img src="https://picsum.photos/800/500?random=3"
-                                    class="d-block w-100 img-fluid object-fit-cover" style="max-height: 450px;"
-                                    alt="Placeholder 3">
-                                <div class="carousel-caption d-none d-md-block bg-dark-translucent rounded-3 py-1">
-                                    <p class="fs-8 text-neon-cyan tracking-wider text-uppercase m-0">{{ __('ui.rear_overview') }}</p>
-                                </div>
+                    @else
+                        <div
+                            class="border border-secondary shadow-lg rounded-3 overflow-hidden bg-navbar text-center p-2">
+                            <img src="https://picsum.photos/800/500?random=tech"
+                                class="img-fluid rounded-3 w-100 object-fit-cover opacity-75" style="height: 450px;"
+                                alt="Nessuna foto inserita dall'utente">
+                            <div class="py-2 text-muted-custom font-monospace fs-8">
+                                <i class="bi bi-image-alt me-1"></i> [NESSUNA IMMAGINE DISPONIBILE]
                             </div>
                         </div>
-
-                        <button class="carousel-control-prev" type="button" data-bs-target="#articleCarousel"
-                            data-bs-slide="prev">
-                            <span
-                                class="carousel-control-prev-icon bg-cyber-dark p-3 rounded-circle border border-neon-cyan"
-                                aria-hidden="true"></span>
-                            <span class="visually-hidden">{{ __('ui.previous') }}</span>
-                        </button>
-                        <button class="carousel-control-next" type="button" data-bs-target="#articleCarousel"
-                            data-bs-slide="next">
-                            <span
-                                class="carousel-control-next-icon bg-cyber-dark p-3 rounded-circle border border-neon-cyan"
-                                aria-hidden="true"></span>
-                            <span class="visually-hidden">{{ __('ui.next') }}</span>
-                        </button>
-                    </div>
+                    @endif
                 </div>
 
                 <div class="col-12 col-lg-5 d-flex flex-column justify-content-between">
@@ -90,20 +89,19 @@
                             </span>
                         </div>
 
-                        {{-- <h1 class="h2 fw-black text-white text-uppercase tracking-tight mb-3">
-                            {{ $article->title }}
-                        </h1> --}}
-
-                        <h1 class="h2 fw-black text-white text-uppercase tracking-tight mb-3 d-flex flex-wrap align-items-baseline gap-2">
+                        <h1
+                            class="h2 fw-black text-white text-uppercase tracking-tight mb-3 d-flex flex-wrap align-items-baseline gap-2">
                             <span>{{ $article->title }}</span>
                             <span class="fs-7 text-neon-cyan font-monospace fw-normal text-none-transform">
-                                <i class="bi bi-person-fill me-1"></i>{{ __('ui.published_by', ['name' => $article->user->name ?? __('ui.anonymous_user')]) }}
+                                <i
+                                    class="bi bi-person-fill me-1"></i>{{ __('ui.published_by', ['name' => $article->user->name ?? __('ui.anonymous_user')]) }}
                             </span>
                         </h1>
 
                         <div
                             class="py-3 px-4 rounded-3 bg-cyber-dark border-start border-3 border-neon-cyan mb-4 shadow-sm">
-                            <span class="text-muted-custom fs-8 text-uppercase tracking-wider d-block mb-1">{{ __('ui.requested_price') }}</span>
+                            <span
+                                class="text-muted-custom fs-8 text-uppercase tracking-wider d-block mb-1">{{ __('ui.requested_price') }}</span>
                             <span class="display-6 fw-bold text-glow text-neon-cyan font-monospace">
                                 {{ number_format($article->price, 2, ',', '.') }} €
                             </span>
@@ -120,7 +118,7 @@
                             <div class="row g-2">
                                 <div class="col-12 col-md-8">
                                     <button
-                                        class="btn btn-cyber-gradient w-100 text-uppercase tracking-wider fs-7 fw-bold py-25">
+                                        class="btn btn-cyber-gradient w-100 text-uppercase text-light tracking-wider fs-7 fw-bold py-25">
                                         <i class="bi bi-chat-left-dots-fill me-2"></i> {{ __('ui.contact_seller') }}
                                     </button>
                                 </div>

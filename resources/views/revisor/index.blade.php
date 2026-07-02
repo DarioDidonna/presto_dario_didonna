@@ -16,13 +16,25 @@
 
                 <div class="col-12 col-md-8">
                     <div class="row justify-content-center">
-                        @for ($i = 0; $i < 6; $i++)
-                            <div class="col-6 col-md-4 mb-4 text-center">
-                                <img src="https://picsum.photos/300"
-                                    class="img-fluid rounded shadow transition-all category-card-wrapper"
-                                    alt="immagine segnaposto">
-                            </div>
-                        @endfor
+                        @if ($article_to_check->images->count())
+                            @foreach ($article_to_check->images as $key => $image)
+                                <div class="col-6 col-md-4 mb-4">
+                                    <div class="position-relative overflow-hidden rounded shadow border border-secondary image-review-wrapper">
+                                        <img src="{{ Storage::url($image->path) }}"
+                                            class="img-fluid transition-all"
+                                            alt="Immagine {{ $key + 1 }} dell'articolo '{{ $article_to_check->title }}'">
+                                    </div>
+                                </div>
+                            @endforeach
+                        @else
+                            @for ($i = 0; $i < 6; $i++)
+                                <div class="col-6 col-md-4 mb-4 text-center">
+                                    <img src="https://picsum.photos/300"
+                                        class="img-fluid rounded shadow transition-all category-card-wrapper border border-secondary opacity-50"
+                                        alt="immagine segnaposto">
+                                </div>
+                            @endfor
+                        @endif
                     </div>
                 </div>
 
@@ -50,7 +62,7 @@
 
                     @if (session()->has('message'))
                         <div class="row justify-content-center mb-4">
-                            <div class="col-12 col-md-6">
+                            <div class="col-12">
                                 <div
                                     class="alert alert-success text-center shadow rounded border-0 bg-success bg-opacity-25 text-white d-flex align-items-center justify-content-center p-3">
                                     <i class="bi bi-check-circle-fill me-2 fs-5 text-success"></i>
@@ -59,7 +71,6 @@
                             </div>
                         </div>
                     @endif
-
 
                     <div class="d-flex pb-4 justify-content-between gap-2">
                         <form action="{{ route('reject', ['article' => $article_to_check]) }}" method="POST"
@@ -101,7 +112,6 @@
             </div>
         @endif
 
-
-
     </div>
 </x-layout>
+
