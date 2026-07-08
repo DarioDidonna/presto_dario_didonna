@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use App\Jobs\GoogleVisionLabelImage;
 use App\Jobs\GoogleVisionSafeSearch;
+use App\Jobs\RemoveFaces;
 use App\Jobs\ResizeImage;
 use App\Models\Article;
 use App\Models\Category;
@@ -18,8 +19,7 @@ class CreateArticleForm extends Component
     use WithFileUploads;
 
     public $images = [];
-    
-    public $temporary_images = []; 
+    public $temporary_images = [];
 
     #[Validate('required', message: 'Il titolo dell\'annuncio è obbligatorio.')]
     #[Validate('min:5', message: 'Il titolo deve contenere almeno 5 caratteri.')]
@@ -55,22 +55,24 @@ class CreateArticleForm extends Component
             foreach ($this->images as $image) {
                 $newFileName = "articles/{$this->article->id}/";
                 $newImage = $this->article->images()->create(['path' => $image->store($newFileName, 'public')]);
-                dispatch(new ResizeImage($newImage->path, 300, 300));
-                dispatch(new GoogleVisionSafeSearch($newImage->id));
-                dispatch(new GoogleVisionLabelImage($newImage->id));
+
+                RemoveFaces::withChain([
+                    new ResizeImage($newImage->path, 300, 300),
+                    new GoogleVisionSafeSearch($newImage->id),
+                    new GoogleVisionLabelImage($newImage->id)
+                ])->dispatch($newImage->id);
             }
             File::deleteDirectory(storage_path('app/livewire-tmp'));
         }
 
         session()->flash('message', 'Annuncio pubblicato con successo!');
-
         $this->reset(['title', 'price', 'description', 'category', 'images', 'temporary_images']);
     }
 
     public function updatedTemporaryImages()
     {
         $this->validate([
-            'temporary_images.*' => 'image|max:5120', 
+            'temporary_images.*' => 'image|max:5120',
         ]);
 
         foreach ($this->temporary_images as $image) {

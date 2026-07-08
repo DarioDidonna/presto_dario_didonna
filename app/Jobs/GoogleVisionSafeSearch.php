@@ -16,9 +16,6 @@ class GoogleVisionSafeSearch implements ShouldQueue
 {
     use Queueable;
 
-    /**
-     * Create a new job instance.
-     */
     private $article_image_id;
 
     public function __construct($article_image_id)
@@ -37,9 +34,17 @@ class GoogleVisionSafeSearch implements ShouldQueue
         }
 
         $image = file_get_contents(storage_path('app/public/' . $i->path));
-        putenv('GOOGLE_APPLICATION_CREDENTIALS=' . base_path('google_credential.json'));
+        $jsonPath = base_path('google_credential.json');
 
-        $googleVisionClient = new ImageAnnotatorClient();
+        if (!file_exists($jsonPath)) {
+            logger()->error("GoogleVisionSafeSearch: Manca il file delle credenziali.");
+            return;
+        }
+
+        $googleVisionClient = new ImageAnnotatorClient([
+            'credentials' => $jsonPath
+        ]);
+        
         $google_image = new VisionImage([
             'content' => $image
         ]);
@@ -55,7 +60,6 @@ class GoogleVisionSafeSearch implements ShouldQueue
         $batchRequest->setRequests([$request]);
 
         $responseBatch = $googleVisionClient->batchAnnotateImages($batchRequest);
-
         $response = $responseBatch->getResponses();
         $googleVisionClient->close();
 
