@@ -2,122 +2,115 @@
 
 namespace App\Jobs;
 
-use App\Models\Image;
-use Google\Cloud\Vision\V1\AnnotateImageRequest;
-use Google\Cloud\Vision\V1\BatchAnnotateImagesRequest;
-use Google\Cloud\Vision\V1\Client\ImageAnnotatorClient;
-use Google\Cloud\Vision\V1\Feature;
-use Google\Cloud\Vision\V1\Feature\Type;
-use Google\Cloud\Vision\V1\Image as VisionImage;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
 
 class RemoveFaces implements ShouldQueue
 {
-    use Queueable;
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    private $article_image_id;
+    // Definiamo le proprietà per accettare l'ID in qualunque modo sia passato
+    public $id;
+    public $article_image_id;
 
+    /**
+     * Create a new job instance.
+     */
     public function __construct($article_image_id)
     {
         $this->article_image_id = $article_image_id;
     }
 
+    /**
+     * Execute the job.
+     */
     public function handle(): void
     {
         try {
-            $i = Image::find($this->article_image_id);
-            if (!$i) {
-                logger()->error("RemoveFaces: Modello Image non trovato per ID: " . $this->article_image_id);
-                return;
-            }
+            // Intercettiamo l'ID corretto
+            $imageId = $this->id ?? $this->article_image_id;
+            
+            $i = \App\Models\Image::find($imageId);
+            if (!$i) return;
 
             $srcPath = storage_path('app/public/' . $i->path);
+            if (!file_exists($srcPath)) return;
 
-            if (!file_exists($srcPath)) {
-                logger()->error("RemoveFaces: File originale non trovato in: " . $srcPath);
-                return;
-            }
-
-            $image_content = file_get_contents($srcPath);
             $jsonPath = base_path('google_credential.json');
-            if (!file_exists($jsonPath)) {
-                logger()->error("RemoveFaces: Manca il file delle credenziali.");
-                return;
-            }
+            if (!file_exists($jsonPath)) return;
 
-            $googleVisionClient = new ImageAnnotatorClient([
+            // 1. Inizializziamo il client di Google Vision
+            $imageAnnotatorClient = new \Google\Cloud\Vision\V1\Client\ImageAnnotatorClient([
                 'credentials' => $jsonPath
             ]);
 
-            $google_image = new VisionImage(['content' => $image_content]);
-            $googleFeature = new Feature();
-            $googleFeature->setType(Type::FACE_DETECTION);
+            $image_content = file_get_contents($srcPath);
+            
+            // 2. Prepariamo i parametri della richiesta per i Volti
+            $feature = (new \Google\Cloud\Vision\V1\Feature())
+                ->setType(\Google\Cloud\Vision\V1\Feature\Type::FACE_DETECTION);
+                
+            $image = (new \Google\Cloud\Vision\V1\Image())
+                ->setContent($image_content);
+                
+            $request = (new \Google\Cloud\Vision\V1\AnnotateImageRequest())
+                ->setImage($image)
+                ->setFeatures([$feature]);
 
-            $request = new AnnotateImageRequest();
-            $request->setImage($google_image);
-            $request->setFeatures([$googleFeature]);
+            // 3. Impacchettiamo la richiesta dentro la BatchRequest (Risolve l'errore di tipo)
+            $batchRequest = (new \Google\Cloud\Vision\V1\BatchAnnotateImagesRequest())
+                ->setRequests([$request]);
 
-            $batchRequest = new BatchAnnotateImagesRequest();
-            $batchRequest->setRequests([$request]);
+            $response = $imageAnnotatorClient->batchAnnotateImages($batchRequest);
+            $responses = $response->getResponses();
+            
+            // 4. Se Google ha trovato dei volti, passiamo al disegno del rettangolo nero
+            if (count($responses) > 0 && $responses[0]->getFaceAnnotations()) {
+                $faces = $responses[0]->getFaceAnnotations();
 
-            $responseBatch = $googleVisionClient->batchAnnotateImages($batchRequest);
-            $response = $responseBatch->getResponses()[0];
-            $faces = $response->getFaceAnnotations();
+                $mime = mime_content_type($srcPath);
+                $imageGD = null;
 
-            if (count($faces) > 0) {
-                $isPng = str_ends_with(strtolower($srcPath), '.png');
-                $gdImage = $isPng ? @imagecreatefrompng($srcPath) : @imagecreatefromjpeg($srcPath);
-
-                if (!$gdImage) {
-                    logger()->error("RemoveFaces: Impossibile inizializzare la risorsa GD per il file.");
-                    $googleVisionClient->close();
-                    return;
+                if ($mime === 'image/jpeg' || $mime === 'image/jpg') {
+                    $imageGD = imagecreatefromjpeg($srcPath);
+                } elseif ($mime === 'image/png') {
+                    $imageGD = imagecreatefrompng($srcPath);
                 }
 
-                $black = imagecolorallocate($gdImage, 0, 0, 0);
+                if ($imageGD) {
+                    foreach ($faces as $face) {
+                        $vertices = $face->getBoundingPoly()->getVertices();
+                        
+                        $x1 = $vertices[0]->getX();
+                        $y1 = $vertices[0]->getY();
+                        $x2 = $vertices[2]->getX();
+                        $y2 = $vertices[2]->getY();
 
-                foreach ($faces as $face) {
-                    $vertices = $face->getBoundingPoly()->getVertices();
-                    $bounds = [];
-                    foreach ($vertices as $vertex) {
-                        $x = $vertex->getX();
-                        $y = $vertex->getY();
-                        if ($x !== null && $y !== null) {
-                            $bounds[] = [$x, $y];
-                        }
+                        // Colore Nero della censura
+                        $black = imagecolorallocate($imageGD, 0, 0, 0);
+                        
+                        // Disegna il rettangolo pieno sopra il volto
+                        imagefilledrectangle($imageGD, $x1, $y1, $x2, $y2, $black);
                     }
 
-                    if (!empty($bounds)) {
-                        $xCoordinates = array_column($bounds, 0);
-                        $yCoordinates = array_column($bounds, 1);
-
-                        $minX = max(0, min($xCoordinates));
-                        $maxX = max($xCoordinates);
-                        $minY = max(0, min($yCoordinates));
-                        $maxY = max($yCoordinates);
-
-                        imagefilledrectangle($gdImage, $minX, $minY, $maxX, $maxY, $black);
+                    // Salva sovrascrivendo il file originale sul Mac
+                    if ($mime === 'image/jpeg' || $mime === 'image/jpg') {
+                        imagejpeg($imageGD, $srcPath, 95);
+                    } elseif ($mime === 'image/png') {
+                        imagepng($imageGD, $srcPath);
                     }
+                    
+                    imagedestroy($imageGD);
                 }
-
-                if (file_exists($srcPath)) {
-                    @unlink($srcPath);
-                }
-
-                if ($isPng) {
-                    imagepng($gdImage, $srcPath);
-                } else {
-                    imagejpeg($gdImage, $srcPath, 90);
-                }
-
-                imagedestroy($gdImage);
-                logger()->info("RemoveFaces: Censura applicata con successo tramite GD nativo.");
             }
 
-            $googleVisionClient->close();
+            $imageAnnotatorClient->close();
+
         } catch (\Exception $e) {
-            logger()->error("REMOVE FACES INTRAPPOLATO: " . $e->getMessage());
+            logger()->error("RemoveFaces CRASH DEFINITIVO: " . $e->getMessage());
         }
     }
 }
