@@ -33,7 +33,7 @@
                                 @foreach ($article->images as $key => $image)
                                     <div class="carousel-item {{ $loop->first ? 'active' : '' }}">
                                         <img src="{{ $image->getUrl(300, 300) }}"
-                                            class="d-block w-100 img-fluid object-fit-cover" style="height: 450px;"
+                                            class="d-block w-100 img-fluid object-fit-cover" 
                                             alt="Immagine {{ $key + 1 }} dell'articolo {{ $article->title }}">
                                     </div>
                                 @endforeach
@@ -60,7 +60,7 @@
                         <div
                             class="border border-secondary shadow-lg rounded-3 overflow-hidden bg-navbar text-center p-2">
                             <img src="https://picsum.photos/800/500?random=tech"
-                                class="img-fluid rounded-3 w-100 object-fit-cover opacity-75" style="height: 450px;"
+                                class="img-fluid rounded-3 w-100 object-fit-cover opacity-75" 
                                 alt="Nessuna foto inserita dall'utente">
                             <div class="py-2 text-muted-custom font-monospace fs-8">
                                 <i class="bi bi-image-alt me-1"></i> [NESSUNA IMMAGINE DISPONIBILE]

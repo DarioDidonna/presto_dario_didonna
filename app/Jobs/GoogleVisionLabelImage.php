@@ -37,7 +37,6 @@ class GoogleVisionLabelImage implements ShouldQueue
 
             $srcPath = storage_path('app/public/' . $i->path);
 
-            // 1. CONTROLLO DI SICUREZZA: Evita il crash se l'immagine non esiste fisicamente
             if (!file_exists($srcPath)) {
                 logger()->warning("GoogleVisionLabelImage: File non trovato in " . $srcPath . ". Salto il controllo.");
                 return;
@@ -87,7 +86,6 @@ class GoogleVisionLabelImage implements ShouldQueue
                     $result[] = $label->getDescription();
                 }
                 
-                // Salviamo l'array delle etichette sul database
                 $i->labels = $result;
                 $i->save();
                 

@@ -11,17 +11,15 @@ use Google\Cloud\Vision\V1\Feature\Type;
 use Google\Cloud\Vision\V1\Image as VisionImage;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
-use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Foundation\Bus\Dispatchable;
 
 class RemoveFaces implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    // Supportiamo sia l'ID liscio che la proprietà esplicita passata da Livewire
-    public $id;
-    public $article_image_id;
+    private $article_image_id;
 
     public function __construct($article_image_id)
     {
@@ -31,32 +29,25 @@ class RemoveFaces implements ShouldQueue
     public function handle(): void
     {
         try {
-            // Un piccolo micro-ritardo di sicurezza per dare tempo al Mac di completare la scrittura fisica del file
-            usleep(500000); // 0.5 secondi
-
-            $imageId = $this->id ?? $this->article_image_id;
-
-            $i = Image::find($imageId);
+            $i = Image::find($this->article_image_id);
             if (!$i) {
-                logger()->error("RemoveFaces: Modello Image non trovato per ID: " . $imageId);
+                logger()->error("RemoveFaces: Modello Image non trovato per ID: " . $this->article_image_id);
                 return;
             }
+
+            logger()->info("RemoveFaces [ID {$this->article_image_id}]: Il path nel DB è: '" . $i->path . "'");
 
             $srcPath = storage_path('app/public/' . $i->path);
+            logger()->info("RemoveFaces [ID {$this->article_image_id}]: Cerco il file in: " . $srcPath);
 
             if (!file_exists($srcPath)) {
-                logger()->error("RemoveFaces: File originale non trovato in: " . $srcPath);
+                logger()->error("RemoveFaces [ID {$this->article_image_id}]: File originale NON TROVATO su disco!");
                 return;
             }
 
-            // Forza i permessi di lettura/scrittura sul file nel Mac
-            @chmod($srcPath, 0666);
-
-            // 1. Leggiamo il file così com'è per Google Vision
-            $image_content = file_get_contents($srcPath);
             $jsonPath = base_path('google_credential.json');
             if (!file_exists($jsonPath)) {
-                logger()->error("RemoveFaces: Manca il file delle credenziali.");
+                logger()->error("RemoveFaces: Manca il file google_credential.json nella root del progetto.");
                 return;
             }
 
@@ -64,36 +55,48 @@ class RemoveFaces implements ShouldQueue
                 'credentials' => $jsonPath
             ]);
 
+            $image_content = file_get_contents($srcPath);
             $google_image = new VisionImage(['content' => $image_content]);
+            
             $googleFeature = new Feature();
             $googleFeature->setType(Type::FACE_DETECTION);
 
             $request = new AnnotateImageRequest();
-            $request->setImage($google_image);
-            $request->setFeatures([$googleFeature]);
+            $request->setImage($google_image)->setFeatures([$googleFeature]);
 
             $batchRequest = new BatchAnnotateImagesRequest();
             $batchRequest->setRequests([$request]);
 
             $responseBatch = $googleVisionClient->batchAnnotateImages($batchRequest);
-            $response = $responseBatch->getResponses()[0];
+            $responses = $responseBatch->getResponses();
+            
+            if (empty($responses)) {
+                logger()->error("RemoveFaces: Risposta vuota da Google Vision.");
+                $googleVisionClient->close();
+                return;
+            }
+
+            $response = $responses[0];
             $faces = $response->getFaceAnnotations();
 
-            // Logghiamo quante facce vede l'API in questo esatto momento
-            logger()->info("RemoveFaces: Google Vision restituisce " . count($faces) . " volti per l'immagine " . $imageId);
+            if ($response->getError()) {
+                logger()->error("RemoveFaces ERRORE API GOOGLE: " . $response->getError()->getMessage());
+                $googleVisionClient->close();
+                return;
+            }
+
+            logger()->info("RemoveFaces: Google Vision ha risposto! Volti rilevati: " . count($faces));
 
             if (count($faces) > 0) {
-                // 2. Carichiamo l'immagine usando GD nativo di PHP in base all'estensione
                 $isPng = str_ends_with(strtolower($srcPath), '.png');
                 $gdImage = $isPng ? @imagecreatefrompng($srcPath) : @imagecreatefromjpeg($srcPath);
 
                 if (!$gdImage) {
-                    logger()->error("RemoveFaces: Impossibile inizializzare la risorsa GD per il file.");
+                    logger()->error("RemoveFaces: Impossibile caricare la risorsa GD.");
                     $googleVisionClient->close();
                     return;
                 }
 
-                // Colore nero per la censura
                 $black = imagecolorallocate($gdImage, 0, 0, 0);
 
                 foreach ($faces as $face) {
@@ -116,31 +119,25 @@ class RemoveFaces implements ShouldQueue
                         $minY = max(0, min($yCoordinates));
                         $maxY = max($yCoordinates);
 
-                        // Disegniamo il rettangolo nero direttamente sopra ogni faccia trovata
                         imagefilledrectangle($gdImage, $minX, $minY, $maxX, $maxY, $black);
                     }
-                }
-
-                // 3. Sovrascriviamo in sicurezza il file sul disco del Mac
-                if (file_exists($srcPath)) {
-                    @unlink($srcPath);
                 }
 
                 if ($isPng) {
                     imagepng($gdImage, $srcPath);
                 } else {
-                    imagejpeg($gdImage, $srcPath, 95);
+                    imagejpeg($gdImage, $srcPath, 90);
                 }
 
                 imagedestroy($gdImage);
-                logger()->info("RemoveFaces: Censura applicata con successo tramite GD nativo.");
+                logger()->info("RemoveFaces [ID {$this->article_image_id}]: Volti censurati e file salvato con successo.");
             } else {
-                logger()->warning("RemoveFaces: Google Vision non ha rilevato volti in questa specifica esecuzione.");
+                logger()->warning("RemoveFaces [ID {$this->article_image_id}]: Nessun volto rilevato nella foto.");
             }
 
             $googleVisionClient->close();
         } catch (\Exception $e) {
-            logger()->error("REMOVE FACES INTRAPPOLATO: " . $e->getMessage());
+            logger()->error("REMOVE FACES CRASH TOTALE: " . $e->getMessage());
         }
     }
 }

@@ -68,7 +68,7 @@
 
             <div class="row g-4 row-cols-1 row-cols-md-2 row-cols-lg-3">
                 @foreach ($articles as $index => $article)
-                    <div class="col d-flex animate-fade-in" style="--delay: {{ $index * 0.1 }}s">
+                    <div class="col d-flex animate-fade-in" >
                         <div class="w-100 h-100 p-0 transform-wrapper">
                             <x-card :article="$article" />
                         </div>

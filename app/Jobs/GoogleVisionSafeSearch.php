@@ -37,7 +37,6 @@ class GoogleVisionSafeSearch implements ShouldQueue
 
             $srcPath = storage_path('app/public/' . $i->path);
 
-            // 1. CONTROLLO DI SICUREZZA: Evita il crash se il file non esiste fisicamente
             if (!file_exists($srcPath)) {
                 logger()->warning("GoogleVisionSafeSearch: File non trovato in " . $srcPath . ". Salto il controllo.");
                 return;
@@ -85,7 +84,6 @@ class GoogleVisionSafeSearch implements ShouldQueue
                 return;
             }
 
-            // 2. RECUPERO DEI VALORI INTERI DALL'ENUM: Usiamo ->value() per mapparli sull'array
             $adult = (int) $safeSearchAnnotation->getAdult();
             $spoof = (int) $safeSearchAnnotation->getSpoof();
             $medical = (int) $safeSearchAnnotation->getMedical();
@@ -101,7 +99,6 @@ class GoogleVisionSafeSearch implements ShouldQueue
                 'text-danger bi bi-dash-circle-fill'
             ];
 
-            // Aggiorniamo le proprietà sul database
             $i->adult = $likeliHoodName[$adult];
             $i->spoof = $likeliHoodName[$spoof];
             $i->medical = $likeliHoodName[$medical];

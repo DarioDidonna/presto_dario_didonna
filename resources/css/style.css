@@ -26,7 +26,6 @@ body {
     box-sizing: border-box;
 }
 
-/* Utilities & Tipografia */
 .transition-all {
     transition: all 0.3s ease-in-out !important;
 }
@@ -82,7 +81,6 @@ body {
     max-width: 620px;
 }
 
-/* Neon Glow Effects */
 .text-glow {
     text-shadow: 0 0 10px rgba(255, 255, 255, 0.15), 0 0 20px var(--accent-glow);
 }
@@ -173,7 +171,6 @@ body {
     color: var(--text-hover-white) !important;
 }
 
-/* Navbar Search Input */
 .search-group-custom {
     background-color: var(--bg-search);
     border: 1px solid var(--border-color-alpha);
@@ -199,7 +196,7 @@ body {
 
 .btn-search-submit {
     background-color: var(--accent-cyan);
-    color: #020617;
+    color: #e7e8ef;
 }
 
 .btn-search-submit:hover {
@@ -207,7 +204,6 @@ body {
     color: #ffffff;
 }
 
-/* User Area & Dropdown Menu */
 .lang-selector-link {
     color: var(--text-muted-custom) !important;
     text-decoration: none;
@@ -266,7 +262,6 @@ body {
     padding-left: 1.25rem;
 }
 
-/* Action Buttons */
 .btn-gradient-primary {
     background: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
     color: #ffffff !important;
@@ -303,7 +298,6 @@ body {
     box-shadow: 0 0 8px rgba(245, 158, 11, 0.25);
 }
 
-/* Responsive Navbar (Hamburger Icon Transformation) */
 .custom-toggler {
     padding: 0.25rem 0.5rem;
 }
@@ -386,7 +380,6 @@ body {
     position: relative;
 }
 
-/* Sfondo radiale decorativo sfocato */
 .presto-card-glow {
     position: absolute;
     top: -50%;
@@ -409,7 +402,6 @@ body {
     border-radius: 50%;
 }
 
-/* Form Input Elements */
 .presto-input-group {
     background-color: var(--bg-search);
     border: 1px solid var(--border-color-alpha);
@@ -447,7 +439,6 @@ body {
     text-shadow: 0 0 8px var(--accent-glow);
 }
 
-/* Controllo Stati di Errore Nativi di Laravel */
 .presto-input-group:has(.is-invalid-custom),
 .presto-input-group.is-invalid-group {
     border-color: #ef4444 !important;
@@ -476,7 +467,6 @@ body {
     transform: translateY(0);
 }
 
-/* Custom Checkbox Dark Theme */
 .presto-checkbox {
     background-color: var(--bg-search) !important;
     border: 1px solid var(--border-color-alpha) !important;
@@ -498,7 +488,6 @@ body {
     border-color: var(--accent-cyan) !important;
 }
 
-/* Override Autocompilazione Browser Gialla/Bianca */
 .presto-input:-webkit-autofill,
 .presto-input:-webkit-autofill:hover,
 .presto-input:-webkit-autofill:focus {
@@ -528,14 +517,12 @@ body {
    4. INDEX & HOMEPAGE VIEW
    ========================================================================== */
 
-/* --- SEZIONE 4A: HERO AREA --- */
 .presto-hero-section {
     min-height: 85vh;
     background-color: var(--bg-navbar);
     padding-top: 100px;
 }
 
-/* Griglia Tech di Sfondo */
 .hero-grid-overlay {
     position: absolute;
     inset: 0;
@@ -594,7 +581,6 @@ body {
     box-shadow: 0 0 10px var(--accent-glow);
 }
 
-/* Card Isometria Fluttuante (Hero Visual) */
 .hero-visual-container {
     width: 100%;
     max-width: 420px;
@@ -717,7 +703,6 @@ body {
 }
 
 
-/* --- SEZIONE 4B: MACRO CATEGORIE --- */
 .presto-categories-section {
     background-color: var(--bg-navbar);
     border-top: 1px solid var(--border-color-alpha);
@@ -766,7 +751,6 @@ body {
     border: 1px solid rgba(255, 255, 255, 0.03);
 }
 
-/* Hover Effects Categoria */
 .category-card-wrapper:hover {
     transform: translateY(-5px);
     border-color: var(--accent-cyan);
@@ -812,7 +796,6 @@ body {
     animation: livePulse 1.5s infinite ease-in-out;
 }
 
-/* Radar Layout & Scansione */
 .radar-container {
     width: 100%;
     max-width: 500px;
@@ -859,7 +842,6 @@ body {
     pointer-events: none;
 }
 
-/* Nodi di Rete Interattivi sul Radar */
 .network-node {
     position: absolute;
     width: 24px;
@@ -964,7 +946,6 @@ body {
 }
 
 
-/* --- SEZIONE 4D: HOW IT WORKS --- */
 .presto-how-section {
     background-color: var(--bg-navbar);
     border-top: 1px solid var(--border-color-alpha);
@@ -975,7 +956,6 @@ body {
     border: 1px solid var(--border-color-alpha);
 }
 
-/* Linea laser di connessione tra i passi */
 .laser-connection-line {
     position: absolute;
     top: 61%;
@@ -1012,7 +992,6 @@ body {
     border-radius: 50%;
 }
 
-/* Selettori complessi basati sullo stato delle card figlie (:has) */
 .step-card:has(.text-neon-amber) .step-icon-wrapper {
     border-color: rgba(245, 158, 11, 0.2);
 }
@@ -1047,7 +1026,7 @@ body {
 }
 
 
-/* --- SEZIONE 4E: REVISOR CTA --- */
+/* --- REVISOR CTA --- */
 .presto-revisor-cta {
     background-color: var(--bg-navbar);
     border-top: 1px solid var(--border-color-alpha);
@@ -1073,7 +1052,6 @@ body {
     transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease;
 }
 
-/* Barra verticale arancione al neon sul bordo sinistro */
 .revisor-card::before {
     content: '';
     position: absolute;
@@ -1188,7 +1166,6 @@ body {
    6. ARTICLE CRUD & LIVEWIRE FORMS
    ========================================================================== */
 
-/* Layout per la pagina di creazione (Protegge da sovrapposizioni Navbar/Footer) */
 .article-create-wrapper {
     background-color: var(--bg-navbar) !important;
     min-height: calc(100vh - 76px - 92px);
@@ -1211,7 +1188,6 @@ body {
     margin-bottom: auto !important;
 }
 
-/* Card Overrides */
 .card.bg-navbar {
     background-color: var(--bg-navbar) !important;
     border: 1px solid var(--border-color-alpha) !important;
@@ -1222,7 +1198,6 @@ body {
     box-shadow: 0 0 15px rgba(6, 182, 212, 0.15) !important;
 }
 
-/* Form Control Stylings */
 .card-body form .form-control,
 .card-body form .form-select {
     background-color: var(--bg-search) !important;
@@ -1242,8 +1217,7 @@ body {
 }
 
 .card-body form .form-control::placeholder {
-    color: #475569 !important;
-    opacity: 1;
+    color: #84ade5 !important;
 }
 
 .card-body form .input-group-text {
@@ -1252,7 +1226,6 @@ body {
     color: var(--text-muted-custom) !important;
 }
 
-/* Livewire Validation Overrides */
 .card-body form .form-control.is-invalid,
 .card-body form .form-select.is-invalid,
 .card-body form .input-group:has(.is-invalid) {
@@ -1489,7 +1462,7 @@ body {
     PLATFORM COMPONENT STYLES
    ========================================== */
 .min-vh-50 {
-    min-height: 50vh; 
+    min-height: 50vh;
 }
 
 .card-hover-effect {
@@ -1516,6 +1489,16 @@ body {
     background-size: cover;
     background-position: center;
     display: block;
+}
+
+.btn-remove-preview {
+    width: 24px;
+    height: 24px;
+    transition: transform 0.2s ease-in-out;
+}
+
+.btn-remove-preview:hover {
+    transform: scale(1.1);
 }
 
 .image-review-wrapper img {

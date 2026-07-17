@@ -9,8 +9,7 @@
                 <div class="col-12 col-sm-10 col-md-8 col-lg-6 col-xl-5">
 
                     @if (session('status'))
-                        <div class="alert alert-success border-0 bg-search text-success rounded mb-4 font-monospace fs-8 p-3 animate-fade-in"
-                            style="border-left: 3px solid var(--accent-cyan) !important;">
+                        <div class="alert alert-success border-0 bg-search text-success rounded mb-4 font-monospace fs-8 p-3 animate-fade-in">
                             <i class="bi bi-check-circle-fill text-accent-cyan me-2"></i> {{ session('status') }}
                         </div>
                     @endif

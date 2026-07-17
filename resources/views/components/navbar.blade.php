@@ -92,7 +92,7 @@
                     <div
                         class="d-flex align-items-center gap-2 bg-black bg-opacity-25 p-1 rounded border border-secondary">
                         <x-_locale lang="it" />
-                        <x-_locale lang="en" />
+                        <x-_locale lang="uk" />
                         <x-_locale lang="es" />
                     </div>
                 </li>
@@ -122,8 +122,7 @@
                         <a class="nav-link profile-dropdown-toggle d-flex align-items-center gap-2 ps-1 text-white"
                             href="#" id="userDropdown" role="button" data-bs-toggle="dropdown"
                             aria-expanded="false">
-                            <div class="avatar-container border border-2 border-neon-cyan rounded-circle overflow-hidden d-flex"
-                                style="width: 28px; height: 28px;">
+                            <div class="avatar-container border border-2 border-neon-cyan rounded-circle overflow-hidden d-flex">
                                 <img src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name) }}&background=0F172A&color=06B6D4&bold=true"
                                     alt="Avatar" class="img-fluid">
                             </div>

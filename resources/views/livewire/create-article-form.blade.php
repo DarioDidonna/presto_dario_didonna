@@ -83,21 +83,17 @@
                             <div
                                 class="col-6 col-sm-4 col-md-3 d-flex flex-column align-items-center my-3 position-relative preview-container">
 
-                                <div class="img-preview shadow rounded border border-secondary position-relative overflow-hidden"
-                                    style="background-image: url({{ $image->temporaryUrl() }}); width: 110px; height: 110px; background-size: cover; background-position: center; transition: all 0.3s ease;">
+                                <div
+                                    class="img-preview shadow rounded border border-secondary position-relative overflow-hidden">
+                                    <img src="{{ $image->temporaryUrl() }}" class="w-100 h-100 object-fit-cover"
+                                        alt="Preview">
 
                                     <button type="button"
                                         class="btn btn-danger btn-sm p-0 d-flex align-items-center justify-content-center border-0 position-absolute top-0 end-0 m-1 rounded-circle btn-remove-preview"
-                                        style="width: 24px; height: 24px; font-size: 11px; font-weight: bold; opacity: 0.8; transition: all 0.2s;"
                                         wire:click="removeImage({{ $key }})" title="Rimuovi">
                                         <i class="bi bi-x-lg"></i>
                                     </button>
                                 </div>
-
-                                <span class="font-monospace text-light mt-2">
-                                    [img_0{{ $key }}]
-                                </span>
-
                             </div>
                         @endforeach
                     </div>

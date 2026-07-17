@@ -35,25 +35,25 @@
                     <div class="radar-circle circle-3"></div>
                     <div class="radar-sweep"></div>
 
-                    <div class="network-node node-active" style="top: 25%; left: 30%;"
+                    <div class="network-node node-active" 
                         data-info="{{ __('ui.network_request_tech') }}">
                         <div class="node-dot"></div>
                         <div class="node-ripple"></div>
                     </div>
 
-                    <div class="network-node node-active delay-1" style="top: 60%; left: 45%;"
+                    <div class="network-node node-active delay-1" 
                         data-info="{{ __('ui.network_new_motor_ad') }}">
                         <div class="node-dot dot-amber"></div>
                         <div class="node-ripple ripple-amber"></div>
                     </div>
 
-                    <div class="network-node node-active delay-2" style="top: 40%; left: 75%;"
+                    <div class="network-node node-active delay-2" 
                         data-info="{{ __('ui.network_commission_completed') }}">
                         <div class="node-dot"></div>
                         <div class="node-ripple"></div>
                     </div>
 
-                    <div class="network-node node-active delay-3" style="top: 75%; left: 20%;"
+                    <div class="network-node node-active delay-3" 
                         data-info="{{ __('ui.network_design_request') }}">
                         <div class="node-dot"></div>
                         <div class="node-ripple"></div>

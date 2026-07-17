@@ -19,7 +19,6 @@ class ResizeImage implements ShouldQueue
      */
     public function __construct($filePath, $w, $h)
     {
-        // Ci salviamo il percorso intero originale per fare la query sul database dopo
         $this->fullPathForDb = $filePath; 
         
         $this->path = dirname($filePath);
@@ -45,7 +44,6 @@ class ResizeImage implements ShouldQueue
         }
 
         try {
-            // Usiamo il metodo fit specificando i parametri con i nomi corretti per la V3
             $image = \Spatie\Image\Image::useImageDriver(\Spatie\Image\Enums\ImageDriver::Gd)
                 ->load($srcPath)
                 ->fit(
@@ -54,18 +52,16 @@ class ResizeImage implements ShouldQueue
                     $h
                 );
 
-            // 2. Definiamo il percorso del watermark
             $watermarkPath = base_path('resources/img/watermark.png');
             
             if (file_exists($watermarkPath)) {
-                // Posizioniamo il watermark in alto a destra (TopRight)
                 $image->watermark(
                     $watermarkPath,
                     position: \Spatie\Image\Enums\AlignPosition::TopRight,
                     width: 50,
                     height: 50,
-                    paddingX: 10, // 10 pixel di distanza dal bordo destro
-                    paddingY: 10, // 10 pixel di distanza dal bordo superiore
+                    paddingX: 10, 
+                    paddingY: 10, 
                     paddingUnit: \Spatie\Image\Enums\Unit::Pixel
                 );
                 logger()->info("ResizeImage: Watermark TopRight applicato in memoria.");
@@ -73,16 +69,13 @@ class ResizeImage implements ShouldQueue
                 logger()->warning("ResizeImage: FILE WATERMARK MANCANTE in " . $watermarkPath);
             }
 
-            // 3. Rimuoviamo la vecchia miniatura se esisteva già, per evitare blocchi del Mac
             if (file_exists($destPath)) {
                 @unlink($destPath);
             }
 
-            // 4. Salviamo la miniatura finale ritagliata e con watermark
             $image->save($destPath);
             logger()->info("ResizeImage: Miniatura salvata fisicamente in: " . $destPath);
 
-            // 5. Aggiorniamo il database per renderla visibile nel Blade condizionale
             $pureFileName = $this->fileName;
             $imageModel = \App\Models\Image::where('path', 'LIKE', '%' . $pureFileName)->first();
 

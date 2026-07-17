@@ -2,7 +2,7 @@
 
     <div class="article-create-wrapper m-0 mt-4">
         
-        <div class="card bg-navbar border-neon-cyan shadow-lg p-4" style="width: 100%; max-width: 650px;">
+        <div class="card bg-navbar border-neon-cyan shadow-lg p-4">
             
             <div class="card-header border-0 bg-transparent pb-0">
                 <h3 class="fw-black text-white text-uppercase tracking-tight mb-1">
