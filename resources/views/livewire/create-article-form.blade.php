@@ -14,7 +14,7 @@
 
         <div class="mb-3">
             <label for="title"
-                class="form-label text-uppercase tracking-wide fs-8 fw-semibold text-white-50">{{ __('ui.title') }}</label>
+                class="form-label text-uppercase tracking-wide fs-8 fw-semibold text-neon-cyan">{{ __('ui.title') }}</label>
             <input type="text" wire:model.blur="title" id="title"
                 class="form-control bg-dark border-secondary text-white @error('title') is-invalid @enderror"
                 placeholder="{{ __('ui.placeholder_title') }}">
@@ -26,9 +26,9 @@
         <div class="row">
             <div class="col-12 col-md-6 mb-3">
                 <label for="price"
-                    class="form-label text-uppercase tracking-wide fs-8 fw-semibold text-white-50">{{ __('ui.price_label') }}</label>
+                    class="form-label text-uppercase tracking-wide fs-8 fw-semibold text-neon-cyan">{{ __('ui.price_label') }}</label>
                 <div class="input-group">
-                    <span class="input-group-text bg-dark border-secondary text-white-50">€</span>
+                    <span class="input-group-text bg-dark border-secondary text-neon-cyan">€</span>
                     <input type="number" step="0.01" wire:model.blur="price" id="price"
                         class="form-control bg-dark border-secondary text-white @error('price') is-invalid @enderror"
                         placeholder="0.00">
@@ -40,7 +40,7 @@
 
             <div class="col-12 col-md-6 mb-3">
                 <label for="category"
-                    class="form-label text-uppercase tracking-wide fs-8 fw-semibold text-white-50">{{ __('ui.category') }}</label>
+                    class="form-label text-uppercase tracking-wide fs-8 fw-semibold text-neon-cyan">{{ __('ui.category') }}</label>
                 <select wire:model.blur="category" id="category"
                     class="form-select bg-dark border-secondary text-white @error('category') is-invalid @enderror">
                     <option value="">{{ __('ui.select_category') }}</option>
@@ -56,7 +56,7 @@
 
             <div class="mb-3">
                 <label for="temporary_images"
-                    class="form-label text-uppercase tracking-wide fs-8 fw-semibold text-white-50">Immagini
+                    class="form-label text-uppercase tracking-wide fs-8 fw-semibold text-neon-cyan">Immagini
                     dell'annuncio</label>
                 <input type="file" name="images" wire:model.live="temporary_images" multiple
                     class="form-control shadow @error('temporary_images.*') is-invalid @enderror @error('temporary_images') is-invalid @enderror"
@@ -73,7 +73,7 @@
 
             @if (!empty($images))
                 <div class="col-12 mt-4">
-                    <p class="text-uppercase tracking-wide fs-8 fw-semibold text-white-50 mb-2">
+                    <p class="text-uppercase tracking-wide fs-8 fw-semibold text-neon-cyan mb-2">
                         <i class="bi bi-cpu text-neon-cyan me-1"></i> Photo preview:
                     </p>
 
@@ -103,7 +103,7 @@
 
         <div class="mb-4">
             <label for="description"
-                class="form-label text-uppercase tracking-wide fs-8 fw-semibold text-white-50">{{ __('ui.description_label') }}</label>
+                class="form-label text-uppercase tracking-wide fs-8 fw-semibold text-neon-cyan">{{ __('ui.description_label') }}</label>
             <textarea wire:model.blur="description" id="description" rows="5"
                 class="form-control bg-dark border-secondary text-white @error('description') is-invalid @enderror"
                 placeholder="{{ __('ui.description_placeholder') }}"></textarea>

@@ -79,7 +79,7 @@
                     <div class="input-group search-group-custom">
                         <input type="email" class="form-control bg-search-input border-0 search-input-custom ps-3 py-2 fs-7" placeholder="{{ __('ui.email_placeholder') }}" aria-label="Email" required>
                         <button class="btn btn-search-submit border-0 px-3 transition-all" type="submit">
-                            <i class="bi bi-send-fill fs-7"></i>
+                            <i class="bi bi-send-fill text-white fs-7"></i>
                         </button>
                     </div>
                 </form>

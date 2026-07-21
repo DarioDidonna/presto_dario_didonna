@@ -34,7 +34,7 @@
                                     class="form-label text-white-50 fs-7 text-uppercase tracking-wider fw-bold">{{ __('ui.email_address') }}</label>
                                 <div
                                     class="presto-input-group d-flex align-items-center px-3 {{ $errors->has('email') ? 'is-invalid-group' : '' }}">
-                                    <i class="bi bi-envelope text-white-50 me-2"></i>
+                                    <i class="bi bi-envelope text-neon-cyan me-2"></i>
                                     <input type="email" name="email" id="email"
                                         class="form-control bg-presto-input presto-input text-white border-0 py-2-5 fs-7 w-100"
                                         placeholder="{{ __('ui.email_placeholder') }}" value="{{ old('email') }}" required autofocus>
@@ -57,7 +57,7 @@
                                 </div>
                                 <div
                                     class="presto-input-group d-flex align-items-center px-3 {{ $errors->has('password') ? 'is-invalid-group' : '' }}">
-                                    <i class="bi bi-lock text-white-50 me-2"></i>
+                                    <i class="bi bi-lock text-neon-cyan me-2"></i>
                                     <input type="password" name="password" id="password"
                                         class="form-control bg-presto-input presto-input text-white border-0 py-2-5 fs-7 w-100"
                                         placeholder="{{ __('ui.password_placeholder_login') }}" required>

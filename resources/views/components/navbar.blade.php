@@ -28,16 +28,16 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link nav-link-custom text-white-50 hover-neon transition-all px-2"
+                    <a class="nav-link nav-link-custom text-white hover-neon transition-all px-2"
                         href="{{ route('article.index') }}">
-                        <i class="bi bi-grid me-1"></i> {{ __('ui.announcements') }}
+                        <i class="bi text-neon-cyan bi-grid me-1"></i> {{ __('ui.announcements') }}
                     </a>
                 </li>
 
                 <li class="nav-item dropdown">
-                    <a class="nav-link nav-link-custom text-white-50 hover-neon dropdown-toggle px-2" href="#"
+                    <a class="nav-link nav-link-custom text-white hover-neon dropdown-toggle px-2" href="#"
                         id="categoriesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="bi bi-tags me-1"></i> {{ __('ui.categories') }}
+                        <i class="bi bi-tags text-neon-cyan me-1"></i> {{ __('ui.categories') }}
                     </a>
                     <ul class="dropdown-menu dropdown-menu-dark custom-dropdown-animate border border-secondary shadow-lg p-2 bg-dark"
                         aria-labelledby="categoriesDropdown">
@@ -164,7 +164,7 @@
                     </li>
                 @else
                     <li class="nav-item">
-                        <a class="nav-link text-white-50 hover-neon transition-all px-2.5 py-1.5"
+                        <a class="nav-link text-muted-custom hover-neon fw-bold transition-all px-2.5 py-1.5"
                             href="{{ route('login') }}">{{ __('ui.login') }}</a>
                     </li>
                     <li class="nav-item ms-xl-1">

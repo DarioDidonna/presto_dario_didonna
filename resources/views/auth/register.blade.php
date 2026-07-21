@@ -25,12 +25,12 @@
 
                             <div class="mb-3">
                                 <label for="name"
-                                    class="form-label text-white-50 fs-7 text-uppercase tracking-wider fw-bold">{{ __('ui.username') }}</label>
+                                    class="form-label text-muted-custom fs-7 text-uppercase tracking-wider fw-bold">{{ __('ui.username') }}</label>
                                 <div
                                     class="presto-input-group d-flex align-items-center px-3 {{ $errors->has('name') ? 'is-invalid-group' : '' }}">
-                                    <i class="bi bi-person text-white-50 me-2"></i>
+                                    <i class="bi bi-person text-neon-cyan me-2"></i>
                                     <input type="text" name="name" id="name"
-                                        class="form-control bg-presto-input presto-input text-white border-0 py-2-5 fs-7 w-100"
+                                        class="form-control bg-presto-input presto-input border-0 py-2-5 fs-7 w-100"
                                         placeholder="{{ __('ui.name_placeholder') }}" value="{{ old('name') }}" required>
                                 </div>
                                 @error('name')
@@ -42,12 +42,12 @@
 
                             <div class="mb-3">
                                 <label for="email"
-                                    class="form-label text-white-50 fs-7 text-uppercase tracking-wider fw-bold">{{ __('ui.email_address') }}</label>
+                                    class="form-label text-muted-custom fs-7 text-uppercase tracking-wider fw-bold">{{ __('ui.email_address') }}</label>
                                 <div
                                     class="presto-input-group d-flex align-items-center px-3 {{ $errors->has('email') ? 'is-invalid-group' : '' }}">
-                                    <i class="bi bi-envelope text-white-50 me-2"></i>
+                                    <i class="bi bi-envelope text-neon-cyan me-2"></i>
                                     <input type="email" name="email" id="email"
-                                        class="form-control bg-presto-input presto-input text-white border-0 py-2-5 fs-7 w-100"
+                                        class="form-control bg-presto-input presto-input text-neon-cyan border-0 py-2-5 fs-7 w-100"
                                         placeholder="{{ __('ui.email_placeholder') }}" value="{{ old('email') }}" required>
                                 </div>
                                 @error('email')
@@ -59,12 +59,12 @@
 
                             <div class="mb-3">
                                 <label for="password"
-                                    class="form-label text-white-50 fs-7 text-uppercase tracking-wider fw-bold">{{ __('ui.password') }}</label>
+                                    class="form-label text-muted-custom fs-7 text-uppercase tracking-wider fw-bold">{{ __('ui.password') }}</label>
                                 <div
                                     class="presto-input-group d-flex align-items-center px-3 {{ $errors->has('password') ? 'is-invalid-group' : '' }}">
-                                    <i class="bi bi-lock text-white-50 me-2"></i>
+                                    <i class="bi bi-lock text-neon-cyan me-2"></i>
                                     <input type="password" name="password" id="password"
-                                        class="form-control bg-presto-input presto-input text-white border-0 py-2-5 fs-7 w-100"
+                                        class="form-control bg-presto-input presto-input text-light border-0 py-2-5 fs-7 w-100"
                                         placeholder="{{ __('ui.password_placeholder_register') }}" required>
                                     <button type="button" class="btn btn-toggle-password p-0 border-0 bg-transparent"
                                         onclick="togglePasswordVisibility('password', this)">
@@ -80,9 +80,9 @@
 
                             <div class="mb-4">
                                 <label for="password_confirmation"
-                                    class="form-label text-white-50 fs-7 text-uppercase tracking-wider fw-bold">{{ __('ui.confirm_password') }}</label>
+                                    class="form-label text-muted-custom fs-7 text-uppercase tracking-wider fw-bold">{{ __('ui.confirm_password') }}</label>
                                 <div class="presto-input-group d-flex align-items-center px-3">
-                                    <i class="bi bi-shield-lock text-white-50 me-2"></i>
+                                    <i class="bi bi-shield-lock text-neon-cyan me-2"></i>
                                     <input type="password" name="password_confirmation" id="password_confirmation"
                                         class="form-control bg-presto-input presto-input text-white border-0 py-2-5 fs-7 w-100"
                                         placeholder="{{ __('ui.password_confirmation_placeholder') }}" required>

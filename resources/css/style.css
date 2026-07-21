@@ -179,19 +179,29 @@ body {
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+.search-input-custom::placeholder {
+    color: rgba(255, 255, 255, 0.7) !important;
+    opacity: 1;
+}
+
 .search-group-custom:focus-within {
     border-color: var(--accent-cyan);
     box-shadow: 0 0 12px var(--accent-glow);
 }
 
 .bg-search-input {
-    background-color: transparent !important;
+    background-color: var(--accent-cyan) !important;
+}
+
+
+.search-input-custom {
+    color: var(--accent-cyan) !important; 
 }
 
 .search-input-custom:focus {
     box-shadow: none !important;
     outline: none !important;
-    color: #ffffff !important;
+    color: whitesmoke;
 }
 
 .btn-search-submit {
@@ -364,8 +374,9 @@ body {
    3. AUTHENTICATION VIEWS (Login / Register)
    ========================================================================== */
 
-.presto-auth-wrapper {
-    background-color: var(--bg-navbar);
+/* Input nella login - testo digitato dall'utente (non placeholder) */
+.presto-auth-wrapper input.form-control.presto-input {
+    color: #000000 !important;
 }
 
 .text-accent-cyan {
@@ -403,7 +414,7 @@ body {
 }
 
 .presto-input-group {
-    background-color: var(--bg-search);
+    background-color: var(--text-muted-custom);
     border: 1px solid var(--border-color-alpha);
     border-radius: 6px;
     overflow: hidden;
@@ -418,6 +429,8 @@ body {
 .bg-presto-input {
     background-color: transparent !important;
 }
+
+
 
 .presto-input:focus {
     box-shadow: none !important;
@@ -1202,7 +1215,7 @@ body {
 .card-body form .form-select {
     background-color: var(--bg-search) !important;
     border: 1px solid var(--border-color-alpha) !important;
-    color: #ffffff !important;
+    color: var(--bg-search) !important;
     border-radius: 6px;
     padding: 0.6rem 0.75rem;
     transition: all 0.25s ease-in-out;
@@ -1217,7 +1230,7 @@ body {
 }
 
 .card-body form .form-control::placeholder {
-    color: #84ade5 !important;
+    color: #fefefe !important;
 }
 
 .card-body form .input-group-text {
@@ -1233,6 +1246,7 @@ body {
     box-shadow: 0 0 8px rgba(239, 68, 68, 0.25) !important;
     background-image: none !important;
 }
+
 
 .card-body form .invalid-feedback {
     color: #f87171 !important;
