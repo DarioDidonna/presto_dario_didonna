@@ -15,7 +15,7 @@
         <div class="mb-3">
             <label for="title"
                 class="form-label text-uppercase tracking-wide fs-8 fw-semibold text-neon-cyan">{{ __('ui.title') }}</label>
-            <input type="text" wire:model.blur="title" id="title"
+            <input type="text" wire:model="title" id="title"
                 class="form-control bg-dark border-secondary text-white @error('title') is-invalid @enderror"
                 placeholder="{{ __('ui.placeholder_title') }}">
             @error('title')
@@ -29,7 +29,7 @@
                     class="form-label text-uppercase tracking-wide fs-8 fw-semibold text-neon-cyan">{{ __('ui.price_label') }}</label>
                 <div class="input-group">
                     <span class="input-group-text bg-dark border-secondary text-neon-cyan">€</span>
-                    <input type="number" step="0.01" wire:model.blur="price" id="price"
+                    <input type="number" step="0.01" wire:model="price" id="price"
                         class="form-control bg-dark border-secondary text-white @error('price') is-invalid @enderror"
                         placeholder="0.00">
                     @error('price')
@@ -41,7 +41,7 @@
             <div class="col-12 col-md-6 mb-3">
                 <label for="category"
                     class="form-label text-uppercase tracking-wide fs-8 fw-semibold text-neon-cyan">{{ __('ui.category') }}</label>
-                <select wire:model.blur="category" id="category"
+                <select wire:model="category" id="category"
                     class="form-select bg-dark border-secondary text-white @error('category') is-invalid @enderror">
                     <option value="">{{ __('ui.select_category') }}</option>
 
@@ -58,7 +58,7 @@
                 <label for="temporary_images"
                     class="form-label text-uppercase tracking-wide fs-8 fw-semibold text-neon-cyan">Immagini
                     dell'annuncio</label>
-                <input type="file" name="images" wire:model.live="temporary_images" multiple
+                <input type="file" name="images" wire:model="temporary_images" multiple
                     class="form-control shadow @error('temporary_images.*') is-invalid @enderror @error('temporary_images') is-invalid @enderror"
                     placeholder="Img/">
 
@@ -104,7 +104,7 @@
         <div class="mb-4">
             <label for="description"
                 class="form-label text-uppercase tracking-wide fs-8 fw-semibold text-neon-cyan">{{ __('ui.description_label') }}</label>
-            <textarea wire:model.blur="description" id="description" rows="5"
+            <textarea wire:model="description" id="description" rows="5"
                 class="form-control bg-dark border-secondary text-white @error('description') is-invalid @enderror"
                 placeholder="{{ __('ui.description_placeholder') }}"></textarea>
             @error('description')

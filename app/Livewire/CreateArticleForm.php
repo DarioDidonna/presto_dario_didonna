@@ -41,6 +41,7 @@ class CreateArticleForm extends Component
 
     public function store()
     {
+
         $this->validate();
 
         $this->article = Article::create([
@@ -50,6 +51,7 @@ class CreateArticleForm extends Component
             'category_id' => $this->category,
             'user_id' => Auth::id()
         ]);
+
 
         if (count($this->images) > 0) {
             foreach ($this->images as $image) {
@@ -71,6 +73,8 @@ class CreateArticleForm extends Component
 
     public function updatedTemporaryImages()
     {
+
+
         $this->validate([
             'temporary_images.*' => 'image|max:5120',
         ]);

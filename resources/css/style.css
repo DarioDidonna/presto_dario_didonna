@@ -1215,7 +1215,7 @@ body {
 .card-body form .form-select {
     background-color: var(--bg-search) !important;
     border: 1px solid var(--border-color-alpha) !important;
-    color: var(--bg-search) !important;
+    color: #ffffff !important;
     border-radius: 6px;
     padding: 0.6rem 0.75rem;
     transition: all 0.25s ease-in-out;

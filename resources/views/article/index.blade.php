@@ -41,7 +41,7 @@
                     <div
                         class="col-12 col-md-6 text-center py-5 border border-dashed border-secondary rounded-4 bg-navbar-dark shadow">
                         <div class="fs-1 text-muted mb-3">
-                            <i class="bi bi-folder-x text-neon-amber"></i>
+                            <i class="bi bi-folder-x text-neon-cyan"></i>
                         </div>
                         <h4 class="text-white fw-bold text-uppercase tracking-wide mb-2">{{ __('ui.no_ads_found') }}</h4>
                         <p class="text-muted-custom fs-7 mb-4">{{ __('ui.no_ads_message') }}</p>
