@@ -1,9 +1,3 @@
-/**
- * ==========================================================================
- * PRESTO.IT - CORE UI ENGINE
- * Gestione delle interazioni dinamiche, animazioni e comportamenti asincroni
- * ==========================================================================
- */
 
 document.addEventListener('DOMContentLoaded', () => {
 
@@ -18,12 +12,11 @@ document.addEventListener('DOMContentLoaded', () => {
             navbar.classList.add('shadow-lg');
             navbar.style.paddingTop = '0.5rem';
             navbar.style.paddingBottom = '0.5rem';
-            navbar.style.backgroundColor = '#060a14'; // Sfondo scuro profondo in fase di scroll
-        } else {
+            navbar.style.backgroundColor = '#060a14'; 
             navbar.classList.remove('shadow-lg');
             navbar.style.paddingTop = '0.85rem';
             navbar.style.paddingBottom = '0.85rem';
-            navbar.style.backgroundColor = 'var(--bg-navbar)'; // Ripristina il token CSS globale
+            navbar.style.backgroundColor = 'var(--bg-navbar)';
         }
     });
 
@@ -98,7 +91,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const stepTime = Math.abs(Math.floor(duration / targetValue));
 
         const timer = setInterval(() => {
-            startValue += Math.ceil(targetValue / 100); // Velocizza l'incremento per numeri alti
+            startValue += Math.ceil(targetValue / 100); 
             if (startValue >= targetValue) {
                 element.textContent = targetValue;
                 clearInterval(timer);
@@ -238,7 +231,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     emailInput.placeholder = "Grazie per esserti iscritto!";
                     emailInput.disabled = true;
                     submitBtn.innerHTML = '<i class="bi bi-check-lg text-dark"></i>';
-                    submitBtn.style.backgroundColor = '#10b981'; // Cambio colore in verde successo
+                    submitBtn.style.backgroundColor = '#10b981'; 
                 }, 1200);
             }
         });

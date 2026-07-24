@@ -23,7 +23,7 @@
                                     @foreach ($article_to_check->images as $key => $image)
                                         <div class="carousel-item {{ $key === 0 ? 'active' : '' }}">
                                             <div class="position-relative text-center bg-black">
-                                                <img src="{{ Storage::url($image->path) }}"
+                                                <img src="{{ $article_to_check->images->isNotEmpty() ? $article_to_check->images->first()->getUrl(300, 300) : 'https://picsum.photos/300/200' }}"
                                                     class="img-fluid object-fit-contain"
                                                     alt="Immagine {{ $key + 1 }}">
 
