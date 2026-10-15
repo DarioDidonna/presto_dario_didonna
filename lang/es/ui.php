@@ -317,4 +317,16 @@ return [
     'review_mail_rejected_subject' => 'Tu anuncio «:title» no ha sido aprobado',
     'review_mail_rejected_line' => 'Un revisor ha revisado tu anuncio «:title» y no lo ha aprobado, por lo que no es visible para otros usuarios.',
     'review_mail_rejected_hint' => 'Puedes editarlo, por ejemplo corrigiendo el texto o las fotos: al guardarlo volverá a revisión.',
+    // Filtri elenco annunci
+    'filters' => 'Filtros de anuncios',
+    'all_categories' => 'Todas las categorías',
+    'min_price' => 'Precio mín',
+    'max_price' => 'Precio máx',
+    'sort_by' => 'Ordenar por',
+    'sort_relevance' => 'Relevancia',
+    'sort_newest' => 'Más recientes',
+    'sort_price_asc' => 'Precio: de menor a mayor',
+    'sort_price_desc' => 'Precio: de mayor a menor',
+    'apply_filters' => 'Aplicar filtros',
+    'reset_filters' => 'Borrar filtros',
 ];

@@ -317,4 +317,16 @@ return [
     'review_mail_rejected_subject' => 'Il tuo annuncio «:title» non è stato approvato',
     'review_mail_rejected_line' => 'Un revisore ha esaminato il tuo annuncio «:title» e non lo ha approvato, quindi non è visibile agli altri utenti.',
     'review_mail_rejected_hint' => 'Puoi modificarlo, ad esempio correggendo testo o foto: dopo il salvataggio tornerà in revisione.',
+    // Filtri elenco annunci
+    'filters' => 'Filtri annunci',
+    'all_categories' => 'Tutte le categorie',
+    'min_price' => 'Prezzo min',
+    'max_price' => 'Prezzo max',
+    'sort_by' => 'Ordina per',
+    'sort_relevance' => 'Pertinenza',
+    'sort_newest' => 'Più recenti',
+    'sort_price_asc' => 'Prezzo crescente',
+    'sort_price_desc' => 'Prezzo decrescente',
+    'apply_filters' => 'Applica filtri',
+    'reset_filters' => 'Azzera filtri',
 ];

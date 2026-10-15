@@ -14,25 +14,10 @@ class PublicController extends Controller
         return view('homepage', compact('articles'));
     }
 
+    // Vecchio indirizzo della ricerca: la ricerca ora vive nell'elenco annunci, insieme ai filtri
     public function searchArticles(Request $request)
     {
-        $query = $request->input('query');
-
-        // TNTSearch va in errore con query vuote o non testuali (es. ?query[]=x)
-        if (! is_string($query) || trim($query) === '') {
-            return redirect()->route('article.index');
-        }
-        $query = mb_substr(trim($query), 0, 100);
-
-        $articles = Article::search($query)
-            ->query(fn ($builder) => $builder->accepted()->withCardRelations())
-            ->paginate(10)
-            ->withQueryString();
-
-        return view('article.searched', [
-            'articles' => $articles,
-            'query' => $query,
-        ]);
+        return redirect()->route('article.index', $request->query());
     }
 
     public function setLanguage(Request $request, string $lang)

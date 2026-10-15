@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Article;
 use App\Models\Category;
+use App\Support\ArticleFilters;
+use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Support\Facades\Gate;
@@ -23,11 +25,13 @@ class ArticleController extends Controller implements HasMiddleware
         return view('article.create');
     }
 
-    public function index()
+    // Elenco annunci con ricerca testuale e filtri (categoria, prezzo, ordinamento)
+    public function index(Request $request)
     {
-        $articles = Article::accepted()->withCardRelations()->latest()->paginate(10);
+        $filters = ArticleFilters::fromRequest($request);
+        $articles = $filters->query()->paginate(12)->withQueryString();
 
-        return view('article.index', compact('articles'));
+        return view('article.index', compact('articles', 'filters'));
     }
 
     public function show(Article $article)
