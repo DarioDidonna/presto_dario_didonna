@@ -28,6 +28,11 @@ class FortifyServiceProvider extends ServiceProvider
         Fortify::registerView(function (){
             return view('auth.register');
         });
+
+        // Senza queste viste "Password dimenticata?" e le pagine collegate davano errore 500
+        Fortify::requestPasswordResetLinkView(fn () => view('auth.forgot-password'));
+        Fortify::resetPasswordView(fn ($request) => view('auth.reset-password', ['request' => $request]));
+        Fortify::confirmPasswordView(fn () => view('auth.confirm-password'));
     }
 
     /**
