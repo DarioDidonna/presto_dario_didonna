@@ -2,46 +2,20 @@
 
 namespace App\Livewire;
 
-use App\Jobs\GoogleVisionLabelImage;
-use App\Jobs\GoogleVisionSafeSearch;
-use App\Jobs\RemoveFaces;
-use App\Jobs\ResizeImage;
+use App\Livewire\Concerns\HandlesArticleForm;
 use App\Models\Article;
-use App\Models\Category;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\File;
-use Livewire\Attributes\Validate;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 
 class CreateArticleForm extends Component
 {
-    use WithFileUploads;
-
-    public $images = [];
-    public $temporary_images = [];
-
-    #[Validate('required', message: 'Il titolo dell\'annuncio è obbligatorio.')]
-    #[Validate('min:5', message: 'Il titolo deve contenere almeno 5 caratteri.')]
-    public $title;
-
-    #[Validate('required', message: 'Il prezzo è obbligatorio.')]
-    #[Validate('numeric', message: 'Il prezzo deve essere un numero.')]
-    #[Validate('min:0.01', message: 'Il prezzo deve essere maggiore di zero.')]
-    public $price;
-
-    #[Validate('required', message: 'La descrizione è obbligatoria.')]
-    #[Validate('min:15', message: 'La descrizione deve contenere almeno 15 caratteri.')]
-    public $description;
-
-    #[Validate('required', message: 'Selezionare una categoria è obbligatorio.')]
-    public $category;
+    use WithFileUploads, HandlesArticleForm;
 
     public $article;
 
     public function store()
     {
-
         $this->validate();
 
         $this->article = Article::create([
@@ -52,50 +26,19 @@ class CreateArticleForm extends Component
             'user_id' => Auth::id()
         ]);
 
+        $this->storeNewImages($this->article);
 
-        if (count($this->images) > 0) {
-            foreach ($this->images as $image) {
-                $newFileName = "articles/{$this->article->id}/";
-                $newImage = $this->article->images()->create(['path' => $image->store($newFileName, 'public')]);
-
-                RemoveFaces::withChain([
-                    new ResizeImage($newImage->path, 300, 300),
-                    new GoogleVisionSafeSearch($newImage->id),
-                    new GoogleVisionLabelImage($newImage->id)
-                ])->dispatch($newImage->id);
-            }
-            File::deleteDirectory(storage_path('app/livewire-tmp'));
-        }
-
-        session()->flash('message', 'Annuncio pubblicato con successo!');
+        session()->flash('message', __('ui.article_published'));
         $this->reset(['title', 'price', 'description', 'category', 'images', 'temporary_images']);
-    }
-
-    public function updatedTemporaryImages()
-    {
-
-
-        $this->validate([
-            'temporary_images.*' => 'image|max:5120',
-        ]);
-
-        foreach ($this->temporary_images as $image) {
-            $this->images[] = $image;
-        }
-
-        $this->temporary_images = [];
-    }
-
-    public function removeImage($key)
-    {
-        if (in_array($key, array_keys($this->images))) {
-            unset($this->images[$key]);
-            $this->images = array_values($this->images);
-        }
     }
 
     public function render()
     {
-        return view('livewire.create-article-form');
+        return view('livewire.article-form', [
+            'submitAction' => 'store',
+            'submitLabel' => __('ui.publish_ad'),
+            'submitIcon' => 'bi-plus-circle',
+            'existingImages' => collect(),
+        ]);
     }
 }
