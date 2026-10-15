@@ -17,10 +17,30 @@ class ArticleReviewed extends Notification implements ShouldQueue
 {
     use Queueable, SerializesModels;
 
+    // Annuncio eliminato prima dell'invio: il job viene scartato invece di finire tra i falliti
+    public bool $deleteWhenMissingModels = true;
+
+    // Istante della decisione: se l'annuncio viene modificato dopo (es. decisione annullata) l'email non parte
+    public int $decidedAt;
+
     public function __construct(public Article $article, public bool $accepted)
     {
+        $this->decidedAt = $article->updated_at?->getTimestamp() ?? now()->getTimestamp();
         // Parte solo dopo il commit: il job trova l'annuncio con lo stato già aggiornato
         $this->afterCommit();
+    }
+
+    /**
+     * Controllato da Laravel al momento dell'invio (dopo il ritardo in coda):
+     * niente email se il revisore ha annullato o cambiato la decisione, o se l'annuncio è stato eliminato.
+     */
+    public function shouldSend(object $notifiable, string $channel): bool
+    {
+        $article = $this->article->fresh();
+
+        return $article !== null
+            && $article->is_accepted === $this->accepted
+            && $article->updated_at->getTimestamp() === $this->decidedAt;
     }
 
     /**

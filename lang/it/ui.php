@@ -329,4 +329,10 @@ return [
     'sort_price_desc' => 'Prezzo decrescente',
     'apply_filters' => 'Applica filtri',
     'reset_filters' => 'Azzera filtri',
+    // Annulla decisione del revisore
+    'undo' => 'Annulla',
+    'undo_within' => 'possibile per :minutes min',
+    'undo_available' => 'Puoi ancora annullare la tua ultima decisione.',
+    'undo_done' => 'Decisione annullata: «:title» è tornato in coda di revisione.',
+    'undo_expired' => 'Non è più possibile annullare: il tempo è scaduto o l\'annuncio è stato modificato.',
 ];

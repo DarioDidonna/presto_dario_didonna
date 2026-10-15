@@ -329,4 +329,10 @@ return [
     'sort_price_desc' => 'Precio: de mayor a menor',
     'apply_filters' => 'Aplicar filtros',
     'reset_filters' => 'Borrar filtros',
+    // Annulla decisione del revisore
+    'undo' => 'Deshacer',
+    'undo_within' => 'disponible durante :minutes min',
+    'undo_available' => 'Todavía puedes deshacer tu última decisión.',
+    'undo_done' => 'Decisión deshecha: «:title» ha vuelto a la cola de revisión.',
+    'undo_expired' => 'Ya no se puede deshacer: el tiempo ha expirado o el anuncio ha cambiado.',
 ];

@@ -36,6 +36,7 @@ Progetto finale del corso Hackademy (Aulab), ampliato con refactoring, test auto
 
 ### Revisori
 - **Dashboard di revisione** con coda in ordine di arrivo e conferma prima di accettare o rifiutare
+- **Annulla l'ultima decisione** entro 5 minuti: l'email all'autore parte solo allo scadere della finestra e solo se la decisione è ancora valida
 - Per ogni foto: **etichette** e **valutazioni SafeSearch** (adulti, violenza, contenuti espliciti…) di Google Vision
 - Promozione a revisore tramite **link firmato a tempo** inviato via email all'amministratore
 
@@ -69,7 +70,7 @@ Un errore di Google Vision (credenziali mancanti, servizio non raggiungibile) no
 | Frontend | Blade, Livewire 4, Bootstrap 5.3, Bootstrap Icons, Vite |
 | Immagini | Google Cloud Vision API, Spatie Image (GD) |
 | Dati | MySQL, code e sessioni su database |
-| Test e qualità | PHPUnit (120 test), Laravel Pint, GitHub Actions |
+| Test e qualità | PHPUnit (127 test), Laravel Pint, GitHub Actions |
 
 ---
 
@@ -144,10 +145,10 @@ In sviluppo le email (reset password, candidature revisore) finiscono nel log (`
 php artisan test
 ```
 
-I 120 test coprono, tra l'altro:
+I 127 test coprono, tra l'altro:
 
 - **sicurezza e permessi**: solo i revisori approvano, link di promozione firmati e a scadenza, annunci non pubblicati invisibili agli altri utenti, modifica ed eliminazione riservate all'autore;
-- **flussi completi**: ricerca e filtri, pubblicazione, revisione con email all'autore, reset password, profilo e foto profilo, catena di elaborazione delle immagini;
+- **flussi completi**: ricerca e filtri, pubblicazione, revisione con email all'autore e annullamento, reset password, profilo e foto profilo, catena di elaborazione delle immagini;
 - **pagine di errore** 403, 404, 419, 429, 500 e 503 nella lingua dell'utente;
 - **qualità**: limite di query per pagina (contro i problemi N+1), HTML bilanciato, nessuna classe CSS non definita, nessun link morto, testi tradotti.
 

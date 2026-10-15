@@ -11,6 +11,41 @@
             </div>
         </div>
 
+        {{-- Esito dell'ultima azione, sempre visibile (anche quando la coda è vuota), con "Annulla" entro la finestra --}}
+        @php
+            $lastReview = session('last_review');
+            $undoSeconds = $lastReview
+                ? max(0, $lastReview['decided_at'] + \App\Http\Controllers\RevisorController::UNDO_MINUTES * 60 - now()->getTimestamp())
+                : 0;
+        @endphp
+        @if (session()->has('message') || session()->has('errorMessage') || $undoSeconds > 0)
+            <div class="row justify-content-center px-xl-5 mb-3">
+                <div class="col-12 col-xl-10">
+                    @if (session()->has('errorMessage'))
+                        <div class="alert alert-warning bg-warning bg-opacity-10 border-warning text-warning d-flex align-items-center gap-2 mb-0" role="status">
+                            <i class="bi bi-exclamation-triangle-fill"></i> {{ session('errorMessage') }}
+                        </div>
+                    @else
+                        <div class="alert bg-success bg-opacity-10 border-success text-white d-flex flex-wrap align-items-center justify-content-between gap-2 mb-0" role="status">
+                            <span>
+                                <i class="bi bi-check-circle-fill text-success me-2"></i>{{ session('message') ?? __('ui.undo_available') }}
+                            </span>
+                            @if ($undoSeconds > 0)
+                                <form action="{{ route('revisor.undo') }}" method="POST" class="d-flex align-items-center gap-2 m-0">
+                                    @csrf
+                                    @method('PATCH')
+                                    <span class="text-muted-custom fs-8">{{ __('ui.undo_within', ['minutes' => (int) ceil($undoSeconds / 60)]) }}</span>
+                                    <button type="submit" class="btn btn-sm btn-outline-light fw-bold">
+                                        <i class="bi bi-arrow-counterclockwise me-1"></i>{{ __('ui.undo') }}
+                                    </button>
+                                </form>
+                            @endif
+                        </div>
+                    @endif
+                </div>
+            </div>
+        @endif
+
         @if ($article_to_check)
             <div class="row justify-content-center pt-3 px-xl-5">
 
@@ -176,13 +211,6 @@
                         </div>
 
                         <div class="mt-4">
-                            @if (session()->has('message'))
-                                <div class="alert alert-success text-center shadow rounded border-0 bg-success bg-opacity-25 text-white d-flex align-items-center justify-content-center p-3 mb-3">
-                                    <i class="bi bi-check-circle-fill me-2 fs-5 text-success"></i>
-                                    <span class="font-monospace fs-7">{{ session('message') }}</span>
-                                </div>
-                            @endif
-
                             {{-- I pulsanti aprono una finestra di conferma: l'invio vero parte solo dal form nella modale --}}
                             <div class="d-flex justify-content-between gap-3">
                                 <button type="button" class="btn btn-outline-danger py-2.5 w-100 fw-bold shadow-sm border-2"
