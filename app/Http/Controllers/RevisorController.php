@@ -11,6 +11,9 @@ use Illuminate\Support\Facades\Mail;
 
 class RevisorController extends Controller
 {
+    // Finestra per annullare l'ultima decisione; l'email all'autore parte solo dopo questo tempo
+    public const UNDO_MINUTES = 5;
+
     public function index()
     {
         $article_to_check = Article::with(['images', 'category', 'user'])->whereNull('is_accepted')->oldest()->first();
@@ -44,7 +47,37 @@ class RevisorController extends Controller
         }
 
         $article->setAccepted($accepted);
-        $article->user?->notify(new ArticleReviewed($article, $accepted));
+
+        // L'email parte dopo la finestra di annullamento e solo se la decisione è ancora valida (ArticleReviewed::shouldSend)
+        $article->user?->notify(
+            (new ArticleReviewed($article, $accepted))->delay(now()->addMinutes(self::UNDO_MINUTES))
+        );
+
+        session()->put('last_review', [
+            'article_id' => $article->id,
+            'accepted' => $accepted,
+            'decided_at' => $article->updated_at->getTimestamp(),
+        ]);
+    }
+
+    public function undo()
+    {
+        $review = session()->pull('last_review');
+        $article = $review ? Article::find($review['article_id']) : null;
+
+        // Annullabile solo la propria ultima decisione, entro la finestra e se nessuno l'ha cambiata nel frattempo
+        $valid = $article
+            && $article->is_accepted === $review['accepted']
+            && $article->updated_at->getTimestamp() === $review['decided_at']
+            && now()->getTimestamp() - $review['decided_at'] <= self::UNDO_MINUTES * 60;
+
+        if (! $valid) {
+            return redirect()->route('revisor.index')->with('errorMessage', __('ui.undo_expired'));
+        }
+
+        $article->setAccepted(null);
+
+        return redirect()->route('revisor.index')->with('message', __('ui.undo_done', ['title' => $article->title]));
     }
 
     public function becomeRevisor()

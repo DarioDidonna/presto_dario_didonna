@@ -329,4 +329,10 @@ return [
     'sort_price_desc' => 'Price: high to low',
     'apply_filters' => 'Apply filters',
     'reset_filters' => 'Clear filters',
+    // Annulla decisione del revisore
+    'undo' => 'Undo',
+    'undo_within' => 'available for :minutes min',
+    'undo_available' => 'You can still undo your last decision.',
+    'undo_done' => 'Decision undone: “:title” is back in the review queue.',
+    'undo_expired' => 'It can no longer be undone: time is up or the ad has changed.',
 ];

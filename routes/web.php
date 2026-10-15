@@ -33,6 +33,9 @@ Route::patch('/accept/{article}', [RevisorController::class, 'accept'])->middlew
 // REJECT
 Route::patch('/reject/{article}', [RevisorController::class, 'reject'])->middleware('isRevisor')->name('reject');
 
+// UNDO (ultima decisione del revisore)
+Route::patch('/revisor/undo', [RevisorController::class, 'undo'])->middleware('isRevisor')->name('revisor.undo');
+
 // BECOME REVISOR
 Route::post('/revisor/request', [RevisorController::class, 'becomeRevisor'])->middleware(['auth', 'throttle:3,60'])->name('become.revisor');
 
