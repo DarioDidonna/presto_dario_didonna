@@ -295,4 +295,18 @@ return [
     'confirm_delete_title' => 'Delete this ad?',
     'confirm_delete_text' => 'The ad “:title” and its photos will be permanently deleted. This cannot be undone.',
     'confirm_delete_button' => 'Yes, delete',
+    // Pagine di errore
+    'error_404_title' => 'Page not found',
+    'error_404_text' => 'The address may be wrong, or the ad has been removed or is not published yet.',
+    'error_403_title' => 'Access denied',
+    'error_403_text' => 'You do not have permission to view this page or perform this action.',
+    'error_419_title' => 'Session expired',
+    'error_419_text' => 'The page was open for too long. Go back, reload and try again.',
+    'error_retry' => 'Go back',
+    'error_429_title' => 'Too many requests',
+    'error_429_text' => 'You made too many requests in a short time. Wait a few minutes and try again.',
+    'error_500_title' => 'Something went wrong',
+    'error_500_text' => 'An unexpected error occurred. It has been logged: please try again shortly.',
+    'error_503_title' => 'Under maintenance',
+    'error_503_text' => 'We are updating Presto.it. Please come back in a few minutes.',
 ];
