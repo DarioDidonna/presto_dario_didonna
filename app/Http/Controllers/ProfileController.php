@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\UpdateAvatarRequest;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
@@ -38,18 +39,9 @@ class ProfileController extends Controller implements HasMiddleware
         return view('profile.show', compact('user', 'articles', 'counts'));
     }
 
-    public function updateAvatar(Request $request)
+    // Validazione in UpdateAvatarRequest
+    public function updateAvatar(UpdateAvatarRequest $request)
     {
-        $request->validate([
-            'avatar' => ['required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048', 'dimensions:min_width=64,min_height=64'],
-        ], [
-            'avatar.required' => __('ui.avatar_required'),
-            'avatar.image' => __('ui.validation_image_image'),
-            'avatar.mimes' => __('ui.validation_image_image'),
-            'avatar.max' => __('ui.avatar_max'),
-            'avatar.dimensions' => __('ui.avatar_dimensions'),
-        ]);
-
         $user = $request->user();
         $disk = Storage::disk('public');
         $path = "avatars/{$user->id}/".Str::random(40).'.jpg';

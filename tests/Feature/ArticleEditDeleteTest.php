@@ -74,11 +74,11 @@ class ArticleEditDeleteTest extends TestCase
 
         Livewire::actingAs($article->user)
             ->test(EditArticleForm::class, ['article' => $article])
-            ->assertSet('title', $article->title)
-            ->set('title', 'Titolo aggiornato')
-            ->set('price', 42.5)
-            ->set('description', 'Descrizione aggiornata e abbastanza lunga')
-            ->set('category', $newCategory->id)
+            ->assertSet('form.title', $article->title)
+            ->set('form.title', 'Titolo aggiornato')
+            ->set('form.price', 42.5)
+            ->set('form.description', 'Descrizione aggiornata e abbastanza lunga')
+            ->set('form.category', $newCategory->id)
             ->call('update')
             ->assertHasNoErrors()
             ->assertRedirect(route('article.show', $article));
@@ -105,9 +105,9 @@ class ArticleEditDeleteTest extends TestCase
 
         Livewire::actingAs($article->user)
             ->test(EditArticleForm::class, ['article' => $article])
-            ->set('title', 'abc')
+            ->set('form.title', 'abc')
             ->call('update')
-            ->assertHasErrors(['title' => 'min']);
+            ->assertHasErrors(['form.title' => 'min']);
 
         $this->assertTrue($article->fresh()->is_accepted);
     }

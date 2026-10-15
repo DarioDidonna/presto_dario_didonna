@@ -16,7 +16,7 @@ class ArticleController extends Controller implements HasMiddleware
     public static function middleware(): array
     {
         return [
-            new Middleware('auth', only: ['create', 'edit', 'destroy']),
+            new Middleware('auth', only: ['create']),
         ];
     }
 
@@ -44,17 +44,15 @@ class ArticleController extends Controller implements HasMiddleware
         return view('article.show', compact('article'));
     }
 
+    // Permesso verificato sulla rotta: ->can('update', 'article')
     public function edit(Article $article)
     {
-        Gate::authorize('update', $article);
-
         return view('article.edit', compact('article'));
     }
 
+    // Permesso verificato sulla rotta: ->can('delete', 'article')
     public function destroy(Article $article)
     {
-        Gate::authorize('delete', $article);
-
         // Le righe di "images" spariscono per il cascade del DB; i file vanno rimossi a mano
         Storage::disk('public')->deleteDirectory("articles/{$article->id}");
         $article->delete();

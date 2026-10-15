@@ -14,10 +14,10 @@
         <div class="mb-3">
             <label for="title"
                 class="form-label text-uppercase tracking-wide fs-8 fw-semibold text-neon-cyan">{{ __('ui.title') }}</label>
-            <input type="text" wire:model.blur="title" id="title"
-                class="form-control bg-dark border-secondary text-white @error('title') is-invalid @enderror"
+            <input type="text" wire:model.blur="form.title" id="title"
+                class="form-control bg-dark border-secondary text-white @error('form.title') is-invalid @enderror"
                 placeholder="{{ __('ui.placeholder_title') }}">
-            @error('title')
+            @error('form.title')
                 <div class="invalid-feedback font-monospace fs-8">{{ $message }}</div>
             @enderror
         </div>
@@ -28,10 +28,10 @@
                     class="form-label text-uppercase tracking-wide fs-8 fw-semibold text-neon-cyan">{{ __('ui.price_label') }}</label>
                 <div class="input-group">
                     <span class="input-group-text bg-dark border-secondary text-neon-cyan">€</span>
-                    <input type="number" step="0.01" min="0.01" wire:model.blur="price" id="price"
-                        class="form-control bg-dark border-secondary text-white @error('price') is-invalid @enderror"
+                    <input type="number" step="0.01" min="0.01" wire:model.blur="form.price" id="price"
+                        class="form-control bg-dark border-secondary text-white @error('form.price') is-invalid @enderror"
                         placeholder="0.00">
-                    @error('price')
+                    @error('form.price')
                         <div class="invalid-feedback font-monospace fs-8 d-block">{{ $message }}</div>
                     @enderror
                 </div>
@@ -40,15 +40,15 @@
             <div class="col-12 col-md-6 mb-3">
                 <label for="category"
                     class="form-label text-uppercase tracking-wide fs-8 fw-semibold text-neon-cyan">{{ __('ui.category') }}</label>
-                <select wire:model.live="category" id="category"
-                    class="form-select bg-dark border-secondary text-white @error('category') is-invalid @enderror">
+                <select wire:model.live="form.category" id="category"
+                    class="form-select bg-dark border-secondary text-white @error('form.category') is-invalid @enderror">
                     <option value="">{{ __('ui.select_category') }}</option>
 
                     @foreach ($categories as $cat)
                         <option value="{{ $cat->id }}">{{ $cat->translated_name }}</option>
                     @endforeach
                 </select>
-                @error('category')
+                @error('form.category')
                     <div class="invalid-feedback font-monospace fs-8">{{ $message }}</div>
                 @enderror
             </div>
@@ -139,10 +139,10 @@
         <div class="mb-4">
             <label for="description"
                 class="form-label text-uppercase tracking-wide fs-8 fw-semibold text-neon-cyan">{{ __('ui.description_label') }}</label>
-            <textarea wire:model.blur="description" id="description" rows="5"
-                class="form-control bg-dark border-secondary text-white @error('description') is-invalid @enderror"
+            <textarea wire:model.blur="form.description" id="description" rows="5"
+                class="form-control bg-dark border-secondary text-white @error('form.description') is-invalid @enderror"
                 placeholder="{{ __('ui.description_placeholder') }}"></textarea>
-            @error('description')
+            @error('form.description')
                 <div class="invalid-feedback font-monospace fs-8">{{ $message }}</div>
             @enderror
         </div>

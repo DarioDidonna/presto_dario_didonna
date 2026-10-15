@@ -2,27 +2,22 @@
 
 namespace App\Livewire\Concerns;
 
+use App\Livewire\Forms\ArticleForm;
 use App\Models\Article;
 use Illuminate\Validation\ValidationException;
 
 /**
- * Campi, validazione e gestione delle nuove foto condivisi da creazione e modifica annuncio.
+ * Form dell'annuncio (ArticleForm) e gestione delle nuove foto, condivisi da creazione e modifica.
  */
 trait HandlesArticleForm
 {
     public const MAX_IMAGES = 6;
 
+    public ArticleForm $form;
+
     public $images = [];
 
     public $temporary_images = [];
-
-    public $title;
-
-    public $price;
-
-    public $description;
-
-    public $category;
 
     // Foto già salvate che restano sull'annuncio (0 in creazione)
     protected function keptImagesCount(): int
@@ -35,13 +30,10 @@ trait HandlesArticleForm
         return max(0, self::MAX_IMAGES - $this->keptImagesCount());
     }
 
+    // Regole delle sole foto: quelle dei campi testuali stanno in ArticleForm
     protected function rules(): array
     {
         return [
-            'title' => 'required|string|min:5|max:100',
-            'price' => 'required|numeric|min:0.01|max:999999.99',
-            'description' => 'required|string|min:15|max:5000',
-            'category' => 'required|integer|exists:categories,id',
             'images' => 'array|max:'.$this->maxNewImages(),
             'images.*' => 'image|max:5120',
         ];
@@ -52,19 +44,6 @@ trait HandlesArticleForm
         $maxImages = __('ui.validation_images_max_count', ['max' => self::MAX_IMAGES]);
 
         return [
-            'title.required' => __('ui.validation_title_required'),
-            'title.min' => __('ui.validation_title_min'),
-            'title.max' => __('ui.validation_title_max'),
-            'price.required' => __('ui.validation_price_required'),
-            'price.numeric' => __('ui.validation_price_numeric'),
-            'price.min' => __('ui.validation_price_min'),
-            'price.max' => __('ui.validation_price_max'),
-            'description.required' => __('ui.validation_description_required'),
-            'description.min' => __('ui.validation_description_min'),
-            'description.max' => __('ui.validation_description_max'),
-            'category.required' => __('ui.validation_category_required'),
-            'category.integer' => __('ui.validation_category_exists'),
-            'category.exists' => __('ui.validation_category_exists'),
             'images.max' => $maxImages,
             'images.*.image' => __('ui.validation_image_image'),
             'images.*.max' => __('ui.validation_image_max'),
@@ -74,12 +53,21 @@ trait HandlesArticleForm
         ];
     }
 
-    // Validazione in tempo reale dei campi testuali
+    // Validazione in tempo reale dei campi testuali (form.title, form.price, ...)
     public function updated($property)
     {
-        if (in_array($property, ['title', 'price', 'description', 'category'], true)) {
-            $this->validateOnly($property);
+        if (str_starts_with($property, 'form.')) {
+            $this->form->validateOnly(substr($property, strlen('form.')));
         }
+    }
+
+    // Valida campi testuali e foto in un'unica passata, così l'utente vede tutti gli errori insieme
+    protected function validateArticle(): void
+    {
+        $this->validate(
+            [...$this->form->prefixedRules(), ...$this->rules()],
+            [...$this->form->prefixedMessages(), ...$this->messages()],
+        );
     }
 
     public function updatedTemporaryImages()

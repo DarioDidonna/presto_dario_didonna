@@ -22,10 +22,7 @@ class EditArticleForm extends Component
         $this->authorize('update', $article);
 
         $this->article = $article;
-        $this->title = $article->title;
-        $this->price = $article->price;
-        $this->description = $article->description;
-        $this->category = $article->category_id;
+        $this->form->fillFromArticle($article);
     }
 
     protected function keptImagesCount(): int
@@ -51,14 +48,9 @@ class EditArticleForm extends Component
     {
         // Ricontrollo: un componente Livewire può ricevere richieste anche dopo il mount
         $this->authorize('update', $this->article);
-        $this->validate();
+        $this->validateArticle();
 
-        $this->article->fill([
-            'title' => $this->title,
-            'description' => $this->description,
-            'price' => $this->price,
-            'category_id' => $this->category,
-        ]);
+        $this->article->fill($this->form->attributes());
         // Ogni modifica torna in revisione: un annuncio approvato non può cambiare contenuto senza controllo
         $this->article->is_accepted = null;
         $this->article->save();
