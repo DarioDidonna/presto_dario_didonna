@@ -27,7 +27,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         View::composer(
-            ['components.navbar', 'components.categories', 'livewire.article-form'],
+            ['components.navbar', 'components.categories', 'livewire.article-form', 'article.index'],
             fn ($view) => $view->with('categories', once(
                 // Conteggio dei soli annunci pubblicati, calcolato in SQL (prima: tutti gli annunci caricati per ogni categoria)
                 fn () => Category::withCount(['articles as accepted_articles_count' => fn ($query) => $query->accepted()])

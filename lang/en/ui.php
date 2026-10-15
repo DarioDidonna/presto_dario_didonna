@@ -317,4 +317,16 @@ return [
     'review_mail_rejected_subject' => 'Your ad “:title” was not approved',
     'review_mail_rejected_line' => 'A reviewer checked your ad “:title” and did not approve it, so it is not visible to other users.',
     'review_mail_rejected_hint' => 'You can edit it, for example fixing the text or photos: after saving it will go back under review.',
+    // Filtri elenco annunci
+    'filters' => 'Ad filters',
+    'all_categories' => 'All categories',
+    'min_price' => 'Min price',
+    'max_price' => 'Max price',
+    'sort_by' => 'Sort by',
+    'sort_relevance' => 'Relevance',
+    'sort_newest' => 'Newest',
+    'sort_price_asc' => 'Price: low to high',
+    'sort_price_desc' => 'Price: high to low',
+    'apply_filters' => 'Apply filters',
+    'reset_filters' => 'Clear filters',
 ];

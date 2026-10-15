@@ -51,7 +51,7 @@ class DemoSeederTest extends TestCase
         foreach (['/', '/article/index', "/category/{$article->category_id}", "/show/article/{$article->id}"] as $url) {
             $this->get($url)->assertOk();
         }
-        $this->get('/search/article?query=bicicletta')->assertOk()->assertSee('Bicicletta da corsa');
+        $this->get('/article/index?query=bicicletta')->assertOk()->assertSee('Bicicletta da corsa');
 
         // Le credenziali demo funzionano
         $this->post('/login', ['email' => 'revisore@presto.it', 'password' => DemoSeeder::PASSWORD]);

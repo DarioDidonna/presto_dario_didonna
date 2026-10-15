@@ -35,7 +35,7 @@ class QueryCountTest extends TestCase
             'homepage' => ['/'],
             'indice' => ['/article/index'],
             'categoria' => ['/category/2'],
-            'ricerca' => ['/search/article?query=Articolo'],
+            'ricerca' => ['/article/index?query=Articolo&min_price=1&sort=price_desc'],
             'dettaglio' => ['/show/article/1'],
             'revisore' => ['/revisor/index'],
         ];
@@ -51,7 +51,7 @@ class QueryCountTest extends TestCase
         $queries = array_column(DB::getQueryLog(), 'query');
         // Il driver Scout "collection" (solo test) chiama toSearchableArray() su ogni articolo:
         // quelle query non esistono in produzione con TNTSearch, quindi non le contiamo
-        if (str_starts_with($url, '/search')) {
+        if (str_contains($url, 'query=')) {
             $firstEngineQuery = array_search('select * from "articles" order by "articles"."id" desc', $queries);
             $queries = array_values(array_filter(
                 $queries,

@@ -16,12 +16,12 @@ class FrontendTest extends TestCase
 
     public function test_search_pagination_keeps_the_query(): void
     {
-        Article::factory()->count(12)->accepted()->create(['title' => 'Chitarra elettrica']);
+        Article::factory()->count(13)->accepted()->create(['title' => 'Chitarra elettrica']);
 
-        $response = $this->get('/search/article?query=Chitarra')->assertOk();
+        $response = $this->get('/article/index?query=Chitarra&sort=price_asc')->assertOk();
 
-        $response->assertSee('query=Chitarra&amp;page=2', false);
-        $this->get('/search/article?query=Chitarra&page=2')->assertOk()->assertViewHas('articles', fn ($a) => $a->count() === 2);
+        $response->assertSee('query=Chitarra&amp;sort=price_asc&amp;page=2', false);
+        $this->get('/article/index?query=Chitarra&sort=price_asc&page=2')->assertOk()->assertViewHas('articles', fn ($a) => $a->count() === 1);
     }
 
     public function test_password_toggle_buttons_use_data_attribute(): void
@@ -168,7 +168,7 @@ class FrontendTest extends TestCase
     {
         Article::factory()->accepted()->create(['title' => 'Lampada vintage']);
 
-        $this->get('/search/article?query=Lampada')
+        $this->get('/article/index?query=Lampada')
             ->assertOk()
             ->assertDontSee('bg-light', false)
             ->assertDontSee('bg-white', false)

@@ -69,13 +69,13 @@
             </ul>
 
             <form class="d-flex mx-auto col-12 col-xl-3 px-0 px-xl-2 my-3 my-xl-0 position-relative"
-                action="{{ route('article.search') }}" method="GET">
+                action="{{ route('article.index') }}" method="GET" role="search">
                 <div class="input-group search-group-custom w-100 border border-secondary rounded overflow-hidden">
                     <span class="input-group-text bg-black border-0 text-muted ps-3">
                         <i class="bi bi-search text-neon-cyan"></i>
                     </span>
                     <input class="form-control border-0 text-white search-input-custom bg-black ps-2 py-1.5 fs-7"
-                        type="search" name="query" placeholder="{{ __('ui.search_placeholder') }}" aria-label="{{ __('ui.search') }}">
+                        type="search" name="query" value="{{ request()->routeIs('article.index') && is_string(request('query')) ? request('query') : '' }}" placeholder="{{ __('ui.search_placeholder') }}" aria-label="{{ __('ui.search') }}">
                     <button
                         class="btn btn-search-submit border-0 text-uppercase text-neon-cyan fw-bold bg-black px-3 transition-all"
                         type="submit">
