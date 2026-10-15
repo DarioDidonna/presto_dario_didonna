@@ -68,10 +68,10 @@ Un errore di Google Vision (credenziali mancanti, servizio non raggiungibile) no
 | Ambito | Strumenti |
 |---|---|
 | Backend | PHP 8.2+, Laravel 13, Laravel Fortify, Laravel Scout + TNTSearch |
-| Frontend | Blade, Livewire 4, Bootstrap 5.3, Bootstrap Icons, Vite |
+| Frontend | Blade, Livewire 4, Bootstrap 5.3, Bootstrap Icons, Vite (nessuna dipendenza da CDN) |
 | Immagini | Google Cloud Vision API, Spatie Image (GD) |
 | Dati | MySQL, code e sessioni su database |
-| Test e qualità | PHPUnit (133 test), Laravel Pint, GitHub Actions |
+| Test e qualità | PHPUnit (136 test), Laravel Pint, GitHub Actions |
 
 ---
 
@@ -112,7 +112,17 @@ Il sito è su [http://localhost:8000](http://localhost:8000).
 | Utente | `demo@presto.it` | `password` |
 | Revisore | `revisore@presto.it` | `password` |
 
-I dati demo comprendono 24 annunci in tutti gli stati (pubblicati, in revisione, rifiutati). Si possono ricaricare con `php artisan db:seed --class=DemoSeeder`; per usare foto vere al posto delle immagini generate vedi [`database/seeders/demo-images`](database/seeders/demo-images/README.md).
+I dati demo comprendono 24 annunci in tutti gli stati (pubblicati, in revisione, rifiutati).
+
+Per riportare il sito allo stato demo iniziale (database, foto caricate e indice di ricerca da zero) basta un comando, che chiede conferma e non gira in produzione:
+
+```bash
+composer run demo
+```
+
+Il sito non usa CDN: icone e stili sono inclusi nel build, quindi la demo funziona anche senza connessione (tranne l'analisi di Google Vision).
+
+Per usare foto vere al posto delle immagini generate vedi [`database/seeders/demo-images`](database/seeders/demo-images/README.md).
 
 ### Google Cloud Vision (facoltativo)
 
@@ -133,6 +143,7 @@ In sviluppo le email (reset password, candidature revisore) finiscono nel log (`
 | Comando | Descrizione |
 |---|---|
 | `php artisan test` | Esegue la suite di test |
+| `composer run demo` | Riporta il sito allo stato demo (cancella il database locale) |
 | `php artisan app:make-user-revisor {email}` | Rende revisore un utente |
 | `php artisan app:analyze-images [--all]` | Rimette in coda l'analisi delle immagini (solo quelle mai analizzate, o tutte) |
 | `php artisan scout:import "App\Models\Article"` | Ricostruisce l'indice di ricerca |
@@ -146,7 +157,7 @@ In sviluppo le email (reset password, candidature revisore) finiscono nel log (`
 php artisan test
 ```
 
-I 133 test coprono, tra l'altro:
+I 136 test coprono, tra l'altro:
 
 - **sicurezza e permessi**: solo i revisori approvano, link di promozione firmati e a scadenza, annunci non pubblicati invisibili agli altri utenti, modifica ed eliminazione riservate all'autore;
 - **flussi completi**: ricerca e filtri, pubblicazione, revisione con email all'autore e annullamento, reset password, profilo e foto profilo, catena di elaborazione delle immagini;
