@@ -5,8 +5,6 @@ namespace App\Http\Controllers;
 use App\Mail\BecomeRevisor;
 use App\Models\Article;
 use App\Models\User;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 
@@ -14,7 +12,7 @@ class RevisorController extends Controller
 {
     public function index()
     {
-        $article_to_check = Article::where('is_accepted', null)->first();
+        $article_to_check = Article::with(['images', 'category', 'user'])->whereNull('is_accepted')->oldest()->first();
         return view('revisor.index', compact('article_to_check'));
     }
 
@@ -42,7 +40,9 @@ class RevisorController extends Controller
 
     public function makeRevisor(User $user)
     {
-        Artisan::call('app:make-user-revisor', ['email' => $user->email]);
-        return redirect()->back();
+        // La rotta è protetta dal middleware 'signed': il link è valido solo se generato dalla mail
+        $user->is_revisor = true;
+        $user->save();
+        return redirect()->route('homepage')->with('message', __('ui.revisor_promoted', ['name' => $user->name]));
     }
 }

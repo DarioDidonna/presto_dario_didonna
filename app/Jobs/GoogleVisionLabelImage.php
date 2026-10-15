@@ -2,19 +2,15 @@
 
 namespace App\Jobs;
 
+use App\Jobs\Concerns\CallsGoogleVision;
 use App\Models\Image;
-use Google\Cloud\Vision\V1\Feature;
 use Google\Cloud\Vision\V1\Feature\Type;
-use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Google\Cloud\Vision\V1\AnnotateImageRequest;
-use Google\Cloud\Vision\V1\Image as VisionImage;
-use Google\Cloud\Vision\V1\BatchAnnotateImagesRequest;
-use Google\Cloud\Vision\V1\Client\ImageAnnotatorClient;
+use Illuminate\Foundation\Queue\Queueable;
 
 class GoogleVisionLabelImage implements ShouldQueue
 {
-    use Queueable;
+    use Queueable, CallsGoogleVision;
 
     private $article_image_id;
 
@@ -35,67 +31,23 @@ class GoogleVisionLabelImage implements ShouldQueue
                 return;
             }
 
-            $srcPath = storage_path('app/public/' . $i->path);
-
-            if (!file_exists($srcPath)) {
-                logger()->warning("GoogleVisionLabelImage: File non trovato in " . $srcPath . ". Salto il controllo.");
+            $response = $this->annotate($i, Type::LABEL_DETECTION);
+            if (!$response) {
                 return;
             }
 
-            $image = file_get_contents($srcPath);
-            $jsonPath = base_path('google_credential.json');
-
-            if (!file_exists($jsonPath)) {
-                logger()->error("GoogleVisionLabelImage: Manca il file delle credenziali.");
-                return;
+            $result = [];
+            foreach ($response->getLabelAnnotations() as $label) {
+                $result[] = $label->getDescription();
             }
 
-            $googleVisionClient = new ImageAnnotatorClient([
-                'credentials' => $jsonPath
-            ]);
-            
-            $google_image = new VisionImage([
-                'content' => $image
-            ]);
+            $i->labels = $result;
+            $i->save();
 
-            $googleFeature = new Feature();
-            $googleFeature->setType(Type::LABEL_DETECTION);
-
-            $request = new AnnotateImageRequest();
-            $request->setImage($google_image);
-            $request->setFeatures([$googleFeature]);
-
-            $batchRequest = new BatchAnnotateImagesRequest();
-            $batchRequest->setRequests([$request]);
-
-            $responseBatch = $googleVisionClient->batchAnnotateImages($batchRequest);
-            
-            $responses = $responseBatch->getResponses();
-            if (!isset($responses[0])) {
-                logger()->error("GoogleVisionLabelImage: Risposta vuota da Google Vision.");
-                $googleVisionClient->close();
-                return;
-            }
-
-            $response = $responses[0];
-            $labels = $response->getLabelAnnotations();
-
-            if ($labels) {
-                $result = [];
-                foreach ($labels as $label) {
-                    $result[] = $label->getDescription();
-                }
-                
-                $i->labels = $result;
-                $i->save();
-                
-                logger()->info("GoogleVisionLabelImage: Etichette salvate con successo per l'immagine ID: " . $this->article_image_id);
-            }
-            
-            $googleVisionClient->close();
-
-        } catch (\Exception $e) {
-            logger()->error("GoogleVisionLabelImage CRASH GENERALE: " . $e->getMessage());
+            logger()->info("GoogleVisionLabelImage: Etichette salvate con successo per l'immagine ID: " . $this->article_image_id);
+        } catch (\Throwable $e) {
+            // Non blocchiamo la catena: un errore di Google Vision non deve impedire la pubblicazione
+            logger()->error("GoogleVisionLabelImage CRASH: " . $e->getMessage());
         }
     }
 }

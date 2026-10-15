@@ -2,16 +2,16 @@
 
 namespace App\Models;
 
-use App\Models\Image;
+use Database\Factories\ArticleFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Laravel\Scout\Searchable;
-use PhpParser\Node\Expr\FuncCall;
 
 class Article extends Model
 {
+    /** @use HasFactory<ArticleFactory> */
     use HasFactory, Searchable;
     protected $fillable = [
         'title',
@@ -31,6 +31,14 @@ class Article extends Model
         return $this->belongsTo(Category::class);
     }
 
+    protected function casts(): array
+    {
+        return [
+            'is_accepted' => 'boolean',
+            'price' => 'decimal:2',
+        ];
+    }
+
     public function setAccepted($value)
     {
         $this->is_accepted = $value;
@@ -38,9 +46,26 @@ class Article extends Model
         return true;
     }
 
+    public function scopeAccepted($query)
+    {
+        return $query->where('is_accepted', true);
+    }
+
+    public function scopeWithCardRelations($query)
+    {
+        return $query->with(['images', 'category']);
+    }
+
     public static function toBeRevisedCount()
     {
-        return Article::where('is_accepted', null)->count();
+        // once(): la navbar può chiamarlo più volte nella stessa richiesta
+        return once(fn () => Article::whereNull('is_accepted')->count());
+    }
+
+    // scout:import carica le categorie in blocco invece di una query per articolo
+    protected function makeAllSearchableUsing($query)
+    {
+        return $query->with('category');
     }
 
     public function toSearchableArray(): array
@@ -49,7 +74,7 @@ class Article extends Model
             'id'          => $this->id,
             'title'       => $this->title,
             'description' => $this->description,
-            'category'    => $this->category
+            'category'    => $this->category?->name,
         ];
     }
 

@@ -1,11 +1,11 @@
-<x-layout>
-    <div class="container-fluid pt-5">
+<x-layout :title="__('ui.revisor_dashboard_title')">
+    <div class="container-fluid pt-custom-navbar pb-5">
 
-        <div class="row mb-5 pt-5 justify-content-center">
-            <div class="col-12 col-md-6 col-lg-4 mt-5">
+        <div class="row my-4 justify-content-center">
+            <div class="col-12 col-md-6 col-lg-4">
                 <div class="rounded shadow-lg bg-dark p-3 text-center border border-secondary">
                     <h1 class="display-5 m-0 text-uppercase fw-bold tracking-wide text-white fs-3">
-                        <i class="bi bi-shield-check me-2 text-neon-cyan animate-pulse"></i>Revisor Dashboard
+                        <i class="bi bi-shield-check me-2 text-neon-cyan animate-pulse"></i>{{ __('ui.revisor_dashboard_title') }}
                     </h1>
                 </div>
             </div>
@@ -23,9 +23,9 @@
                                     @foreach ($article_to_check->images as $key => $image)
                                         <div class="carousel-item {{ $key === 0 ? 'active' : '' }}">
                                             <div class="position-relative text-center bg-black">
-                                                <img src="{{ $article_to_check->images->isNotEmpty() ? $article_to_check->images->first()->getUrl(300, 300) : 'https://picsum.photos/300/200' }}"
+                                                <img src="{{ $image->getDisplayUrl() }}"
                                                     class="img-fluid object-fit-contain"
-                                                    alt="Immagine {{ $key + 1 }}">
+                                                    alt="{{ __('ui.image_number', ['n' => $key + 1]) }}">
 
                                                 <span
                                                     class="position-absolute top-0 start-0 m-3 badge bg-dark bg-opacity-75 border border-secondary text-neon-cyan font-monospace">
@@ -42,14 +42,14 @@
                                         <span
                                             class="carousel-control-prev-icon p-3 bg-dark bg-opacity-50 rounded-circle border border-secondary"
                                             aria-hidden="true"></span>
-                                        <span class="visually-hidden">Previous</span>
+                                        <span class="visually-hidden">{{ __('ui.previous') }}</span>
                                     </button>
                                     <button class="carousel-control-next" type="button"
                                         data-bs-target="#revisorImageCarousel" data-bs-slide="next">
                                         <span
                                             class="carousel-control-next-icon p-3 bg-dark bg-opacity-50 rounded-circle border border-secondary"
                                             aria-hidden="true"></span>
-                                        <span class="visually-hidden">Next</span>
+                                        <span class="visually-hidden">{{ __('ui.next') }}</span>
                                     </button>
                                 @endif
                             </div>
@@ -62,9 +62,9 @@
                                                 data-bs-slide-to="{{ $key }}"
                                                 class="btn p-0 w-100 rounded overflow-hidden border {{ $key === 0 ? 'border-neon-cyan' : 'border-secondary' }} opacity-75 hover-opacity-100"
                                                 aria-current="{{ $key === 0 ? 'true' : 'false' }}"
-                                                aria-label="Slide {{ $key + 1 }}">
+                                                aria-label="{{ __('ui.image_number', ['n' => $key + 1]) }}">
                                                 <img src="{{ $image->getUrl(300, 300) }}"
-                                                    class="img-fluid object-fit-cover">
+                                                    class="img-fluid object-fit-cover" alt="" loading="lazy">
                                             </button>
                                         </div>
                                     @endforeach
@@ -75,7 +75,7 @@
 
                         <div class="card bg-dark border border-secondary shadow-lg rounded p-3 mt-4">
                             <h5 class="text-neon-cyan font-monospace text-uppercase small mb-3">
-                                <i class="bi bi-cpu me-2"></i>Google Vision AI Analysis
+                                <i class="bi bi-cpu me-2"></i>{{ __('ui.vision_title') }}
                             </h5>
 
                             <div class="row">
@@ -85,11 +85,24 @@
                                             
                                             <div>
                                                 <div class="d-flex justify-content-between align-items-center mb-3">
-                                                    <span class="badge bg-secondary font-monospace">Imm #{{ $key + 1 }}</span>
+                                                    <span class="badge bg-secondary font-monospace">{{ __('ui.image_number', ['n' => $key + 1]) }}</span>
+                                                    @if ($image->hasVisionAnalysis())
+                                                        <span class="badge bg-success bg-opacity-25 text-success border border-success font-monospace">
+                                                            <i class="bi bi-check-circle-fill me-1"></i>{{ __('ui.vision_done') }}
+                                                        </span>
+                                                    @else
+                                                        <span class="badge bg-warning bg-opacity-25 text-warning border border-warning font-monospace">
+                                                            <i class="bi bi-exclamation-triangle-fill me-1"></i>{{ __('ui.vision_missing') }}
+                                                        </span>
+                                                    @endif
                                                 </div>
 
+                                                @unless ($image->hasVisionAnalysis())
+                                                    <p class="text-warning small fst-italic mb-3">{{ __('ui.vision_missing_help') }}</p>
+                                                @endunless
+
                                                 <div class="mb-3">
-                                                    <label class="text-neon-cyan font-monospace small d-block text-uppercase mb-2">Labels</label>
+                                                    <label class="text-neon-cyan font-monospace small d-block text-uppercase mb-2">{{ __('ui.vision_labels') }}</label>
                                                     <div class="d-flex flex-wrap gap-1">
                                                         @if ($image->labels)
                                                             @foreach ($image->labels as $label)
@@ -98,42 +111,28 @@
                                                                 </span>
                                                             @endforeach
                                                         @else
-                                                            <span class="text-muted small fst-italic">No labels detected</span>
+                                                            <span class="text-muted small fst-italic">{{ __('ui.no_labels') }}</span>
                                                         @endif
                                                     </div>
                                                 </div>
                                             </div>
 
-                                            <div class="mt-2">
-                                                <label class="text-neon-cyan font-monospace small d-block text-uppercase mb-2">Ratings</label>
-                                                <div class="row justify-content-center align-items-center g-1 text-white-50 small font-monospace">
-                                                    <div class="col-2 text-center">
-                                                        <div class="{{ $image->adult }}"></div>
+                                            @if ($image->adult !== null)
+                                                <div class="mt-2">
+                                                    <label class="text-neon-cyan font-monospace small d-block text-uppercase mb-2">{{ __('ui.vision_ratings') }}</label>
+                                                    <div class="row justify-content-center align-items-center g-1 text-white-50 small font-monospace">
+                                                        @foreach (['adult', 'violence', 'spoof', 'racy', 'medical'] as $rating)
+                                                            <div class="col-2 text-center">
+                                                                <i class="{{ $image->$rating }}" title="{{ \App\Models\Image::likelihoodLabel($image->$rating) }}" aria-hidden="true"></i>
+                                                            </div>
+                                                            <div class="col-10 text-uppercase">
+                                                                {{ __('ui.vision_' . $rating) }}
+                                                                <span class="visually-hidden">: {{ \App\Models\Image::likelihoodLabel($image->$rating) }}</span>
+                                                            </div>
+                                                        @endforeach
                                                     </div>
-                                                    <div class="col-10 text-uppercase">Adult</div>
-
-                                                    <div class="col-2 text-center">
-                                                        <div class="{{ $image->violence }}"></div>
-                                                    </div>
-                                                    <div class="col-10 text-uppercase">Violence</div>
-
-                                                    <div class="col-2 text-center">
-                                                        <div class="{{ $image->spoof }}"></div>
-                                                    </div>
-                                                    <div class="col-10 text-uppercase">Spoof</div>
-
-                                                    <div class="col-2 text-center">
-                                                        <div class="{{ $image->racy }}"></div>
-                                                    </div>
-                                                    <div class="col-10 text-uppercase">Racy</div>
-
-                                                    <div class="col-2 text-center">
-                                                        <div class="{{ $image->medical }}"></div>
-                                                    </div>
-                                                    <div class="col-10 text-uppercase">Medical</div>
                                                 </div>
-                                            </div>
-
+                                            @endif
                                         </div>
                                     </div>
                                 @endforeach
@@ -142,7 +141,7 @@
                     @else
                         <div class="card bg-dark border border-secondary shadow-lg rounded p-5 text-center d-flex flex-column align-items-center justify-content-center">
                             <i class="bi bi-image text-muted display-2 mb-3"></i>
-                            <p class="text-muted-custom fst-italic">Nessuna immagine caricata per questo articolo</p>
+                            <p class="text-muted-custom fst-italic">{{ __('ui.no_images_uploaded') }}</p>
                         </div>
                     @endif
                 </div>
@@ -155,22 +154,22 @@
                                     <i class="bi bi-hourglass-split me-1 animate-pulse"></i>{{ __('ui.review_phase') }}
                                 </span>
                                 <h4 class="text-neon-cyan fw-bold font-monospace m-0 fs-3">
-                                    {{ $article_to_check->price }}€
+                                    {{ number_format($article_to_check->price, 2, ',', '.') }} €
                                 </h4>
                             </div>
 
                             <h1 class="text-white fw-bold mb-2 display-6">{{ $article_to_check->title }}</h1>
 
                             <div class="d-flex gap-3 mb-4 text-muted-custom fs-6 font-monospace">
-                                <span><i class="bi bi-person me-1"></i>{{ $article_to_check->user->name }}</span>
-                                <span><i class="bi bi-tag me-1"></i>#{{ __($article_to_check->category->name) }}</span>
+                                <span><i class="bi bi-person me-1"></i>{{ $article_to_check->user?->name ?? __('ui.anonymous_user') }}</span>
+                                <span><i class="bi bi-tag me-1"></i>#{{ $article_to_check->category?->translated_name }}</span>
                             </div>
 
                             <hr class="border-secondary my-3">
 
-                            <div class="p-3 bg-black rounded border border-secondary min-height-custom">
-                                <label class="text-neon-cyan font-monospace small mb-2 d-block text-uppercase">Descrizione Prodotto</label>
-                                <p class="text-light mb-0 leading-relaxed font-sans">
+                            <div class="p-3 bg-black rounded border border-secondary">
+                                <label class="text-neon-cyan font-monospace small mb-2 d-block text-uppercase">{{ __('ui.product_description') }}</label>
+                                <p class="text-light mb-0 lh-lg text-pre-wrap">
                                     {{ $article_to_check->description }}
                                 </p>
                             </div>
@@ -184,28 +183,56 @@
                                 </div>
                             @endif
 
+                            {{-- I pulsanti aprono una finestra di conferma: l'invio vero parte solo dal form nella modale --}}
                             <div class="d-flex justify-content-between gap-3">
-                                <form action="{{ route('reject', ['article' => $article_to_check]) }}" method="POST" class="w-100">
-                                    @csrf
-                                    @method('PATCH')
-                                    <button type="submit" class="btn btn-outline-danger py-2.5 w-100 fw-bold shadow-sm border-2">
-                                        <i class="bi bi-x-circle me-2"></i>{{ __('ui.reject') }}
-                                    </button>
-                                </form>
+                                <button type="button" class="btn btn-outline-danger py-2.5 w-100 fw-bold shadow-sm border-2"
+                                    data-bs-toggle="modal" data-bs-target="#confirmRejectModal">
+                                    <i class="bi bi-x-circle me-2"></i>{{ __('ui.reject') }}
+                                </button>
 
-                                <form action="{{ route('accept', ['article' => $article_to_check]) }}" method="POST" class="w-100">
-                                    @csrf
-                                    @method('PATCH')
-                                    <button type="submit" class="btn btn-success py-2.5 w-100 fw-bold shadow-sm text-black fw-black">
-                                        <i class="bi bi-check-circle me-2"></i>{{ __('ui.accept') }}
-                                    </button>
-                                </form>
+                                <button type="button" class="btn btn-success py-2.5 w-100 fw-bold shadow-sm text-black fw-black"
+                                    data-bs-toggle="modal" data-bs-target="#confirmAcceptModal">
+                                    <i class="bi bi-check-circle me-2"></i>{{ __('ui.accept') }}
+                                </button>
                             </div>
                         </div>
                     </div>
                 </div>
 
             </div>
+
+            @foreach ([
+                ['id' => 'confirmAcceptModal', 'route' => 'accept', 'icon' => 'bi-check-circle-fill text-success', 'border' => 'border-success', 'button' => 'btn-success text-black', 'key' => 'accept'],
+                ['id' => 'confirmRejectModal', 'route' => 'reject', 'icon' => 'bi-x-octagon-fill text-danger', 'border' => 'border-danger', 'button' => 'btn-danger', 'key' => 'reject'],
+            ] as $modal)
+                <div class="modal fade" id="{{ $modal['id'] }}" tabindex="-1" aria-labelledby="{{ $modal['id'] }}Label" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content bg-dark border {{ $modal['border'] }} shadow-lg">
+                            <div class="modal-header border-secondary">
+                                <h2 class="modal-title fs-5 text-white fw-bold" id="{{ $modal['id'] }}Label">
+                                    <i class="bi {{ $modal['icon'] }} me-2"></i>{{ __('ui.confirm_' . $modal['key'] . '_title') }}
+                                </h2>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ __('ui.close') }}"></button>
+                            </div>
+                            <div class="modal-body text-muted-custom">
+                                {{ __('ui.confirm_' . $modal['key'] . '_text', ['title' => $article_to_check->title]) }}
+                            </div>
+                            <div class="modal-footer border-secondary">
+                                <button type="button" class="btn btn-outline-secondary text-white" data-bs-dismiss="modal">
+                                    {{ __('ui.cancel') }}
+                                </button>
+                                <form action="{{ route($modal['route'], ['article' => $article_to_check]) }}" method="POST" class="m-0">
+                                    @csrf
+                                    @method('PATCH')
+                                    <button type="submit" class="btn {{ $modal['button'] }} fw-bold">
+                                        {{ __('ui.confirm_' . $modal['key'] . '_button') }}
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            @endforeach
         @else
             <div class="row justify-content-center align-items-center text-center py-5">
                 <div class="col-12 col-md-6 col-lg-5 mt-4">
