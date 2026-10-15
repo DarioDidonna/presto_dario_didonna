@@ -1,4 +1,4 @@
-<x-layout>
+<x-layout :title="__('ui.login')">
     <div
         class="presto-auth-wrapper min-vh-100 d-flex align-items-center justify-content-center position-relative overflow-hidden py-5 my-5 mb-0">
 
@@ -62,7 +62,7 @@
                                         class="form-control bg-presto-input presto-input text-white border-0 py-2-5 fs-7 w-100"
                                         placeholder="{{ __('ui.password_placeholder_login') }}" required>
                                     <button type="button" class="btn btn-toggle-password p-0 border-0 bg-transparent"
-                                        onclick="togglePasswordVisibility('password', this)">
+                                        data-toggle-password="password" aria-label="{{ __('ui.show_password') }}" aria-pressed="false">
                                         <i class="bi bi-eye-slash"></i>
                                     </button>
                                 </div>

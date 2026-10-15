@@ -5,32 +5,33 @@ document.addEventListener('DOMContentLoaded', () => {
        1. NAVBAR & GLOBAL NAVIGATION
        ========================================================================== */
     const navbar = document.getElementById('mainNavbar');
-    const dropdowns = document.querySelectorAll('.navbar-collapse .dropdown');
 
-    window.addEventListener('scroll', () => {
-        if (window.scrollY > 20) {
-            navbar.classList.add('shadow-lg');
-            navbar.style.paddingTop = '0.5rem';
-            navbar.style.paddingBottom = '0.5rem';
-            navbar.style.backgroundColor = '#060a14'; 
-            navbar.classList.remove('shadow-lg');
-            navbar.style.paddingTop = '0.85rem';
-            navbar.style.paddingBottom = '0.85rem';
-            navbar.style.backgroundColor = 'var(--bg-navbar)';
-        }
+    // Navbar più compatta e scura dopo i primi pixel di scroll
+    const updateNavbar = () => {
+        if (!navbar) return;
+        navbar.classList.toggle('navbar-scrolled', window.scrollY > 20);
+    };
+    window.addEventListener('scroll', updateNavbar, { passive: true });
+    updateNavbar();
+
+    // Profilo: anteprima della foto scelta prima del caricamento
+    document.querySelectorAll('[data-avatar-preview]').forEach(input => {
+        input.addEventListener('change', () => {
+            const target = document.getElementById(input.dataset.avatarPreview);
+            const file = input.files && input.files[0];
+            if (!target || !file || !file.type.startsWith('image/')) return;
+
+            const img = document.createElement('img');
+            img.src = URL.createObjectURL(file);
+            img.alt = '';
+            img.className = 'w-100 h-100 object-fit-cover';
+            img.onload = () => URL.revokeObjectURL(img.src);
+            target.replaceChildren(img);
+        });
     });
 
-    if (window.innerWidth < 992) {
-        dropdowns.forEach(dropdown => {
-            const toggle = dropdown.querySelector('.dropdown-toggle');
-            toggle.addEventListener('click', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                dropdown.classList.toggle('show');
-                dropdown.querySelector('.dropdown-menu').classList.toggle('show');
-            });
-        });
-    }
+    // I dropdown (anche su mobile) sono gestiti da Bootstrap tramite data-bs-toggle="dropdown":
+    // un secondo gestore qui li apriva e richiudeva subito.
 
     document.addEventListener('keydown', (e) => {
         if (e.key === '/' && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
@@ -44,38 +45,24 @@ document.addEventListener('DOMContentLoaded', () => {
     /* ==========================================================================
        2. AUTHENTICATION & LOGIN FORM LOGIC
        ========================================================================== */
-    const toggleBtn = document.getElementById('togglePasswordBtn');
-    const passwordField = document.getElementById('password');
-    const toggleIcon = document.getElementById('toggleIcon');
-    const loginForm = document.getElementById('prestoLoginForm');
-    const submitBtn = document.getElementById('prestoSubmitBtn');
+    // Mostra/nascondi password: <button data-toggle-password="id-del-campo">
+    // (prima era un onclick verso una funzione non globale, quindi non funzionava)
+    document.querySelectorAll('[data-toggle-password]').forEach(button => {
+        button.addEventListener('click', () => {
+            const input = document.getElementById(button.dataset.togglePassword);
+            const icon = button.querySelector('i');
+            if (!input) return;
 
-    if (toggleBtn && passwordField && toggleIcon) {
-        toggleBtn.addEventListener('click', () => {
-            const isPassword = passwordField.getAttribute('type') === 'password';
-            passwordField.setAttribute('type', isPassword ? 'text' : 'password');
-
-            if (isPassword) {
-                toggleIcon.classList.replace('bi-eye', 'bi-eye-slash');
-                toggleIcon.classList.add('text-neon-cyan');
-            } else {
-                toggleIcon.classList.replace('bi-eye-slash', 'bi-eye');
-                toggleIcon.classList.remove('text-neon-cyan');
+            const show = input.type === 'password';
+            input.type = show ? 'text' : 'password';
+            button.setAttribute('aria-pressed', show ? 'true' : 'false');
+            if (icon) {
+                icon.classList.toggle('bi-eye', show);
+                icon.classList.toggle('bi-eye-slash', !show);
+                icon.classList.toggle('text-neon-cyan', show);
             }
         });
-    }
-
-    if (loginForm && submitBtn) {
-        loginForm.addEventListener('submit', () => {
-            if (loginForm.checkValidity()) {
-                const textContainer = submitBtn.querySelector('.btn-text');
-                submitBtn.disabled = true;
-                if (textContainer) {
-                    textContainer.innerHTML = '<i class="bi bi-hourglass-split me-2 animate-pulse"></i>Verifica in corso...';
-                }
-            }
-        });
-    }
+    });
 
 
     /* ==========================================================================
@@ -85,9 +72,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const userCounter = document.getElementById('headerCounterUsers');
     const exploreBtn = document.getElementById('heroExploreBtn');
 
-    const animateCounter = (element, targetValue, duration) => {
+    // Il valore reale arriva dal server in data-count (ed è già scritto nell'HTML se il JS non parte)
+    const animateCounter = (element, duration) => {
         if (!element) return;
+        const targetValue = parseInt(element.dataset.count, 10);
+        if (!Number.isFinite(targetValue) || targetValue <= 0) return;
         let startValue = 0;
+        element.textContent = '0';
         const stepTime = Math.abs(Math.floor(duration / targetValue));
 
         const timer = setInterval(() => {
@@ -102,8 +93,8 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     setTimeout(() => {
-        animateCounter(announcementCounter, 1420, 1500);
-        animateCounter(userCounter, 84, 1200);
+        animateCounter(announcementCounter, 1500);
+        animateCounter(userCounter, 1200);
     }, 400);
 
     if (exploreBtn) {
@@ -136,7 +127,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const info = node.getAttribute('data-info');
                 logText.style.opacity = '0';
                 setTimeout(() => {
-                    logText.innerHTML = `> EXTRACTED: "${info}"`;
+                    logText.textContent = `> ${info}`;
                     logText.style.color = node.querySelector('.dot-amber') ? 'var(--accent-amber)' : 'var(--accent-cyan)';
                     logText.style.opacity = '1';
                 }, 100);
@@ -145,7 +136,7 @@ document.addEventListener('DOMContentLoaded', () => {
             node.addEventListener('mouseleave', () => {
                 logText.style.opacity = '0';
                 setTimeout(() => {
-                    logText.innerHTML = 'Passa il mouse sopra i nodi del network...';
+                    logText.textContent = logText.dataset.hint;
                     logText.style.color = 'var(--accent-cyan)';
                     logText.style.opacity = '1';
                 }, 100);
@@ -200,63 +191,11 @@ document.addEventListener('DOMContentLoaded', () => {
         revisorObserver.observe(revisorCard);
     }
 
-    if (btnBecomeRevisor) {
-        btnBecomeRevisor.addEventListener('click', () => {
-            const originalHtml = btnBecomeRevisor.innerHTML;
-            btnBecomeRevisor.innerHTML = '<i class="bi bi-hourglass-split me-2 animate-pulse"></i> Elaborazione...';
-            setTimeout(() => {
-                btnBecomeRevisor.innerHTML = originalHtml;
-            }, 1000);
-        });
-    }
-
-
-    /* ==========================================================================
-       6. WIDGETS & MARKETING INTERACTIONS
-       ========================================================================== */
-    const newsletterForm = document.getElementById('newsletterForm');
-
-    if (newsletterForm) {
-        newsletterForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const emailInput = newsletterForm.querySelector('input[type="email"]');
-            const submitBtn = newsletterForm.querySelector('button');
-
-            if (emailInput.value.trim() !== "") {
-                submitBtn.disabled = true;
-                submitBtn.innerHTML = '<i class="bi bi-hourglass-split text-dark animate-pulse"></i>';
-
-                setTimeout(() => {
-                    emailInput.value = "";
-                    emailInput.placeholder = "Grazie per esserti iscritto!";
-                    emailInput.disabled = true;
-                    submitBtn.innerHTML = '<i class="bi bi-check-lg text-dark"></i>';
-                    submitBtn.style.backgroundColor = '#10b981'; 
-                }, 1200);
-            }
+    // Evita doppi invii della candidatura; il testo arriva tradotto da data-loading-text
+    if (btnBecomeRevisor && btnBecomeRevisor.form) {
+        btnBecomeRevisor.form.addEventListener('submit', () => {
+            btnBecomeRevisor.disabled = true;
+            btnBecomeRevisor.textContent = btnBecomeRevisor.dataset.loadingText || '…';
         });
     }
 });
-
-
-/* ==========================================================================
-   7. GLOBAL UTILITY FUNCTIONS (Disponibili fuori dal DOMContentLoaded)
-   ========================================================================== */
-
-/**
- * @param {string} inputId 
- * @param {HTMLElement} button 
- */
-function togglePasswordVisibility(inputId, button) {
-    const input = document.getElementById(inputId);
-    const icon = button.querySelector('i');
-
-    if (input.type === 'password') {
-        input.type = 'text';
-        icon.classList.replace('bi-eye-slash', 'bi-eye');
-    } else {
-        input.type = 'password';
-        icon.classList.replace('bi-eye', 'bi-eye-slash');
-    }
-}
-

@@ -1,6 +1,6 @@
-<x-layout>
+<x-layout :title="__('ui.all_ads_title')">
 
-    <div class="position-relative overflow-hidden bg-navbar py-5 border-bottom border-secondary-subtle">
+    <div class="position-relative overflow-hidden bg-navbar py-5 pt-custom-navbar border-bottom border-secondary-subtle">
         <div
             class="position-absolute top-50 start-50 translate-middle w-50 h-50 bg-glow-radial opacity-10 pointer-events-none">
         </div>

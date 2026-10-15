@@ -16,13 +16,12 @@
 
                 <div class="row g-3 pt-2 border-top border-secondary-subtle">
                     <div class="col-6">
-                        <div class="stat-number font-monospace fw-bold text-neon-cyan fs-3">1.2s</div>
-                        <div class="text-muted-custom fs-8 text-uppercase tracking-wide">{{ __('ui.avg_response_time') }}</div>
+                        <div class="stat-number font-monospace fw-bold text-neon-cyan fs-3">+{{ $stats['articles_last_week'] }}</div>
+                        <div class="text-muted-custom fs-8 text-uppercase tracking-wide">{{ __('ui.articles_last_week') }}</div>
                     </div>
                     <div class="col-6">
-                        <div class="stat-number font-monospace fw-bold text-neon-amber fs-3">+340</div>
-                        <div class="text-muted-custom fs-8 text-uppercase tracking-wide">{{ __('ui.interactions_last_hour') }}
-                        </div>
+                        <div class="stat-number font-monospace fw-bold text-neon-amber fs-3">{{ $stats['pending_articles'] }}</div>
+                        <div class="text-muted-custom fs-8 text-uppercase tracking-wide">{{ __('ui.articles_in_review') }}</div>
                     </div>
                 </div>
             </div>
@@ -35,33 +34,22 @@
                     <div class="radar-circle circle-3"></div>
                     <div class="radar-sweep"></div>
 
-                    <div class="network-node node-active" 
-                        data-info="{{ __('ui.network_request_tech') }}">
-                        <div class="node-dot"></div>
-                        <div class="node-ripple"></div>
-                    </div>
-
-                    <div class="network-node node-active delay-1" 
-                        data-info="{{ __('ui.network_new_motor_ad') }}">
-                        <div class="node-dot dot-amber"></div>
-                        <div class="node-ripple ripple-amber"></div>
-                    </div>
-
-                    <div class="network-node node-active delay-2" 
-                        data-info="{{ __('ui.network_commission_completed') }}">
-                        <div class="node-dot"></div>
-                        <div class="node-ripple"></div>
-                    </div>
-
-                    <div class="network-node node-active delay-3" 
-                        data-info="{{ __('ui.network_design_request') }}">
-                        <div class="node-dot"></div>
-                        <div class="node-ripple"></div>
-                    </div>
+                    {{-- Un nodo per ciascuno degli ultimi annunci pubblicati (prima: 4 eventi inventati) --}}
+                    @foreach ($stats['latest_articles'] as $latest)
+                        <a href="{{ route('article.show', $latest) }}"
+                            class="network-node node-active node-pos-{{ $loop->iteration }} {{ $loop->index ? 'delay-' . $loop->index : '' }}"
+                            data-info="{{ __('ui.network_new_article', ['title' => Str::limit($latest->title, 40), 'category' => $latest->category?->translated_name ?? __('ui.no_category')]) }}"
+                            aria-label="{{ $latest->title }}">
+                            <div class="node-dot {{ $loop->even ? 'dot-amber' : '' }}"></div>
+                            <div class="node-ripple {{ $loop->even ? 'ripple-amber' : '' }}"></div>
+                        </a>
+                    @endforeach
 
                     <div class="radar-log-panel p-3 rounded font-monospace fs-8" id="radarLogPanel">
                         <div class="text-white-50 mb-1">// SYSTEM STATUS: ACTIVE</div>
-                        <div class="text-neon-cyan" id="radarLogText">{{ __('ui.network_hover_hint') }}</div>
+                        <div class="text-neon-cyan" id="radarLogText" data-hint="{{ __('ui.network_hover_hint') }}">
+                            {{ $stats['latest_articles']->isEmpty() ? __('ui.network_empty') : __('ui.network_hover_hint') }}
+                        </div>
                     </div>
 
                 </div>

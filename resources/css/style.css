@@ -338,7 +338,8 @@ body {
     transform: rotate(-45deg) translate(5px, -5px);
 }
 
-@media (max-width: 991.98px) {
+/* La navbar è navbar-expand-xl: il menu è compresso fino a 1199px, non 991px */
+@media (max-width: 1199.98px) {
     .navbar-collapse {
         background-color: var(--bg-navbar);
         padding: 1.5rem 1rem;
@@ -1341,152 +1342,10 @@ body {
 
 
 /* ==========================================
-    BASE STYLES & EMAIL CONTAINER
-   ========================================== */
-body {
-    background-color: #060a14;
-    color: #ffffff;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    margin: 0;
-    padding: 40px 20px;
-}
-
-.email-container {
-    max-width: 600px;
-    margin: 0 auto;
-    background-color: #0b111e;
-    outline: 1px solid #06b6d4;
-    outline-offset: -4px;
-    border-radius: 8px;
-    padding: 30px;
-    box-shadow: 0 4px 20px rgba(6, 182, 212, 0.15);
-}
-
-/* ==========================================
-    EMAIL HEADER & TEXT
-   ========================================== */
-.email-header {
-    text-align: center;
-    margin-bottom: 30px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    padding-bottom: 20px;
-}
-
-.brand-title {
-    color: #ffffff;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    margin: 0;
-}
-
-.brand-dot {
-    color: #06b6d4;
-}
-
-.email-subtitle {
-    color: #06b6d4;
-    font-size: 12px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    margin-top: 5px;
-    margin-bottom: 0;
-}
-
-.email-title {
-    font-size: 20px;
-    font-weight: 600;
-    color: #ffffff;
-    margin-top: 0;
-    margin-bottom: 15px;
-    text-align: center;
-}
-
-.email-lead {
-    color: #94a3b8;
-    font-size: 15px;
-    text-align: center;
-    margin-bottom: 25px;
-}
-
-/* ==========================================
-    DATA BOX & ACTIONS
-   ========================================== */
-.user-data-box {
-    background-color: #0d1527;
-    border-radius: 6px;
-    padding: 20px;
-    margin-bottom: 30px;
-    border-left: 4px solid #06b6d4;
-    outline: 1px solid #1e293b;
-}
-
-.user-data-line {
-    margin: 0 0 10px 0;
-    font-size: 15px;
-    color: #94a3b8;
-}
-
-.user-data-line.last {
-    margin: 0;
-}
-
-.label-highlight {
-    color: #ffffff;
-}
-
-.action-section {
-    text-align: center;
-}
-
-.action-text {
-    color: #ffffff;
-    font-size: 14px;
-    margin-bottom: 20px;
-}
-
-.btn-revisor {
-    display: inline-block;
-    background-color: #06b6d4;
-    color: #060a14;
-    font-weight: bold;
-    text-transform: uppercase;
-    font-size: 13px;
-    letter-spacing: 1px;
-    text-decoration: none;
-    padding: 12px 30px;
-    border-radius: 4px;
-    outline: 2px solid #06b6d4;
-    outline-offset: 2px;
-}
-
-.email-footer {
-    text-align: center;
-    margin-top: 40px;
-    border-top: 1px solid rgba(255, 255, 255, 0.05);
-    padding-top: 20px;
-}
-
-.footer-text {
-    color: #475569;
-    font-size: 11px;
-    margin: 0;
-}
-
-/* ==========================================
     PLATFORM COMPONENT STYLES
    ========================================== */
-.min-vh-50 {
-    min-height: 50vh;
-}
 
-.card-hover-effect {
-    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-}
 
-.card-hover-effect:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .15) !important;
-}
 
 .flag-hover {
     transition: transform 0.2s ease, filter 0.2s ease;
@@ -1515,13 +1374,147 @@ body {
     transform: scale(1.1);
 }
 
-.image-review-wrapper img {
-    width: 100%;
-    height: 250px;
-    object-fit: cover;
-    transition: transform 0.2s ease-in-out;
+
+/* ==========================================================================
+   FIX FRONT-END: classi usate nelle viste ma mai definite
+   ========================================================================== */
+
+/* Navbar dopo lo scroll (classe aggiunta da script.js) */
+#mainNavbar.navbar-scrolled {
+    background-color: #060a14 !important;
+    box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.5) !important;
+    border-bottom-color: rgba(6, 182, 212, 0.25) !important;
 }
 
-.image-review-wrapper:hover img {
-    transform: scale(1.05);
+/* Pulsante principale a gradiente (Inserisci annuncio, Contatta venditore, ...) */
+.btn-cyber-gradient {
+    background: linear-gradient(135deg, var(--accent-cyan) 0%, #3b82f6 100%);
+    color: #ffffff !important;
+    border: 0;
+    padding: 0.6rem 1.4rem;
+    box-shadow: 0 4px 14px rgba(6, 182, 212, 0.3);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
 }
+
+.btn-cyber-gradient:hover,
+.btn-cyber-gradient:focus-visible {
+    color: #ffffff !important;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(6, 182, 212, 0.45);
+    filter: brightness(1.1);
+}
+
+/* Mantiene gli a capo scritti dall'utente nelle descrizioni */
+.text-pre-wrap {
+    white-space: pre-line;
+    overflow-wrap: anywhere;
+}
+
+/* Posizione dei nodi del radar: prima erano tutti sovrapposti al centro */
+.network-node.node-pos-1 { top: 22%; left: 30%; }
+.network-node.node-pos-2 { top: 34%; left: 72%; }
+.network-node.node-pos-3 { top: 56%; left: 22%; }
+.network-node.node-pos-4 { top: 62%; left: 64%; }
+
+/* Card: immagini sempre quadrate (come le miniature 300x300), senza deformazioni */
+.card > .card-img-top {
+    aspect-ratio: 1 / 1;
+    height: auto;
+    object-fit: cover;
+}
+
+/* ==========================================================================
+   UTILITY usate nelle viste ma mai definite (stile Tailwind)
+   ========================================================================== */
+:root {
+    /* Altezza della navbar fissa + respiro: spazio da lasciare in cima alle pagine */
+    --navbar-offset: 88px;
+}
+
+.pt-custom-navbar { padding-top: var(--navbar-offset) !important; }
+
+.tracking-tight { letter-spacing: -0.02em; }
+.tracking-wide { letter-spacing: 0.04em; }
+.tracking-widest { letter-spacing: 0.12em; }
+.uppercase { text-transform: uppercase; }
+.text-none-transform { text-transform: none !important; letter-spacing: normal; }
+
+.py-1\.5 { padding-top: 0.375rem !important; padding-bottom: 0.375rem !important; }
+.py-2\.5 { padding-top: 0.625rem !important; padding-bottom: 0.625rem !important; }
+.px-1\.5 { padding-left: 0.375rem !important; padding-right: 0.375rem !important; }
+.px-2\.5 { padding-left: 0.625rem !important; padding-right: 0.625rem !important; }
+.gap-1\.5 { gap: 0.375rem !important; }
+
+.max-w-100 { max-width: 100px; }
+.max-w-500 { max-width: 500px; }
+.pointer-events-none { pointer-events: none; }
+.opacity-10 { opacity: 0.1 !important; }
+
+.bg-cyber-dark { background-color: #060a14 !important; }
+.bg-navbar-card { background-color: #0d1424 !important; }
+.bg-search { background-color: var(--bg-search) !important; }
+.bg-amber-alpha { background-color: var(--bg-amber-alpha) !important; }
+.border-neon-amber { border-color: var(--accent-amber) !important; }
+
+.text-neon-amber-badge { color: var(--accent-amber) !important; border-color: var(--accent-amber) !important; }
+.shadow-amber-icon { box-shadow: 0 0 18px rgba(245, 158, 11, 0.25); }
+
+.hover-neon:hover,
+.hover-neon:focus-visible { color: var(--accent-cyan) !important; }
+
+.hover-back { display: inline-block; transition: transform 0.2s ease; }
+.hover-back:hover { transform: translateX(-4px); }
+
+.hover-opacity-100:hover,
+.hover-opacity-100[aria-current="true"] { opacity: 1 !important; }
+
+.cyber-badge-pulse {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: var(--accent-cyan);
+    box-shadow: 0 0 8px var(--accent-cyan);
+    animation: badgePulse 2s infinite;
+}
+
+.cyber-glow-2 {
+    position: absolute;
+    bottom: -10%;
+    left: -10%;
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle, rgba(245, 158, 11, 0.1) 0%, rgba(0, 0, 0, 0) 70%);
+    filter: blur(40px);
+    pointer-events: none;
+}
+
+/* Link della navbar relativo alla pagina corrente */
+.nav-link-custom.active {
+    color: #ffffff !important;
+    background-color: rgba(6, 182, 212, 0.12);
+    box-shadow: inset 0 -2px 0 var(--accent-cyan);
+}
+
+/* Link "Vai al contenuto": visibile solo con la tastiera */
+.skip-link {
+    position: absolute;
+    top: 0.5rem;
+    left: 0.5rem;
+    z-index: 2000;
+}
+
+/* Avatar (componente x-avatar): foto profilo o iniziali */
+.avatar-circle {
+    background-color: #0f172a;
+    color: var(--accent-cyan);
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    line-height: 1;
+}
+
+/* Profilo: elenco "I miei annunci" */
+.min-w-0 { min-width: 0; }
+
+.profile-article-row { transition: background-color 0.2s ease; }
+.profile-article-row:hover,
+.profile-article-row:focus-visible { background-color: rgba(6, 182, 212, 0.06); }

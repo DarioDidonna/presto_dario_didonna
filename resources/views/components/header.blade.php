@@ -25,7 +25,7 @@
                         class="btn btn-gradient-primary border-0 rounded-pill px-4 py-2-5 fw-bold text-uppercase tracking-wider fs-7 shadow shadow-cyan transition-all">
                         <i class="bi bi-plus-circle-fill me-2"></i> {{ __('ui.publish_ad') }}
                     </a>
-                    <a href="#"
+                    <a href="#categoriesSection"
                         class="btn btn-outline-custom text-light rounded-pill px-4 py-2-5 fw-bold text-uppercase tracking-wider fs-7 transition-all"
                         id="heroExploreBtn">
                         <i class="bi bi-grid-3x3-gap-fill me-2 text-neon-cyan"></i> {{ __('ui.explore_categories') }}
@@ -52,16 +52,16 @@
                         <div class="row g-3">
                             <div class="col-6">
                                 <div class="stat-box p-3 rounded">
-                                    <div class="text-muted-custom fs-8 text-uppercase mb-1">Articoli Totali</div>
+                                    <div class="text-muted-custom fs-8 text-uppercase mb-1">{{ __('ui.total_articles') }}</div>
                                     <div class="fs-4 fw-bold text-white font-monospace text-glow"
-                                        id="headerCounterAnnouncements">0</div>
+                                        id="headerCounterAnnouncements" data-count="{{ $stats['published_articles'] }}">{{ $stats['published_articles'] }}</div>
                                 </div>
                             </div>
                             <div class="col-6">
                                 <div class="stat-box p-3 rounded">
-                                    <div class="text-muted-custom fs-8 text-uppercase mb-1">Utenti Online</div>
-                                    <div class="fs-4 fw-bold text-neon-cyan font-monospace" id="headerCounterUsers">0
-                                    </div>
+                                    <div class="text-muted-custom fs-8 text-uppercase mb-1">{{ __('ui.online_users') }}</div>
+                                    <div class="fs-4 fw-bold text-neon-cyan font-monospace" id="headerCounterUsers"
+                                        data-count="{{ $stats['online_users'] }}">{{ $stats['online_users'] }}</div>
                                 </div>
                             </div>
                         </div>
