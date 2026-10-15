@@ -2,15 +2,21 @@
 
 namespace Tests\Unit;
 
-use PHPUnit\Framework\TestCase;
+use App\Models\Image;
+use Tests\TestCase;
 
 class ExampleTest extends TestCase
 {
-    /**
-     * A basic test example.
-     */
-    public function test_that_true_is_true(): void
+    public function test_image_url_without_size_points_to_original(): void
     {
-        $this->assertTrue(true);
+        $this->assertStringEndsWith('/storage/articles/5/foto.jpg', Image::getUrlByFilePath('articles/5/foto.jpg'));
+    }
+
+    public function test_image_url_with_size_points_to_cropped_version(): void
+    {
+        $this->assertStringEndsWith(
+            '/storage/articles/5/crop_300x300_foto.jpg',
+            (new Image(['path' => 'articles/5/foto.jpg']))->getUrl(300, 300)
+        );
     }
 }
