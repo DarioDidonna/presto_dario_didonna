@@ -309,4 +309,12 @@ return [
     'error_500_text' => 'An unexpected error occurred. It has been logged: please try again shortly.',
     'error_503_title' => 'Under maintenance',
     'error_503_text' => 'We are updating Presto.it. Please come back in a few minutes.',
+    // Email esito revisione
+    'review_mail_greeting' => 'Hi :name,',
+    'review_mail_accepted_subject' => 'Your ad “:title” has been published',
+    'review_mail_accepted_line' => 'Good news: a reviewer approved your ad “:title”, which is now visible to everyone on Presto.it.',
+    'review_mail_view_ad' => 'View the ad',
+    'review_mail_rejected_subject' => 'Your ad “:title” was not approved',
+    'review_mail_rejected_line' => 'A reviewer checked your ad “:title” and did not approve it, so it is not visible to other users.',
+    'review_mail_rejected_hint' => 'You can edit it, for example fixing the text or photos: after saving it will go back under review.',
 ];

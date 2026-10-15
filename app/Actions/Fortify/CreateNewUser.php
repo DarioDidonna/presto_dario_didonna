@@ -34,10 +34,15 @@ class CreateNewUser implements CreatesNewUsers
             'password' => $this->passwordRules(),
         ])->validate();
 
-        return User::create([
+        $user = User::create([
             'name' => $input['name'],
             'email' => $input['email'],
             'password' => Hash::make($input['password']),
         ]);
+
+        // Lingua in uso durante la registrazione, per le email future
+        $user->forceFill(['locale' => app()->getLocale()])->save();
+
+        return $user;
     }
 }

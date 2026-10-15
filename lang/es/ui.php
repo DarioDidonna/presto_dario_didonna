@@ -309,4 +309,12 @@ return [
     'error_500_text' => 'Se ha producido un error inesperado. Ha quedado registrado: inténtalo de nuevo en unos instantes.',
     'error_503_title' => 'En mantenimiento',
     'error_503_text' => 'Estamos actualizando Presto.it. Vuelve en unos minutos.',
+    // Email esito revisione
+    'review_mail_greeting' => 'Hola :name:',
+    'review_mail_accepted_subject' => 'Tu anuncio «:title» ha sido publicado',
+    'review_mail_accepted_line' => 'Buenas noticias: un revisor ha aprobado tu anuncio «:title», que ya es visible para todos en Presto.it.',
+    'review_mail_view_ad' => 'Ver el anuncio',
+    'review_mail_rejected_subject' => 'Tu anuncio «:title» no ha sido aprobado',
+    'review_mail_rejected_line' => 'Un revisor ha revisado tu anuncio «:title» y no lo ha aprobado, por lo que no es visible para otros usuarios.',
+    'review_mail_rejected_hint' => 'Puedes editarlo, por ejemplo corrigiendo el texto o las fotos: al guardarlo volverá a revisión.',
 ];
