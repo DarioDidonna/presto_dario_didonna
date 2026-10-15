@@ -31,6 +31,7 @@ Progetto finale del corso Hackademy (Aulab), ampliato con refactoring, test auto
 - **Modifica ed eliminazione** dei propri annunci: dopo una modifica l'annuncio torna in revisione
 - **Profilo personale**: dati dell'account, foto profilo (ritagliata e ripulita dai metadati EXIF), cambio nome e password, elenco dei propri annunci con lo stato di revisione
 - **Ricerca full-text** (Laravel Scout + TNTSearch) e navigazione per categoria
+- **Email con l'esito della revisione** (accettato o rifiutato), inviata in coda e nella lingua dell'utente
 - Candidatura per diventare revisore
 
 ### Revisori
@@ -68,7 +69,7 @@ Un errore di Google Vision (credenziali mancanti, servizio non raggiungibile) no
 | Frontend | Blade, Livewire 4, Bootstrap 5.3, Bootstrap Icons, Vite |
 | Immagini | Google Cloud Vision API, Spatie Image (GD) |
 | Dati | MySQL, code e sessioni su database |
-| Test e qualità | PHPUnit (105 test), Laravel Pint, GitHub Actions |
+| Test e qualità | PHPUnit (112 test), Laravel Pint, GitHub Actions |
 
 ---
 
@@ -143,10 +144,10 @@ In sviluppo le email (reset password, candidature revisore) finiscono nel log (`
 php artisan test
 ```
 
-I 105 test coprono, tra l'altro:
+I 112 test coprono, tra l'altro:
 
 - **sicurezza e permessi**: solo i revisori approvano, link di promozione firmati e a scadenza, annunci non pubblicati invisibili agli altri utenti, modifica ed eliminazione riservate all'autore;
-- **flussi completi**: pubblicazione, revisione, reset password, profilo e foto profilo, catena di elaborazione delle immagini;
+- **flussi completi**: pubblicazione, revisione con email all'autore, reset password, profilo e foto profilo, catena di elaborazione delle immagini;
 - **pagine di errore** 403, 404, 419, 429, 500 e 503 nella lingua dell'utente;
 - **qualità**: limite di query per pagina (contro i problemi N+1), HTML bilanciato, nessuna classe CSS non definita, nessun link morto, testi tradotti.
 

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Mail\BecomeRevisor;
 use App\Models\Article;
 use App\Models\User;
+use App\Notifications\ArticleReviewed;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 
@@ -19,7 +20,7 @@ class RevisorController extends Controller
 
     public function accept(Article $article)
     {
-        $article->setAccepted(true);
+        $this->review($article, true);
 
         return redirect()
             ->back()
@@ -28,11 +29,22 @@ class RevisorController extends Controller
 
     public function reject(Article $article)
     {
-        $article->setAccepted(false);
+        $this->review($article, false);
 
         return redirect()
             ->back()
             ->with('message', __('ui.rejected_article', ['title' => $article->title]));
+    }
+
+    // Aggiorna lo stato e avvisa l'autore, solo se l'esito cambia davvero (niente email doppie)
+    private function review(Article $article, bool $accepted): void
+    {
+        if ($article->is_accepted === $accepted) {
+            return;
+        }
+
+        $article->setAccepted($accepted);
+        $article->user?->notify(new ArticleReviewed($article, $accepted));
     }
 
     public function becomeRevisor()

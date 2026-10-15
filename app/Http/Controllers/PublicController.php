@@ -35,9 +35,11 @@ class PublicController extends Controller
         ]);
     }
 
-    public function setLanguage(string $lang)
+    public function setLanguage(Request $request, string $lang)
     {
         session()->put('locale', $lang);
+        // Salvata anche sull'utente: serve per le email e per ripristinarla al prossimo login
+        $request->user()?->forceFill(['locale' => $lang])->save();
 
         return redirect()->back();
     }

@@ -309,4 +309,12 @@ return [
     'error_500_text' => 'Si è verificato un errore imprevisto. È stato registrato: riprova tra qualche istante.',
     'error_503_title' => 'Manutenzione in corso',
     'error_503_text' => 'Stiamo aggiornando Presto.it. Torna tra pochi minuti.',
+    // Email esito revisione
+    'review_mail_greeting' => 'Ciao :name,',
+    'review_mail_accepted_subject' => 'Il tuo annuncio «:title» è stato pubblicato',
+    'review_mail_accepted_line' => 'Buone notizie: un revisore ha approvato il tuo annuncio «:title», che ora è visibile a tutti su Presto.it.',
+    'review_mail_view_ad' => 'Vedi l\'annuncio',
+    'review_mail_rejected_subject' => 'Il tuo annuncio «:title» non è stato approvato',
+    'review_mail_rejected_line' => 'Un revisore ha esaminato il tuo annuncio «:title» e non lo ha approvato, quindi non è visibile agli altri utenti.',
+    'review_mail_rejected_hint' => 'Puoi modificarlo, ad esempio correggendo testo o foto: dopo il salvataggio tornerà in revisione.',
 ];
