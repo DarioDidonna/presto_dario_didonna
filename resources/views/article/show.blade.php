@@ -1,4 +1,14 @@
-<x-layout :title="$article->title" :description="Str::limit($article->description, 155)">
+<x-layout :title="$article->title" :description="Str::limit(Str::squish($article->description), 155)" type="product"
+    :image="$article->images->first()?->getDisplayUrl()" :image-alt="$article->title">
+    <x-slot:meta>
+        <meta property="product:price:amount" content="{{ number_format($article->price, 2, '.', '') }}">
+        <meta property="product:price:currency" content="EUR">
+        @unless ($article->is_accepted)
+            {{-- Annunci non pubblicati (visibili solo ad autore e revisori): fuori dai motori di ricerca --}}
+            <meta name="robots" content="noindex">
+        @endunless
+    </x-slot:meta>
+
     <div class="article-show-wrapper pt-custom-navbar pb-5">
         <div class="container py-4 position-relative z-1">
 

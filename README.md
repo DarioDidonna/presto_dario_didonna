@@ -59,6 +59,7 @@ Un errore di Google Vision (credenziali mancanti, servizio non raggiungibile) no
 - Interfaccia in **italiano, inglese e spagnolo** (testi, validazione ed email)
 - Tema scuro coerente, layout responsive, attenzione all'accessibilità (testi per screen reader, link "vai al contenuto", `aria-*`)
 - Statistiche reali in homepage (annunci pubblicati, utenti online, ultimi annunci)
+- **Anteprima nei link condivisi** (Open Graph e Twitter Card): un annuncio incollato su WhatsApp, LinkedIn o Telegram mostra foto, titolo e prezzo
 
 ---
 
@@ -70,7 +71,7 @@ Un errore di Google Vision (credenziali mancanti, servizio non raggiungibile) no
 | Frontend | Blade, Livewire 4, Bootstrap 5.3, Bootstrap Icons, Vite |
 | Immagini | Google Cloud Vision API, Spatie Image (GD) |
 | Dati | MySQL, code e sessioni su database |
-| Test e qualità | PHPUnit (127 test), Laravel Pint, GitHub Actions |
+| Test e qualità | PHPUnit (132 test), Laravel Pint, GitHub Actions |
 
 ---
 
@@ -145,11 +146,12 @@ In sviluppo le email (reset password, candidature revisore) finiscono nel log (`
 php artisan test
 ```
 
-I 127 test coprono, tra l'altro:
+I 132 test coprono, tra l'altro:
 
 - **sicurezza e permessi**: solo i revisori approvano, link di promozione firmati e a scadenza, annunci non pubblicati invisibili agli altri utenti, modifica ed eliminazione riservate all'autore;
 - **flussi completi**: ricerca e filtri, pubblicazione, revisione con email all'autore e annullamento, reset password, profilo e foto profilo, catena di elaborazione delle immagini;
 - **pagine di errore** 403, 404, 419, 429, 500 e 503 nella lingua dell'utente;
+- **SEO e condivisione**: meta tag Open Graph per pagina, foto e prezzo dell'annuncio;
 - **qualità**: limite di query per pagina (contro i problemi N+1), HTML bilanciato, nessuna classe CSS non definita, nessun link morto, testi tradotti.
 
 I test usano un database SQLite in memoria e il driver Scout `collection`: non toccano il database né l'indice di ricerca di sviluppo.
