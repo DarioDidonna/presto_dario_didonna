@@ -13,12 +13,13 @@ class Article extends Model
 {
     /** @use HasFactory<ArticleFactory> */
     use HasFactory, Searchable;
+
     protected $fillable = [
         'title',
         'description',
         'price',
         'category_id',
-        'user_id'
+        'user_id',
     ];
 
     public function user(): BelongsTo
@@ -43,6 +44,7 @@ class Article extends Model
     {
         $this->is_accepted = $value;
         $this->save();
+
         return true;
     }
 
@@ -71,10 +73,10 @@ class Article extends Model
     public function toSearchableArray(): array
     {
         return [
-            'id'          => $this->id,
-            'title'       => $this->title,
+            'id' => $this->id,
+            'title' => $this->title,
             'description' => $this->description,
-            'category'    => $this->category?->name,
+            'category' => $this->category?->name,
         ];
     }
 

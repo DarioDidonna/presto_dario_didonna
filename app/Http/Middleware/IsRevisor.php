@@ -18,7 +18,8 @@ class IsRevisor
     {
         if (Auth::check() && Auth::user()->is_revisor) {
             return $next($request);
-            }
+        }
+
         return redirect()->route('homepage')->with('errorMessage', __('ui.access_denied'));
     }
 }

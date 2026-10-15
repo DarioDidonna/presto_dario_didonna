@@ -68,5 +68,4 @@ class DemoSeederTest extends TestCase
         $this->assertSame(5, User::count());
         $this->assertSame(24, Article::count());
     }
-
 }

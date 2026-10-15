@@ -7,6 +7,7 @@ use App\Models\Category;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\TestCase;
 
 class QueryCountTest extends TestCase
@@ -40,7 +41,7 @@ class QueryCountTest extends TestCase
         ];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('pages')]
+    #[DataProvider('pages')]
     public function test_page_query_count_does_not_grow_with_articles(string $url): void
     {
         $revisor = User::factory()->revisor()->create();
@@ -54,7 +55,7 @@ class QueryCountTest extends TestCase
             $firstEngineQuery = array_search('select * from "articles" order by "articles"."id" desc', $queries);
             $queries = array_values(array_filter(
                 $queries,
-                fn ($q, $i) => !($i > $firstEngineQuery && str_contains($q, '"categories"."id" = ? limit 1')),
+                fn ($q, $i) => ! ($i > $firstEngineQuery && str_contains($q, '"categories"."id" = ? limit 1')),
                 ARRAY_FILTER_USE_BOTH
             ));
         }

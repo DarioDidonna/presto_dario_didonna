@@ -15,12 +15,13 @@ class Category extends Model
 
     protected $fillable = [
         'name',
-        'icon'
+        'icon',
     ];
 
     public function getTranslatedNameAttribute(): string
     {
-        $key = 'ui.' . Str::slug($this->name, '_');
+        $key = 'ui.'.Str::slug($this->name, '_');
+
         return trans()->has($key) ? __($key) : $this->name;
     }
 

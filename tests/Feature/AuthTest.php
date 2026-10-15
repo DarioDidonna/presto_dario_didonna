@@ -3,7 +3,11 @@
 namespace Tests\Feature;
 
 use App\Models\User;
+use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Password;
 use Tests\TestCase;
 
 class AuthTest extends TestCase
@@ -71,16 +75,17 @@ class AuthTest extends TestCase
 
     public function test_reset_link_email_is_sent_and_translated(): void
     {
-        \Illuminate\Support\Facades\Notification::fake();
+        Notification::fake();
         $user = User::factory()->create();
 
         $this->from('/forgot-password')->post('/forgot-password', ['email' => $user->email])
             ->assertRedirect('/forgot-password')
             ->assertSessionHas('status', 'Ti abbiamo inviato via email il link per reimpostare la password.');
 
-        \Illuminate\Support\Facades\Notification::assertSentTo($user, \Illuminate\Auth\Notifications\ResetPassword::class,
+        Notification::assertSentTo($user, ResetPassword::class,
             function ($notification) use ($user) {
                 $mail = $notification->toMail($user);
+
                 return $mail->subject === 'Reimposta la tua password' && $mail->actionText === 'Reimposta password';
             });
     }
@@ -88,7 +93,7 @@ class AuthTest extends TestCase
     public function test_user_can_reset_password_with_valid_token(): void
     {
         $user = User::factory()->create();
-        $token = \Illuminate\Support\Facades\Password::createToken($user);
+        $token = Password::createToken($user);
 
         $this->post('/reset-password', [
             'token' => $token,
@@ -97,7 +102,7 @@ class AuthTest extends TestCase
             'password_confirmation' => 'NuovissimaPassword1!',
         ])->assertRedirect(route('login'))->assertSessionHas('status', 'La tua password è stata reimpostata.');
 
-        $this->assertTrue(\Illuminate\Support\Facades\Hash::check('NuovissimaPassword1!', $user->fresh()->password));
+        $this->assertTrue(Hash::check('NuovissimaPassword1!', $user->fresh()->password));
     }
 
     public function test_invalid_reset_token_is_rejected(): void
@@ -111,7 +116,7 @@ class AuthTest extends TestCase
             'password_confirmation' => 'NuovissimaPassword1!',
         ])->assertSessionHasErrors(['email' => 'Il link per reimpostare la password non è valido o è scaduto.']);
 
-        $this->assertTrue(\Illuminate\Support\Facades\Hash::check('password', $user->fresh()->password));
+        $this->assertTrue(Hash::check('password', $user->fresh()->password));
     }
 
     public function test_unused_two_factor_routes_are_disabled(): void

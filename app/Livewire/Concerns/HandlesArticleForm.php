@@ -13,11 +13,15 @@ trait HandlesArticleForm
     public const MAX_IMAGES = 6;
 
     public $images = [];
+
     public $temporary_images = [];
 
     public $title;
+
     public $price;
+
     public $description;
+
     public $category;
 
     // Foto già salvate che restano sull'annuncio (0 in creazione)
@@ -38,7 +42,7 @@ trait HandlesArticleForm
             'price' => 'required|numeric|min:0.01|max:999999.99',
             'description' => 'required|string|min:15|max:5000',
             'category' => 'required|integer|exists:categories,id',
-            'images' => 'array|max:' . $this->maxNewImages(),
+            'images' => 'array|max:'.$this->maxNewImages(),
             'images.*' => 'image|max:5120',
         ];
     }
@@ -85,7 +89,7 @@ trait HandlesArticleForm
 
         try {
             $this->validate([
-                'temporary_images' => 'array|max:' . ($this->maxNewImages() - count($this->images)),
+                'temporary_images' => 'array|max:'.($this->maxNewImages() - count($this->images)),
                 'temporary_images.*' => 'image|max:5120',
             ]);
         } catch (ValidationException $e) {

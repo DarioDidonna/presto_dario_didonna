@@ -24,7 +24,6 @@ Route::delete('/article/{article}', [ArticleController::class, 'destroy'])->name
 // CATEGORY
 Route::get('/category/{category}', [ArticleController::class, 'byCategory'])->name('byCategory');
 
-
 // REVISOR
 Route::get('/revisor/index', [RevisorController::class, 'index'])->middleware('isRevisor')->name('revisor.index');
 
@@ -34,10 +33,8 @@ Route::patch('/accept/{article}', [RevisorController::class, 'accept'])->middlew
 // REJECT
 Route::patch('/reject/{article}', [RevisorController::class, 'reject'])->middleware('isRevisor')->name('reject');
 
-
 // BECOME REVISOR
 Route::post('/revisor/request', [RevisorController::class, 'becomeRevisor'])->middleware(['auth', 'throttle:3,60'])->name('become.revisor');
-
 
 // MAKE REVISOR
 Route::get('/make/revisor/{user}', [RevisorController::class, 'makeRevisor'])->middleware('signed')->name('make.revisor');

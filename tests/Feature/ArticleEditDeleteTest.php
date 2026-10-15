@@ -6,6 +6,7 @@ use App\Jobs\RemoveFaces;
 use App\Livewire\EditArticleForm;
 use App\Models\Article;
 use App\Models\Category;
+use App\Models\Image;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
@@ -35,6 +36,7 @@ class ArticleEditDeleteTest extends TestCase
             Storage::disk('public')->put("articles/{$article->id}/crop_800x800_foto{$n}.jpg", 'x');
             $article->images()->create(['path' => $path]);
         }
+
         return $article;
     }
 
@@ -174,7 +176,7 @@ class ArticleEditDeleteTest extends TestCase
             ->assertSessionHas('message');
 
         $this->assertModelMissing($article);
-        $this->assertSame(0, \App\Models\Image::count());
+        $this->assertSame(0, Image::count());
         $this->assertSame([], Storage::disk('public')->allFiles("articles/{$article->id}"));
     }
 

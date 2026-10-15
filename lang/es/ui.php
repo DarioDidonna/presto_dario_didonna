@@ -41,7 +41,7 @@ return [
     'description_label' => 'Descripción del servicio o producto',
     'description_placeholder' => 'Proporciona todos los detalles que puedas...',
     'access_denied' => 'Zona reservada para revisores',
-    'revisor_promoted' => "El usuario :name ahora es revisor",
+    'revisor_promoted' => 'El usuario :name ahora es revisor',
     'revisor_request_success' => 'Felicidades, has solicitado convertirte en revisor',
     'accepted_article' => 'Has aceptado el artículo :title',
     'rejected_article' => 'Has rechazado el artículo :title',

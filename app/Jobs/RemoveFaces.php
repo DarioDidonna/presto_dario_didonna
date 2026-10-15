@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Storage;
 
 class RemoveFaces implements ShouldQueue
 {
-    use Queueable, CallsGoogleVision;
+    use CallsGoogleVision, Queueable;
 
     private $article_image_id;
 
@@ -24,19 +24,21 @@ class RemoveFaces implements ShouldQueue
     {
         try {
             $i = Image::find($this->article_image_id);
-            if (!$i) {
-                logger()->error("RemoveFaces: Modello Image non trovato per ID: " . $this->article_image_id);
+            if (! $i) {
+                logger()->error('RemoveFaces: Modello Image non trovato per ID: '.$this->article_image_id);
+
                 return;
             }
 
             $response = $this->annotate($i, Type::FACE_DETECTION);
-            if (!$response) {
+            if (! $response) {
                 return;
             }
 
             $faces = $response->getFaceAnnotations();
             if (count($faces) === 0) {
                 logger()->info("RemoveFaces [ID {$this->article_image_id}]: Nessun volto rilevato nella foto.");
+
                 return;
             }
 
@@ -45,8 +47,9 @@ class RemoveFaces implements ShouldQueue
             // imagecreatefromstring gestisce jpeg, png, gif, webp… senza basarsi sull'estensione
             $gdImage = @imagecreatefromstring(file_get_contents($srcPath));
 
-            if (!$gdImage) {
-                logger()->error("RemoveFaces: Impossibile caricare la risorsa GD.");
+            if (! $gdImage) {
+                logger()->error('RemoveFaces: Impossibile caricare la risorsa GD.');
+
                 return;
             }
 
@@ -87,7 +90,7 @@ class RemoveFaces implements ShouldQueue
                 logger()->error("RemoveFaces [ID {$this->article_image_id}]: Salvataggio del file fallito.");
             }
         } catch (\Throwable $e) {
-            logger()->error("RemoveFaces CRASH: " . $e->getMessage());
+            logger()->error('RemoveFaces CRASH: '.$e->getMessage());
         }
     }
 }

@@ -41,7 +41,7 @@ return [
     'description_label' => 'Description of the service or product',
     'description_placeholder' => 'Provide as many details as possible...',
     'access_denied' => 'Restricted area for reviewers',
-    'revisor_promoted' => "User :name is now a revisor",
+    'revisor_promoted' => 'User :name is now a revisor',
     'revisor_request_success' => 'Congratulations, you requested to become a Revisor',
     'accepted_article' => 'You accepted the article :title',
     'rejected_article' => 'You rejected the article :title',

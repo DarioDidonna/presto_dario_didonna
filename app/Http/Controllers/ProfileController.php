@@ -52,7 +52,7 @@ class ProfileController extends Controller implements HasMiddleware
 
         $user = $request->user();
         $disk = Storage::disk('public');
-        $path = "avatars/{$user->id}/" . Str::random(40) . '.jpg';
+        $path = "avatars/{$user->id}/".Str::random(40).'.jpg';
 
         // Ritaglio quadrato e ricodifica in JPEG: immagine leggera e senza metadati EXIF (es. posizione GPS)
         $disk->makeDirectory(dirname($path));

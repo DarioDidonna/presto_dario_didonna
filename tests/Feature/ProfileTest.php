@@ -6,6 +6,7 @@ use App\Models\Article;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
@@ -139,11 +140,11 @@ class ProfileTest extends TestCase
         $this->actingAs(User::factory()->create())->get(route('profile.show'))
             ->assertSee(__('ui.quick_actions'))
             ->assertSee(__('ui.apply_revisor'))
-            ->assertSee('action="' . route('become.revisor') . '"', false);
+            ->assertSee('action="'.route('become.revisor').'"', false);
 
         $this->actingAs(User::factory()->revisor()->create())->get(route('profile.show'))
             ->assertDontSee(__('ui.apply_revisor'))
-            ->assertSee('href="' . route('revisor.index') . '"', false);
+            ->assertSee('href="'.route('revisor.index').'"', false);
     }
 
     public function test_user_can_change_password_from_profile(): void
@@ -160,7 +161,7 @@ class ProfileTest extends TestCase
             ->assertRedirect(route('profile.show'))
             ->assertSessionHasNoErrors();
 
-        $this->assertTrue(\Illuminate\Support\Facades\Hash::check('NuovaPassword123!', $user->fresh()->password));
+        $this->assertTrue(Hash::check('NuovaPassword123!', $user->fresh()->password));
 
         $this->actingAs($user->fresh())->withSession(['status' => 'password-updated'])
             ->get(route('profile.show'))
@@ -184,7 +185,7 @@ class ProfileTest extends TestCase
                 'password' => 'La conferma del campo password non corrisponde.',
             ]);
 
-        $this->assertTrue(\Illuminate\Support\Facades\Hash::check('password', $user->fresh()->password));
+        $this->assertTrue(Hash::check('password', $user->fresh()->password));
     }
 
     public function test_login_failure_message_is_translated(): void

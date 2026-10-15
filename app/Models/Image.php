@@ -2,13 +2,13 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use App\Jobs\GoogleVisionLabelImage;
 use App\Jobs\GoogleVisionSafeSearch;
 use App\Jobs\RemoveFaces;
 use App\Jobs\ResizeImage;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\Storage;
 
 class Image extends Model
@@ -19,7 +19,7 @@ class Image extends Model
     public const DISPLAY_SIZE = 800;
 
     protected $fillable = [
-        'path'
+        'path',
     ];
 
     public function article(): BelongsTo
@@ -29,19 +29,20 @@ class Image extends Model
 
     public static function getUrlByFilePath($filePath, $w = null, $h = null)
     {
-        if (!$w && !$h) {
+        if (! $w && ! $h) {
             return Storage::url($filePath);
         }
         $path = dirname($filePath);
         $filename = basename($filePath);
         $file = "{$path}/crop_{$w}x{$h}_{$filename}";
+
         return Storage::url($file);
     }
 
     // I job Google Vision salvano i rating SafeSearch e le etichette: se mancano entrambi l'analisi non è avvenuta
     public function hasVisionAnalysis(): bool
     {
-        return $this->adult !== null || !empty($this->labels);
+        return $this->adult !== null || ! empty($this->labels);
     }
 
     /**
@@ -68,7 +69,7 @@ class Image extends Model
         Storage::disk('public')->delete([
             $this->path,
             "{$dir}/crop_300x300_{$name}",
-            "{$dir}/crop_" . self::DISPLAY_SIZE . 'x' . self::DISPLAY_SIZE . "_{$name}",
+            "{$dir}/crop_".self::DISPLAY_SIZE.'x'.self::DISPLAY_SIZE."_{$name}",
         ]);
 
         $this->delete();
@@ -93,7 +94,7 @@ class Image extends Model
     {
         $disk = Storage::disk('public');
         foreach ([self::DISPLAY_SIZE, 300] as $size) {
-            $crop = dirname($this->path) . "/crop_{$size}x{$size}_" . basename($this->path);
+            $crop = dirname($this->path)."/crop_{$size}x{$size}_".basename($this->path);
             if ($disk->exists($crop)) {
                 return Storage::url($crop);
             }

@@ -8,6 +8,7 @@ use App\Jobs\RemoveFaces;
 use App\Jobs\ResizeImage;
 use App\Models\Article;
 use App\Models\Category;
+use App\Models\Image;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
@@ -54,13 +55,13 @@ class ArticleFlowTest extends TestCase
 
         RemoveFaces::withChain([
             new ResizeImage($image->path, 300, 300),
-            new ResizeImage($image->path, \App\Models\Image::DISPLAY_SIZE, \App\Models\Image::DISPLAY_SIZE),
+            new ResizeImage($image->path, Image::DISPLAY_SIZE, Image::DISPLAY_SIZE),
             new GoogleVisionSafeSearch($image->id),
             new GoogleVisionLabelImage($image->id),
         ])->dispatch($image->id);
 
-        Storage::disk('public')->assertExists(dirname($path) . '/crop_300x300_' . basename($path));
-        Storage::disk('public')->assertExists(dirname($path) . '/crop_800x800_' . basename($path));
-        $this->assertStringEndsWith('crop_800x800_' . basename($path), $image->getDisplayUrl());
+        Storage::disk('public')->assertExists(dirname($path).'/crop_300x300_'.basename($path));
+        Storage::disk('public')->assertExists(dirname($path).'/crop_800x800_'.basename($path));
+        $this->assertStringEndsWith('crop_800x800_'.basename($path), $image->getDisplayUrl());
     }
 }
