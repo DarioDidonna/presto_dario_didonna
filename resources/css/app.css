@@ -1,5 +1,5 @@
-/* Gli @import esterni devono stare in cima; poi Bootstrap e per ULTIMO il tema del sito,
-   così i nostri stili sovrascrivono quelli di Bootstrap (prima era il contrario). */
-@import url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css");
+/* Tutto locale (niente CDN): il sito funziona anche offline, ad esempio durante una demo.
+   Prima Bootstrap e per ULTIMO il tema del sito, così i nostri stili sovrascrivono quelli di Bootstrap. */
+@import 'bootstrap-icons/font/bootstrap-icons.min.css';
 @import 'bootstrap/dist/css/bootstrap.min.css';
 @import './style.css';
