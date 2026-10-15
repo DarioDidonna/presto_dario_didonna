@@ -3,8 +3,11 @@
 namespace Tests\Feature;
 
 use App\Models\Article;
+use App\Models\Category;
+use App\Models\Image;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 class FrontendTest extends TestCase
@@ -99,12 +102,12 @@ class FrontendTest extends TestCase
 
     public function test_category_counter_counts_only_published_articles(): void
     {
-        $category = \App\Models\Category::factory()->create();
+        $category = Category::factory()->create();
         Article::factory()->count(2)->accepted()->for($category)->create();
         Article::factory()->for($category)->create();
         Article::factory()->rejected()->for($category)->create();
 
-        $this->get('/')->assertSee('2 ' . __('ui.ads'));
+        $this->get('/')->assertSee('2 '.__('ui.ads'));
     }
 
     public function test_flash_message_has_generic_title(): void
@@ -133,7 +136,7 @@ class FrontendTest extends TestCase
             ->assertDontSee('mailto:', false);
 
         $this->actingAs(User::factory()->create())->get(route('article.show', $article))
-            ->assertSee('mailto:' . $article->user->email, false);
+            ->assertSee('mailto:'.$article->user->email, false);
 
         $this->actingAs($article->user)->get(route('article.show', $article))
             ->assertSee(__('ui.your_own_ad'))
@@ -181,15 +184,15 @@ class FrontendTest extends TestCase
 
     public function test_display_url_falls_back_when_large_version_is_missing(): void
     {
-        \Illuminate\Support\Facades\Storage::fake('public');
-        $image = new \App\Models\Image(['path' => 'articles/1/foto.jpg']);
+        Storage::fake('public');
+        $image = new Image(['path' => 'articles/1/foto.jpg']);
 
         $this->assertStringEndsWith('articles/1/foto.jpg', $image->getDisplayUrl());
 
-        \Illuminate\Support\Facades\Storage::disk('public')->put('articles/1/crop_300x300_foto.jpg', 'x');
+        Storage::disk('public')->put('articles/1/crop_300x300_foto.jpg', 'x');
         $this->assertStringEndsWith('crop_300x300_foto.jpg', $image->getDisplayUrl());
 
-        \Illuminate\Support\Facades\Storage::disk('public')->put('articles/1/crop_800x800_foto.jpg', 'x');
+        Storage::disk('public')->put('articles/1/crop_800x800_foto.jpg', 'x');
         $this->assertStringEndsWith('crop_800x800_foto.jpg', $image->getDisplayUrl());
     }
 
@@ -199,20 +202,28 @@ class FrontendTest extends TestCase
         $hooks = ['class-step', 'slide', 'node-active', 'node-pos-', 'preview-container', 'brand-icon', 'brand-icon-wrapper',
             'profile-dropdown-toggle', 'custom-checkbox-wrapper', 'stat-number', 'article-show-wrapper', 'transform-wrapper'];
 
-        $css = file_get_contents(resource_path('css/style.css')) . file_get_contents(base_path('node_modules/bootstrap/dist/css/bootstrap.css'));
+        $css = file_get_contents(resource_path('css/style.css')).file_get_contents(base_path('node_modules/bootstrap/dist/css/bootstrap.css'));
         preg_match_all('/\.((?:[a-zA-Z][\w-]*)(?:\\\\\.\w+)?)/', $css, $m);
         $defined = array_flip(array_map(fn ($c) => str_replace('\\.', '.', $c), $m[1]));
 
         $missing = [];
         foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator(resource_path('views'))) as $file) {
-            if (!str_ends_with($file, '.blade.php')) continue;
+            if (! str_ends_with($file, '.blade.php')) {
+                continue;
+            }
             preg_match_all('/class="([^"]*)"/', file_get_contents($file), $attrs);
             foreach ($attrs[1] as $attr) {
                 $attr = preg_replace('/\{\{.*?\}\}|@\w+\([^)]*\)/', '', $attr);
                 foreach (preg_split('/\s+/', trim($attr)) as $class) {
-                    if ($class === '' || !preg_match('/^[a-zA-Z][\w.-]*$/', $class)) continue;
-                    if (str_starts_with($class, 'bi') || str_starts_with($class, 'fa') || in_array($class, $hooks, true)) continue;
-                    if (!isset($defined[$class])) $missing[$class][] = basename($file);
+                    if ($class === '' || ! preg_match('/^[a-zA-Z][\w.-]*$/', $class)) {
+                        continue;
+                    }
+                    if (str_starts_with($class, 'bi') || str_starts_with($class, 'fa') || in_array($class, $hooks, true)) {
+                        continue;
+                    }
+                    if (! isset($defined[$class])) {
+                        $missing[$class][] = basename($file);
+                    }
                 }
             }
         }
@@ -224,12 +235,12 @@ class FrontendTest extends TestCase
     {
         $article = Article::factory()->accepted()->create(['title' => 'Divano letto', 'description' => 'Comodo divano in tessuto grigio']);
 
-        $this->get('/')->assertSee('<title>Presto.it - ' . __('ui.meta_tagline') . '</title>', false);
-        $this->get('/article/index')->assertSee('<title>' . __('ui.all_ads_title') . ' · Presto.it</title>', false);
+        $this->get('/')->assertSee('<title>Presto.it - '.__('ui.meta_tagline').'</title>', false);
+        $this->get('/article/index')->assertSee('<title>'.__('ui.all_ads_title').' · Presto.it</title>', false);
         $this->get(route('article.show', $article))
             ->assertSee('<title>Divano letto · Presto.it</title>', false)
             ->assertSee('<meta name="description" content="Comodo divano in tessuto grigio">', false);
-        $this->get('/login')->assertSee('<title>' . __('ui.login') . ' · Presto.it</title>', false);
+        $this->get('/login')->assertSee('<title>'.__('ui.login').' · Presto.it</title>', false);
     }
 
     public function test_english_pages_contain_no_leftover_italian_labels(): void
@@ -262,9 +273,9 @@ class FrontendTest extends TestCase
                 'medical' => 'text-secondary bi bi-circle-fill'])->save();
 
         $this->actingAs(User::factory()->revisor()->create())->get(route('revisor.index'))
-            ->assertSee(__('ui.vision_adult') . "\n", false)
-            ->assertSee(': ' . __('ui.likelihood_likely'), false)
-            ->assertSee(': ' . __('ui.likelihood_possible'), false)
+            ->assertSee(__('ui.vision_adult')."\n", false)
+            ->assertSee(': '.__('ui.likelihood_likely'), false)
+            ->assertSee(': '.__('ui.likelihood_possible'), false)
             ->assertDontSee('Imm #', false);
     }
 

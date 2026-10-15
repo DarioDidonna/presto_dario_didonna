@@ -295,4 +295,18 @@ return [
     'confirm_delete_title' => 'Eliminare l\'annuncio?',
     'confirm_delete_text' => 'L\'annuncio «:title» e le sue foto verranno eliminati definitivamente. L\'operazione non si può annullare.',
     'confirm_delete_button' => 'Sì, elimina',
+    // Pagine di errore
+    'error_404_title' => 'Pagina non trovata',
+    'error_404_text' => 'L\'indirizzo potrebbe essere sbagliato, oppure l\'annuncio è stato rimosso o non è ancora pubblicato.',
+    'error_403_title' => 'Accesso negato',
+    'error_403_text' => 'Non hai i permessi per vedere questa pagina o eseguire questa operazione.',
+    'error_419_title' => 'Sessione scaduta',
+    'error_419_text' => 'La pagina è rimasta aperta troppo a lungo. Torna indietro, ricarica e riprova.',
+    'error_retry' => 'Torna indietro',
+    'error_429_title' => 'Troppe richieste',
+    'error_429_text' => 'Hai effettuato troppe richieste in poco tempo. Attendi qualche minuto e riprova.',
+    'error_500_title' => 'Qualcosa è andato storto',
+    'error_500_text' => 'Si è verificato un errore imprevisto. È stato registrato: riprova tra qualche istante.',
+    'error_503_title' => 'Manutenzione in corso',
+    'error_503_text' => 'Stiamo aggiornando Presto.it. Torna tra pochi minuti.',
 ];

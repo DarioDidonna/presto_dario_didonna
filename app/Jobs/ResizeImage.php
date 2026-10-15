@@ -16,8 +16,11 @@ class ResizeImage implements ShouldQueue
     use Queueable;
 
     private $w;
+
     private $h;
+
     private $fileName;
+
     private $path;
 
     public function __construct($filePath, $w, $h)
@@ -34,11 +37,12 @@ class ResizeImage implements ShouldQueue
         $h = $this->h;
 
         $disk = Storage::disk('public');
-        $srcPath = $disk->path($this->path . '/' . $this->fileName);
-        $destPath = $disk->path($this->path . "/crop_{$w}x{$h}_" . $this->fileName);
+        $srcPath = $disk->path($this->path.'/'.$this->fileName);
+        $destPath = $disk->path($this->path."/crop_{$w}x{$h}_".$this->fileName);
 
-        if (!file_exists($srcPath)) {
+        if (! file_exists($srcPath)) {
             logger()->error("ResizeImage: file non trovato in {$srcPath}");
+
             return;
         }
 
@@ -69,8 +73,7 @@ class ResizeImage implements ShouldQueue
                     alpha: 100
                 );
 
-
-                logger()->info("ResizeImage: watermark applicata in alto a destra.");
+                logger()->info('ResizeImage: watermark applicata in alto a destra.');
             } else {
                 logger()->warning("ResizeImage: watermark non trovata in {$watermarkPath}");
             }
@@ -79,7 +82,7 @@ class ResizeImage implements ShouldQueue
 
             logger()->info("ResizeImage: immagine salvata in {$destPath}");
         } catch (\Throwable $e) {
-            logger()->error("ResizeImage CRASH: " . $e->getMessage());
+            logger()->error('ResizeImage CRASH: '.$e->getMessage());
         }
     }
 }

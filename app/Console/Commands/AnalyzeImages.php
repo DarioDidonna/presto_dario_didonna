@@ -22,6 +22,7 @@ class AnalyzeImages extends Command
 
         if ($images->isEmpty()) {
             $this->info('Nessuna immagine da analizzare.');
+
             return self::SUCCESS;
         }
 
@@ -31,6 +32,7 @@ class AnalyzeImages extends Command
         }
 
         $this->info("Messe in coda {$images->count()} immagini: verranno elaborate dal worker (php artisan queue:work).");
+
         return self::SUCCESS;
     }
 }

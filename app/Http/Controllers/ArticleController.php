@@ -4,10 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Article;
 use App\Models\Category;
-use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Storage;
 
 class ArticleController extends Controller implements HasMiddleware
 {
@@ -26,6 +26,7 @@ class ArticleController extends Controller implements HasMiddleware
     public function index()
     {
         $articles = Article::accepted()->withCardRelations()->latest()->paginate(10);
+
         return view('article.index', compact('articles'));
     }
 
@@ -35,6 +36,7 @@ class ArticleController extends Controller implements HasMiddleware
         abort_unless(Gate::allows('view', $article), 404);
 
         $article->load(['images', 'category', 'user']);
+
         return view('article.show', compact('article'));
     }
 
@@ -59,6 +61,7 @@ class ArticleController extends Controller implements HasMiddleware
     public function byCategory(Category $category)
     {
         $articles = $category->articles()->accepted()->withCardRelations()->latest()->paginate(12);
+
         return view('article.byCategory', compact('articles', 'category'));
     }
 }

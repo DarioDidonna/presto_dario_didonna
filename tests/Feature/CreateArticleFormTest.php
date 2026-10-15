@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Jobs\RemoveFaces;
 use App\Livewire\CreateArticleForm;
 use App\Models\Article;
 use App\Models\Category;
@@ -74,7 +75,7 @@ class CreateArticleFormTest extends TestCase
         $this->assertNotNull($article);
         $this->assertNull($article->is_accepted);
         $this->assertCount(1, $article->images);
-        Queue::assertPushed(\App\Jobs\RemoveFaces::class);
+        Queue::assertPushed(RemoveFaces::class);
     }
 
     public function test_english_locale_is_selectable_and_ukrainian_is_not(): void

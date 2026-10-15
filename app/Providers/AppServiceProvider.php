@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Models\Category;
+use App\View\Composers\ErrorPageLocaleComposer;
 use App\View\Composers\MarketStatsComposer;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\View;
@@ -34,5 +35,6 @@ class AppServiceProvider extends ServiceProvider
         );
 
         View::composer(['components.header', 'components.live-activity'], MarketStatsComposer::class);
+        View::composer('errors::*', ErrorPageLocaleComposer::class);
     }
 }

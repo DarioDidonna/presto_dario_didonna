@@ -19,7 +19,7 @@ Progetto finale del corso Hackademy (Aulab), ampliato con refactoring, test auto
 ![Laravel](https://img.shields.io/badge/Laravel-13-FF2D20?logo=laravel&logoColor=white)
 ![Livewire](https://img.shields.io/badge/Livewire-4-FB70A9?logo=livewire&logoColor=white)
 ![Bootstrap](https://img.shields.io/badge/Bootstrap-5.3-7952B3?logo=bootstrap&logoColor=white)
-![Test](https://img.shields.io/badge/test-99%20passati-2ea44f)
+[![Test](https://github.com/DarioDidonna/presto_dario_didonna/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/DarioDidonna/presto_dario_didonna/actions/workflows/tests.yml)
 
 ---
 
@@ -68,7 +68,7 @@ Un errore di Google Vision (credenziali mancanti, servizio non raggiungibile) no
 | Frontend | Blade, Livewire 4, Bootstrap 5.3, Bootstrap Icons, Vite |
 | Immagini | Google Cloud Vision API, Spatie Image (GD) |
 | Dati | MySQL, code e sessioni su database |
-| Test | PHPUnit (99 test) |
+| Test e qualità | PHPUnit (105 test), Laravel Pint, GitHub Actions |
 
 ---
 
@@ -143,13 +143,16 @@ In sviluppo le email (reset password, candidature revisore) finiscono nel log (`
 php artisan test
 ```
 
-I 99 test coprono, tra l'altro:
+I 105 test coprono, tra l'altro:
 
 - **sicurezza e permessi**: solo i revisori approvano, link di promozione firmati e a scadenza, annunci non pubblicati invisibili agli altri utenti, modifica ed eliminazione riservate all'autore;
 - **flussi completi**: pubblicazione, revisione, reset password, profilo e foto profilo, catena di elaborazione delle immagini;
+- **pagine di errore** 403, 404, 419, 429, 500 e 503 nella lingua dell'utente;
 - **qualità**: limite di query per pagina (contro i problemi N+1), HTML bilanciato, nessuna classe CSS non definita, nessun link morto, testi tradotti.
 
 I test usano un database SQLite in memoria e il driver Scout `collection`: non toccano il database né l'indice di ricerca di sviluppo.
+
+A ogni push e pull request **GitHub Actions** esegue la suite completa (con il build del front-end) e controlla lo stile del codice con [Laravel Pint](https://laravel.com/docs/pint): vedi [`.github/workflows/tests.yml`](.github/workflows/tests.yml). Per formattare il codice in locale: `vendor/bin/pint`.
 
 ---
 

@@ -10,7 +10,7 @@ use Illuminate\Foundation\Queue\Queueable;
 
 class GoogleVisionLabelImage implements ShouldQueue
 {
-    use Queueable, CallsGoogleVision;
+    use CallsGoogleVision, Queueable;
 
     private $article_image_id;
 
@@ -26,13 +26,14 @@ class GoogleVisionLabelImage implements ShouldQueue
     {
         try {
             $i = Image::find($this->article_image_id);
-            if (!$i) {
-                logger()->error("GoogleVisionLabelImage: Modello Image non trovato per ID: " . $this->article_image_id);
+            if (! $i) {
+                logger()->error('GoogleVisionLabelImage: Modello Image non trovato per ID: '.$this->article_image_id);
+
                 return;
             }
 
             $response = $this->annotate($i, Type::LABEL_DETECTION);
-            if (!$response) {
+            if (! $response) {
                 return;
             }
 
@@ -44,10 +45,10 @@ class GoogleVisionLabelImage implements ShouldQueue
             $i->labels = $result;
             $i->save();
 
-            logger()->info("GoogleVisionLabelImage: Etichette salvate con successo per l'immagine ID: " . $this->article_image_id);
+            logger()->info("GoogleVisionLabelImage: Etichette salvate con successo per l'immagine ID: ".$this->article_image_id);
         } catch (\Throwable $e) {
             // Non blocchiamo la catena: un errore di Google Vision non deve impedire la pubblicazione
-            logger()->error("GoogleVisionLabelImage CRASH: " . $e->getMessage());
+            logger()->error('GoogleVisionLabelImage CRASH: '.$e->getMessage());
         }
     }
 }

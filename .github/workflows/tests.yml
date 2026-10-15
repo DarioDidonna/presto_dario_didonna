@@ -1,0 +1,74 @@
+name: Test
+
+on:
+  push:
+  pull_request:
+
+# Un nuovo push sullo stesso ramo annulla l'esecuzione precedente ancora in corso
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  tests:
+    name: PHPUnit
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: PHP 8.4
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: gd, exif, fileinfo, mbstring, pdo_sqlite
+          coverage: none
+
+      - name: Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Cache Composer
+        uses: actions/cache@v4
+        with:
+          path: ~/.composer/cache/files
+          key: composer-${{ hashFiles('composer.lock') }}
+
+      - name: Dipendenze PHP
+        run: composer install --no-interaction --prefer-dist --no-progress
+
+      # Le viste usano @vite: senza il build (o il dev server) i test non possono renderizzarle
+      - name: Dipendenze e build front-end
+        run: |
+          npm ci
+          npm run build
+
+      - name: Configurazione
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+
+      # phpunit.xml usa SQLite in memoria e Scout "collection": nessun servizio esterno necessario
+      - name: Test
+        run: php artisan test
+
+  pint:
+    name: Stile del codice (Pint)
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: PHP 8.4
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          coverage: none
+
+      - name: Dipendenze PHP
+        run: composer install --no-interaction --prefer-dist --no-progress
+
+      - name: Pint
+        run: vendor/bin/pint --test

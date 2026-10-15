@@ -83,6 +83,7 @@ class DemoSeeder extends Seeder
         if (Article::whereIn('user_id', $sellers->pluck('id'))->exists()) {
             $this->command?->warn('Annunci demo già presenti: salto la creazione (usa migrate:fresh --seed per ripartire da zero).');
             $this->printCredentials();
+
             return;
         }
 
@@ -108,7 +109,7 @@ class DemoSeeder extends Seeder
             }
         }
 
-        $this->command?->info(count(self::ARTICLES) . ' annunci demo creati.');
+        $this->command?->info(count(self::ARTICLES).' annunci demo creati.');
         $this->printCredentials();
     }
 
@@ -128,7 +129,7 @@ class DemoSeeder extends Seeder
     private function addImage(Article $article, string $category, int $n): void
     {
         $disk = Storage::disk('public');
-        $path = "articles/{$article->id}/demo-{$n}-" . Str::random(8) . '.jpg';
+        $path = "articles/{$article->id}/demo-{$n}-".Str::random(8).'.jpg';
         $disk->makeDirectory(dirname($path));
 
         $photo = $this->realPhoto($category, $article->id + $n);
@@ -146,8 +147,8 @@ class DemoSeeder extends Seeder
     // Foto vere opzionali in database/seeders/demo-images/{slug-categoria}/
     private function realPhoto(string $category, int $seed): ?string
     {
-        $dir = database_path('seeders/demo-images/' . Str::slug($category));
-        if (!is_dir($dir)) {
+        $dir = database_path('seeders/demo-images/'.Str::slug($category));
+        if (! is_dir($dir)) {
             return null;
         }
 

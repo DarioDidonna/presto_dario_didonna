@@ -14,45 +14,45 @@ class CategoriesSeeder extends Seeder
     {
         $categories = [
             [
-                'name' => 'Abbigliamento', 
-                'icon' => 'bi bi-bag'
+                'name' => 'Abbigliamento',
+                'icon' => 'bi bi-bag',
             ],
             [
-                'name' => 'Accessori', 
-                'icon' => 'bi bi-device-ssd'
+                'name' => 'Accessori',
+                'icon' => 'bi bi-device-ssd',
             ],
             [
-                'name' => 'Animali domestici', 
-                'icon' => 'bi bi-house-heart'
+                'name' => 'Animali domestici',
+                'icon' => 'bi bi-house-heart',
             ],
             [
-                'name' => 'Casa e Giardinaggio', 
-                'icon' => 'bi bi-house-door'
+                'name' => 'Casa e Giardinaggio',
+                'icon' => 'bi bi-house-door',
             ],
             [
-                'name' => 'Elettronica', 
-                'icon' => 'bi bi-laptop'
+                'name' => 'Elettronica',
+                'icon' => 'bi bi-laptop',
             ],
             [
-                'name' => 'Giocattoli', 
-                'icon' => 'bi bi-controller'
+                'name' => 'Giocattoli',
+                'icon' => 'bi bi-controller',
             ],
             [
-                'name' => 'Libri e Riviste', 
-                'icon' => 'bi bi-book'
+                'name' => 'Libri e Riviste',
+                'icon' => 'bi bi-book',
             ],
             [
-                'name' => 'Motori', 
-                'icon' => 'bi bi-car-front'
+                'name' => 'Motori',
+                'icon' => 'bi bi-car-front',
             ],
             [
-                'name' => 'Salute e Bellezza', 
-                'icon' => 'bi bi-lungs-fill'
+                'name' => 'Salute e Bellezza',
+                'icon' => 'bi bi-lungs-fill',
             ],
             [
-                'name' => 'Sport', 
-                'icon' => 'bi bi-dribbble'
-            ]
+                'name' => 'Sport',
+                'icon' => 'bi bi-dribbble',
+            ],
         ];
 
         // Rieseguibile: aggiorna le categorie esistenti invece di duplicarle

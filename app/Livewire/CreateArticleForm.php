@@ -10,7 +10,7 @@ use Livewire\WithFileUploads;
 
 class CreateArticleForm extends Component
 {
-    use WithFileUploads, HandlesArticleForm;
+    use HandlesArticleForm, WithFileUploads;
 
     public $article;
 
@@ -23,7 +23,7 @@ class CreateArticleForm extends Component
             'description' => $this->description,
             'price' => $this->price,
             'category_id' => $this->category,
-            'user_id' => Auth::id()
+            'user_id' => Auth::id(),
         ]);
 
         $this->storeNewImages($this->article);

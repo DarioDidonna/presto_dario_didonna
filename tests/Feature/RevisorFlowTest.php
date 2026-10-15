@@ -2,11 +2,13 @@
 
 namespace Tests\Feature;
 
+use App\Jobs\RemoveFaces;
 use App\Mail\BecomeRevisor;
 use App\Models\Article;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Queue;
 use Tests\TestCase;
 
 class RevisorFlowTest extends TestCase
@@ -99,16 +101,16 @@ class RevisorFlowTest extends TestCase
 
     public function test_analyze_images_command_queues_only_missing_analyses(): void
     {
-        \Illuminate\Support\Facades\Queue::fake();
+        Queue::fake();
         $article = Article::factory()->create();
         $article->images()->create(['path' => 'articles/1/senza.jpg']);
         $article->images()->create(['path' => 'articles/1/con.jpg'])->forceFill(['labels' => ['Cat']])->save();
 
         $this->artisan('app:analyze-images')->assertSuccessful();
-        \Illuminate\Support\Facades\Queue::assertPushed(\App\Jobs\RemoveFaces::class, 1);
+        Queue::assertPushed(RemoveFaces::class, 1);
 
         $this->artisan('app:analyze-images', ['--all' => true])->assertSuccessful();
-        \Illuminate\Support\Facades\Queue::assertPushed(\App\Jobs\RemoveFaces::class, 3);
+        Queue::assertPushed(RemoveFaces::class, 3);
     }
 
     public function test_accept_and_reject_require_confirmation_in_a_modal(): void
@@ -129,8 +131,8 @@ class RevisorFlowTest extends TestCase
 
         // Ogni form PATCH sta dentro la rispettiva modale
         foreach (['confirmAcceptModal' => 'accept', 'confirmRejectModal' => 'reject'] as $modal => $route) {
-            $start = strpos($html, 'id="' . $modal . '"');
-            $form = strpos($html, 'action="' . route($route, $article) . '"');
+            $start = strpos($html, 'id="'.$modal.'"');
+            $form = strpos($html, 'action="'.route($route, $article).'"');
             $this->assertNotFalse($start);
             $this->assertGreaterThan($start, $form, "Il form $route deve trovarsi dentro $modal");
         }

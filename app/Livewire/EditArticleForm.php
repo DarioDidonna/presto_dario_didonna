@@ -10,7 +10,7 @@ use Livewire\WithFileUploads;
 
 class EditArticleForm extends Component
 {
-    use WithFileUploads, HandlesArticleForm, AuthorizesRequests;
+    use AuthorizesRequests, HandlesArticleForm, WithFileUploads;
 
     public Article $article;
 
@@ -36,7 +36,7 @@ class EditArticleForm extends Component
     public function toggleExistingImage(int $imageId)
     {
         // Solo foto di questo annuncio: l'ID arriva dal browser e potrebbe essere manomesso
-        if (!$this->article->images()->whereKey($imageId)->exists()) {
+        if (! $this->article->images()->whereKey($imageId)->exists()) {
             return;
         }
 

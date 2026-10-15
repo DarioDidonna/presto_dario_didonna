@@ -10,6 +10,7 @@ class PublicController extends Controller
     public function homepage()
     {
         $articles = Article::accepted()->withCardRelations()->latest()->take(6)->get();
+
         return view('homepage', compact('articles'));
     }
 
@@ -18,7 +19,7 @@ class PublicController extends Controller
         $query = $request->input('query');
 
         // TNTSearch va in errore con query vuote o non testuali (es. ?query[]=x)
-        if (!is_string($query) || trim($query) === '') {
+        if (! is_string($query) || trim($query) === '') {
             return redirect()->route('article.index');
         }
         $query = mb_substr(trim($query), 0, 100);
@@ -37,6 +38,7 @@ class PublicController extends Controller
     public function setLanguage(string $lang)
     {
         session()->put('locale', $lang);
+
         return redirect()->back();
     }
 }

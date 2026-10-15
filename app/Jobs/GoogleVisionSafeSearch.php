@@ -10,7 +10,7 @@ use Illuminate\Foundation\Queue\Queueable;
 
 class GoogleVisionSafeSearch implements ShouldQueue
 {
-    use Queueable, CallsGoogleVision;
+    use CallsGoogleVision, Queueable;
 
     private $article_image_id;
 
@@ -26,20 +26,22 @@ class GoogleVisionSafeSearch implements ShouldQueue
     {
         try {
             $i = Image::find($this->article_image_id);
-            if (!$i) {
-                logger()->error("GoogleVisionSafeSearch: Modello Image non trovato per ID: " . $this->article_image_id);
+            if (! $i) {
+                logger()->error('GoogleVisionSafeSearch: Modello Image non trovato per ID: '.$this->article_image_id);
+
                 return;
             }
 
             $response = $this->annotate($i, Type::SAFE_SEARCH_DETECTION);
-            if (!$response) {
+            if (! $response) {
                 return;
             }
 
             $safeSearchAnnotation = $response->getSafeSearchAnnotation();
 
-            if (!$safeSearchAnnotation) {
-                logger()->error("GoogleVisionSafeSearch: Nessuna annotazione SafeSearch per l'immagine ID: " . $this->article_image_id);
+            if (! $safeSearchAnnotation) {
+                logger()->error("GoogleVisionSafeSearch: Nessuna annotazione SafeSearch per l'immagine ID: ".$this->article_image_id);
+
                 return;
             }
 
@@ -50,7 +52,7 @@ class GoogleVisionSafeSearch implements ShouldQueue
                 'text-success bi bi-check-circle-fill',
                 'text-warning bi bi-exclamation-circle-fill',
                 'text-warning bi bi-exclamation-circle-fill',
-                'text-danger bi bi-dash-circle-fill'
+                'text-danger bi bi-dash-circle-fill',
             ];
             $toClass = fn ($value) => $likeliHoodName[(int) $value] ?? $likeliHoodName[0];
 
@@ -61,9 +63,9 @@ class GoogleVisionSafeSearch implements ShouldQueue
             $i->racy = $toClass($safeSearchAnnotation->getRacy());
             $i->save();
 
-            logger()->info("GoogleVisionSafeSearch completato con successo per l'immagine ID: " . $this->article_image_id);
+            logger()->info("GoogleVisionSafeSearch completato con successo per l'immagine ID: ".$this->article_image_id);
         } catch (\Throwable $e) {
-            logger()->error("GoogleVisionSafeSearch CRASH: " . $e->getMessage());
+            logger()->error('GoogleVisionSafeSearch CRASH: '.$e->getMessage());
         }
     }
 }
