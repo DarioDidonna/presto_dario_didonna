@@ -18,8 +18,8 @@ Route::get('/article/index', [ArticleController::class, 'index'])->name('article
 Route::get('/show/article/{article}', [ArticleController::class, 'show'])->name('article.show');
 
 // EDIT / DELETE (solo l'autore: ArticlePolicy)
-Route::get('/article/{article}/edit', [ArticleController::class, 'edit'])->name('article.edit');
-Route::delete('/article/{article}', [ArticleController::class, 'destroy'])->name('article.destroy');
+Route::get('/article/{article}/edit', [ArticleController::class, 'edit'])->middleware(['auth', 'can:update,article'])->name('article.edit');
+Route::delete('/article/{article}', [ArticleController::class, 'destroy'])->middleware(['auth', 'can:delete,article'])->name('article.destroy');
 
 // CATEGORY
 Route::get('/category/{category}', [ArticleController::class, 'byCategory'])->name('byCategory');

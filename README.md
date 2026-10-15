@@ -71,7 +71,7 @@ Un errore di Google Vision (credenziali mancanti, servizio non raggiungibile) no
 | Frontend | Blade, Livewire 4, Bootstrap 5.3, Bootstrap Icons, Vite |
 | Immagini | Google Cloud Vision API, Spatie Image (GD) |
 | Dati | MySQL, code e sessioni su database |
-| Test e qualità | PHPUnit (132 test), Laravel Pint, GitHub Actions |
+| Test e qualità | PHPUnit (133 test), Laravel Pint, GitHub Actions |
 
 ---
 
@@ -146,7 +146,7 @@ In sviluppo le email (reset password, candidature revisore) finiscono nel log (`
 php artisan test
 ```
 
-I 132 test coprono, tra l'altro:
+I 133 test coprono, tra l'altro:
 
 - **sicurezza e permessi**: solo i revisori approvano, link di promozione firmati e a scadenza, annunci non pubblicati invisibili agli altri utenti, modifica ed eliminazione riservate all'autore;
 - **flussi completi**: ricerca e filtri, pubblicazione, revisione con email all'autore e annullamento, reset password, profilo e foto profilo, catena di elaborazione delle immagini;
@@ -166,10 +166,12 @@ A ogni push e pull request **GitHub Actions** esegue la suite completa (con il b
 app/
 ├── Console/Commands/        app:make-user-revisor, app:analyze-images
 ├── Http/Controllers/        Article, Public, Revisor, Profile
+├── Http/Requests/           UpdateAvatarRequest (Form Request)
 ├── Jobs/                    RemoveFaces, ResizeImage, GoogleVision* (+ Concerns/CallsGoogleVision)
-├── Livewire/                CreateArticleForm, EditArticleForm (+ Concerns/HandlesArticleForm)
+├── Livewire/                CreateArticleForm, EditArticleForm (+ Forms/ArticleForm, Concerns/HandlesArticleForm)
 ├── Models/                  Article, Category, Image, User
 ├── Policies/                ArticlePolicy (chi vede, modifica ed elimina un annuncio)
+├── Support/                 ArticleFilters (ricerca e filtri dell'elenco)
 └── View/Composers/          Statistiche della homepage
 resources/views/             Pagine Blade e componenti (layout, card, avatar, navbar…)
 lang/{it,en,es}/             Traduzioni dell'interfaccia e della validazione

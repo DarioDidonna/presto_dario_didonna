@@ -16,20 +16,15 @@ class CreateArticleForm extends Component
 
     public function store()
     {
-        $this->validate();
+        $this->validateArticle();
 
-        $this->article = Article::create([
-            'title' => $this->title,
-            'description' => $this->description,
-            'price' => $this->price,
-            'category_id' => $this->category,
-            'user_id' => Auth::id(),
-        ]);
+        $this->article = Article::create([...$this->form->attributes(), 'user_id' => Auth::id()]);
 
         $this->storeNewImages($this->article);
 
         session()->flash('message', __('ui.article_published'));
-        $this->reset(['title', 'price', 'description', 'category', 'images', 'temporary_images']);
+        $this->form->reset();
+        $this->reset(['images', 'temporary_images']);
     }
 
     public function render()

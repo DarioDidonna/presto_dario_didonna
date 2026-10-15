@@ -22,12 +22,12 @@ class CreateArticleFormTest extends TestCase
     {
         Livewire::actingAs(User::factory()->create())
             ->test(CreateArticleForm::class)
-            ->set('title', 'Bicicletta')
-            ->set('price', 100)
-            ->set('description', 'Bicicletta da corsa in ottimo stato')
-            ->set('category', 999)
+            ->set('form.title', 'Bicicletta')
+            ->set('form.price', 100)
+            ->set('form.description', 'Bicicletta da corsa in ottimo stato')
+            ->set('form.category', 999)
             ->call('store')
-            ->assertHasErrors(['category' => 'exists']);
+            ->assertHasErrors(['form.category' => 'exists']);
 
         $this->assertSame(0, Article::count());
     }
@@ -61,12 +61,12 @@ class CreateArticleFormTest extends TestCase
         app()->setLocale('en');
         Livewire::actingAs(User::factory()->create())
             ->test(CreateArticleForm::class)
-            ->set('title', 'abc')
+            ->set('form.title', 'abc')
             ->assertSee('The title must be at least 5 characters.')
-            ->set('title', 'Bicicletta')
-            ->set('price', 100)
-            ->set('description', 'Bicicletta da corsa in ottimo stato')
-            ->set('category', $category->id)
+            ->set('form.title', 'Bicicletta')
+            ->set('form.price', 100)
+            ->set('form.description', 'Bicicletta da corsa in ottimo stato')
+            ->set('form.category', $category->id)
             ->set('temporary_images', [UploadedFile::fake()->image('a.jpg')])
             ->call('store')
             ->assertHasNoErrors();
@@ -102,5 +102,22 @@ class CreateArticleFormTest extends TestCase
             ->set('temporary_images', [UploadedFile::fake()->image('ok.jpg')])
             ->assertHasNoErrors()
             ->assertCount('images', 1);
+    }
+
+    public function test_empty_form_shows_all_field_errors_at_once(): void
+    {
+        Livewire::actingAs(User::factory()->create())
+            ->test(CreateArticleForm::class)
+            ->call('store')
+            ->assertHasErrors([
+                'form.title' => 'required',
+                'form.price' => 'required',
+                'form.description' => 'required',
+                'form.category' => 'required',
+            ])
+            ->assertSee(__('ui.validation_title_required'))
+            ->assertSee(__('ui.validation_category_required'));
+
+        $this->assertSame(0, Article::count());
     }
 }
