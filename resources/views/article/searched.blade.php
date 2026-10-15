@@ -1,15 +1,19 @@
-<x-layout>
-    <div class="container-fluid bg-light border-bottom py-4 pt-5">
-        <div class="container">
-            <div class="row align-items-center my-5">
+<x-layout :title="__('ui.search_title', ['query' => $query])">
+
+    <div class="position-relative overflow-hidden bg-navbar py-5 pt-custom-navbar border-bottom border-secondary-subtle">
+        <div class="container position-relative z-1 py-4">
+            <div class="row align-items-center gy-3">
                 <div class="col-12 col-md-8 text-center text-md-start">
-                    <p class="text-uppercase text-muted fw-bold small mb-1">{{ __('ui.explore_marketplace') }}</p>
-                    <h1 class="fw-bold display-5 mb-2">
-                        {{ __('ui.results_for') }}: <span class="text-primary">"{{ $query }}"</span>
+                    <span
+                        class="badge bg-transparent border border-neon-cyan text-neon-cyan text-uppercase tracking-widest px-3 py-2 mb-3 fs-8 fw-semibold">
+                        {{ __('ui.explore_marketplace') }}
+                    </span>
+                    <h1 class="display-5 fw-black text-white text-uppercase tracking-tight mb-0 text-break">
+                        {{ __('ui.results_for') }}: <span class="text-glow text-neon-cyan text-none-transform">"{{ $query }}"</span>
                     </h1>
                 </div>
-                <div class="col-12 col-md-4 text-center text-md-end mt-3 mt-md-0">
-                    <span class="badge bg-dark rounded-pill px-3 py-2 fs-6">
+                <div class="col-12 col-md-4 text-center text-md-end">
+                    <span class="badge bg-search border border-secondary text-white rounded-pill px-3 py-2 fs-6 font-monospace">
                         {{ $articles->total() }} {{ $articles->total() == 1 ? __('ui.single_result') : __('ui.results_found') }}
                     </span>
                 </div>
@@ -17,35 +21,41 @@
         </div>
     </div>
 
-    <div class="container my-5">
-        <div class="row min-vh-50 justify-content-start py-4">
-            @forelse ($articles as $article)
-                <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4 d-flex align-items-stretch">
-                    <div class="w-100 shadow-sm rounded border p-2 bg-white card-hover-effect">
-                        <x-card :article="$article" />
+    <div class="article-index-wrapper py-5">
+        <div class="container">
+
+            @if ($articles->count() > 0)
+                <div class="row g-4">
+                    @foreach ($articles as $article)
+                        <div class="col-12 col-md-6 col-lg-4 d-flex">
+                            <x-card :article="$article" />
+                        </div>
+                    @endforeach
+                </div>
+
+                @if ($articles->hasPages())
+                    <div class="d-flex justify-content-center mt-5 pagination-cyber">
+                        {{ $articles->links() }}
+                    </div>
+                @endif
+            @else
+                <div class="row justify-content-center py-5">
+                    <div
+                        class="col-12 col-md-6 text-center py-5 border border-dashed border-secondary rounded-4 bg-navbar-dark shadow">
+                        <div class="fs-1 mb-3">
+                            <i class="bi bi-search text-neon-cyan"></i>
+                        </div>
+                        <h4 class="text-white fw-bold text-uppercase tracking-wide mb-2">{{ __('ui.no_articles_match') }}</h4>
+                        <p class="text-muted-custom fs-7 mb-4">{{ __('ui.search_tip') }}</p>
+                        <a href="{{ route('article.index') }}"
+                            class="btn btn-outline-neon-cyan text-uppercase tracking-wider fs-7 fw-bold px-4 py-2">
+                            <i class="bi bi-arrow-left me-2"></i>{{ __('ui.back_to_all_ads') }}
+                        </a>
                     </div>
                 </div>
-            @empty
-                <div class="col-12 text-center py-5">
-                    <div class="mb-4">
-                        <i class="bi bi-search-heart text-muted display-1"></i>
-                    </div>
-                    <h2 class="fw-bold text-secondary">{{ __('ui.no_articles_match') }}</h2>
-                    <p class="text-muted mb-4">{{ __('ui.search_tip') }}</p>
-                    <a href="{{ route('article.index') }}" class="btn btn-primary px-4 py-2 rounded-pill shadow-sm">
-                        <i class="bi bi-arrow-left me-2"></i>{{ __('ui.back_to_all_ads') }}
-                    </a>
-                </div>
-            @endforelse
+            @endif
+
         </div>
-
-        @if($articles->hasPages())
-            <div class="row justify-content-center border-top pt-4 mt-5">
-                <div class="col-auto">
-                    {{ $articles->links() }}
-                </div>
-            </div>
-        @endif
     </div>
-</x-layout>
 
+</x-layout>

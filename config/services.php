@@ -35,4 +35,9 @@ return [
         ],
     ],
 
+    'google_vision' => [
+        // ?: invece del default di env(): con "GOOGLE_VISION_CREDENTIALS=" vuoto env() restituisce '' e non il default
+        'credentials' => env('GOOGLE_VISION_CREDENTIALS') ?: base_path('google_credential.json'),
+    ],
+
 ];

@@ -1,4 +1,4 @@
-<x-layout>
+<x-layout :title="__('ui.new_ad')">
 
     <div class="article-create-wrapper m-0 mt-4">
         

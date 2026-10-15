@@ -13,7 +13,7 @@
 
         <button class="navbar-toggler custom-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse"
             data-bs-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false"
-            aria-label="Toggle navigation">
+            aria-label="{{ __('ui.toggle_navigation') }}">
             <span class="toggler-icon top-bar"></span>
             <span class="toggler-icon middle-bar"></span>
             <span class="toggler-icon bottom-bar"></span>
@@ -23,33 +23,30 @@
 
             <ul class="navbar-nav me-auto mb-2 mb-xl-0 ms-xl-2 gap-1 fs-7">
                 <li class="nav-item">
-                    <a class="nav-link nav-link-custom text-white fw-semibold px-2" href="{{ route('homepage') }}">
+                    <a class="nav-link nav-link-custom text-white fw-semibold px-2 {{ request()->routeIs('homepage') ? 'active' : '' }}"
+                        href="{{ route('homepage') }}" @if (request()->routeIs('homepage')) aria-current="page" @endif>
                         <i class="bi bi-house-door me-1 text-neon-cyan"></i> {{ __('ui.home') }}
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link nav-link-custom text-white hover-neon transition-all px-2"
-                        href="{{ route('article.index') }}">
+                    <a class="nav-link nav-link-custom text-white hover-neon transition-all px-2 {{ request()->routeIs('article.index', 'article.search') ? 'active' : '' }}"
+                        href="{{ route('article.index') }}" @if (request()->routeIs('article.index')) aria-current="page" @endif>
                         <i class="bi text-neon-cyan bi-grid me-1"></i> {{ __('ui.announcements') }}
                     </a>
                 </li>
 
                 <li class="nav-item dropdown">
-                    <a class="nav-link nav-link-custom text-white hover-neon dropdown-toggle px-2" href="#"
+                    <a class="nav-link nav-link-custom text-white hover-neon dropdown-toggle px-2 {{ request()->routeIs('byCategory') ? 'active' : '' }}" href="#"
                         id="categoriesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                         <i class="bi bi-tags text-neon-cyan me-1"></i> {{ __('ui.categories') }}
                     </a>
                     <ul class="dropdown-menu dropdown-menu-dark custom-dropdown-animate border border-secondary shadow-lg p-2 bg-dark"
                         aria-labelledby="categoriesDropdown">
                         @foreach ($categories as $category)
-                            @php
-                                $categoryTranslationKey = 'ui.' . \Illuminate\Support\Str::slug($category->name, '_');
-                                $categoryLabel = trans()->has($categoryTranslationKey) ? __($categoryTranslationKey) : $category->name;
-                            @endphp
                             <li>
                                 <a class="dropdown-menu-item-custom text-white-50 py-2 px-3 rounded d-block text-decoration-none transition-all"
                                     href="{{ route('byCategory', ['category' => $category]) }}">
-                                    {{ $categoryLabel }}
+                                    {{ $category->translated_name }}
                                 </a>
                             </li>
                             @if (!$loop->last)
@@ -63,7 +60,7 @@
                         </li>
                         <li>
                             <a class="dropdown-menu-item-custom text-neon-cyan fw-semibold py-2 px-3 rounded d-block text-decoration-none"
-                                href="#">
+                                href="{{ route('article.index') }}">
                                 <i class="bi bi-arrow-right-short me-1"></i> {{ __('ui.see_all') }}
                             </a>
                         </li>
@@ -77,7 +74,7 @@
                     <span class="input-group-text bg-black border-0 text-muted ps-3">
                         <i class="bi bi-search text-neon-cyan"></i>
                     </span>
-                    <input class="form-control border-0 text-white search-input-custom bg-black ps-2 py-1-5 fs-7"
+                    <input class="form-control border-0 text-white search-input-custom bg-black ps-2 py-1.5 fs-7"
                         type="search" name="query" placeholder="{{ __('ui.search_placeholder') }}" aria-label="{{ __('ui.search') }}">
                     <button
                         class="btn btn-search-submit border-0 text-uppercase text-neon-cyan fw-bold bg-black px-3 transition-all"
@@ -92,7 +89,7 @@
                     <div
                         class="d-flex align-items-center gap-2 bg-black bg-opacity-25 p-1 rounded border border-secondary">
                         <x-_locale lang="it" />
-                        <x-_locale lang="uk" />
+                        <x-_locale lang="en" />
                         <x-_locale lang="es" />
                     </div>
                 </li>
@@ -101,7 +98,7 @@
                     @if (Auth::user()->is_revisor)
                         <li class="nav-item position-relative me-xl-1 my-1 my-xl-0">
                             <a class="nav-link btn-revisor-alert px-2 py-1 rounded border border-warning d-flex align-items-center gap-1.5 text-decoration-none bg-warning bg-opacity-10"
-                                href="{{ route('revisor.index') }}" title="Dashboard Revisore">
+                                href="{{ route('revisor.index') }}" title="{{ __('ui.revisor_dashboard_title') }}">
                                 <i class="bi bi-shield-check text-neon-amber animate-pulse"></i>
                                 <span class="fs-8 fw-bold text-uppercase tracking-wider text-neon-amber">{{ __('ui.revisor') }}</span>
                                 <span class="badge bg-warning text-dark rounded-circle px-1.5 font-monospace fs-8">
@@ -121,11 +118,8 @@
                     <li class="nav-item dropdown">
                         <a class="nav-link profile-dropdown-toggle d-flex align-items-center gap-2 ps-1 text-white"
                             href="#" id="userDropdown" role="button" data-bs-toggle="dropdown"
-                            aria-expanded="false">
-                            <div class="avatar-container border border-2 border-neon-cyan rounded-circle overflow-hidden d-flex">
-                                <img src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name) }}&background=0F172A&color=06B6D4&bold=true"
-                                    alt="Avatar" class="img-fluid">
-                            </div>
+                            aria-expanded="false" aria-label="{{ __('ui.account_menu', ['name' => Auth::user()->name]) }}">
+                            <x-avatar :user="Auth::user()" :size="32" />
                             <span
                                 class="text-white fw-medium max-w-100 truncate d-none d-xl-inline-block">{{ Auth::user()->name }}</span>
                             <i class="bi bi-chevron-down text-muted fs-8 d-none d-xl-inline-block"></i>
@@ -137,15 +131,9 @@
                                 <div class="text-muted fs-7 truncate">{{ Auth::user()->email }}</div>
                             </li>
                             <li>
-                                <a class="dropdown-menu-item-custom text-white-50 py-2 px-3 rounded d-block text-decoration-none"
-                                    href="#">
+                                <a class="dropdown-menu-item-custom text-white-50 py-2 px-3 rounded d-block text-decoration-none {{ request()->routeIs('profile.show') ? 'text-white' : '' }}"
+                                    href="{{ route('profile.show') }}">
                                     <i class="bi bi-person-workspace me-2 text-light"></i> {{ __('ui.my_profile') }}
-                                </a>
-                            </li>
-                            <li>
-                                <a class="dropdown-menu-item-custom text-white-50 py-2 px-3 rounded d-block text-decoration-none"
-                                    href="#">
-                                    <i class="bi bi-collection me-2 text-light"></i> {{ __('ui.my_ads') }}
                                 </a>
                             </li>
                             <li>

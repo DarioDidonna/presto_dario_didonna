@@ -15,7 +15,7 @@ class CategoriesSeeder extends Seeder
         $categories = [
             [
                 'name' => 'Abbigliamento', 
-                'icon' => 'fa fa-shopping-bag'
+                'icon' => 'bi bi-bag'
             ],
             [
                 'name' => 'Accessori', 
@@ -23,7 +23,7 @@ class CategoriesSeeder extends Seeder
             ],
             [
                 'name' => 'Animali domestici', 
-                'icon' => 'fa fa-leaf'
+                'icon' => 'bi bi-house-heart'
             ],
             [
                 'name' => 'Casa e Giardinaggio', 
@@ -55,11 +55,9 @@ class CategoriesSeeder extends Seeder
             ]
         ];
 
+        // Rieseguibile: aggiorna le categorie esistenti invece di duplicarle
         foreach ($categories as $category) {
-            Category::create([
-                'name' => $category['name'],
-                'icon' => $category['icon'],
-            ]);
+            Category::updateOrCreate(['name' => $category['name']], ['icon' => $category['icon']]);
         }
     }
 }

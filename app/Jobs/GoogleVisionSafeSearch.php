@@ -2,19 +2,15 @@
 
 namespace App\Jobs;
 
+use App\Jobs\Concerns\CallsGoogleVision;
 use App\Models\Image;
-use Google\Cloud\Vision\V1\Feature;
 use Google\Cloud\Vision\V1\Feature\Type;
-use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Google\Cloud\Vision\V1\AnnotateImageRequest;
-use Google\Cloud\Vision\V1\BatchAnnotateImagesRequest;
-use Google\Cloud\Vision\V1\Client\ImageAnnotatorClient;
-use Google\Cloud\Vision\V1\Image as VisionImage;
+use Illuminate\Foundation\Queue\Queueable;
 
 class GoogleVisionSafeSearch implements ShouldQueue
 {
-    use Queueable;
+    use Queueable, CallsGoogleVision;
 
     private $article_image_id;
 
@@ -35,61 +31,19 @@ class GoogleVisionSafeSearch implements ShouldQueue
                 return;
             }
 
-            $srcPath = storage_path('app/public/' . $i->path);
-
-            if (!file_exists($srcPath)) {
-                logger()->warning("GoogleVisionSafeSearch: File non trovato in " . $srcPath . ". Salto il controllo.");
+            $response = $this->annotate($i, Type::SAFE_SEARCH_DETECTION);
+            if (!$response) {
                 return;
             }
 
-            $image = file_get_contents($srcPath);
-            $jsonPath = base_path('google_credential.json');
+            $safeSearchAnnotation = $response->getSafeSearchAnnotation();
 
-            if (!file_exists($jsonPath)) {
-                logger()->error("GoogleVisionSafeSearch: Manca il file delle credenziali.");
-                return;
-            }
-
-            $googleVisionClient = new ImageAnnotatorClient([
-                'credentials' => $jsonPath
-            ]);
-            
-            $google_image = new VisionImage([
-                'content' => $image
-            ]);
-
-            $googleFeature = new Feature();
-            $googleFeature->setType(Type::SAFE_SEARCH_DETECTION);
-
-            $request = new AnnotateImageRequest();
-            $request->setImage($google_image);
-            $request->setFeatures([$googleFeature]);
-
-            $batchRequest = new BatchAnnotateImagesRequest();
-            $batchRequest->setRequests([$request]);
-
-            $responseBatch = $googleVisionClient->batchAnnotateImages($batchRequest);
-            $response = $responseBatch->getResponses();
-            $googleVisionClient->close();
-
-            if (!isset($response[0])) {
-                logger()->error("GoogleVisionSafeSearch: Risposta vuota da Google Vision.");
-                return;
-            }
-
-            $safeSearchAnnotation = $response[0]->getSafeSearchAnnotation();
-            
             if (!$safeSearchAnnotation) {
-                logger()->error("GoogleVisionSafeSearch: Nessuna annotazione SafeSearch trovata.");
+                logger()->error("GoogleVisionSafeSearch: Nessuna annotazione SafeSearch per l'immagine ID: " . $this->article_image_id);
                 return;
             }
 
-            $adult = (int) $safeSearchAnnotation->getAdult();
-            $spoof = (int) $safeSearchAnnotation->getSpoof();
-            $medical = (int) $safeSearchAnnotation->getMedical();
-            $violence = (int) $safeSearchAnnotation->getViolence();
-            $racy = (int) $safeSearchAnnotation->getRacy();
-
+            // Indici = valori dell'enum Likelihood (UNKNOWN, VERY_UNLIKELY, UNLIKELY, POSSIBLE, LIKELY, VERY_LIKELY)
             $likeliHoodName = [
                 'text-secondary bi bi-circle-fill',
                 'text-success bi bi-check-circle-fill',
@@ -98,18 +52,17 @@ class GoogleVisionSafeSearch implements ShouldQueue
                 'text-warning bi bi-exclamation-circle-fill',
                 'text-danger bi bi-dash-circle-fill'
             ];
+            $toClass = fn ($value) => $likeliHoodName[(int) $value] ?? $likeliHoodName[0];
 
-            $i->adult = $likeliHoodName[$adult];
-            $i->spoof = $likeliHoodName[$spoof];
-            $i->medical = $likeliHoodName[$medical];
-            $i->violence = $likeliHoodName[$violence];
-            $i->racy = $likeliHoodName[$racy];
-            
+            $i->adult = $toClass($safeSearchAnnotation->getAdult());
+            $i->spoof = $toClass($safeSearchAnnotation->getSpoof());
+            $i->medical = $toClass($safeSearchAnnotation->getMedical());
+            $i->violence = $toClass($safeSearchAnnotation->getViolence());
+            $i->racy = $toClass($safeSearchAnnotation->getRacy());
             $i->save();
-            
-            logger()->info("GoogleVisionSafeSearch completato con successo per l'immagine ID: " . $this->article_image_id);
 
-        } catch (\Exception $e) {
+            logger()->info("GoogleVisionSafeSearch completato con successo per l'immagine ID: " . $this->article_image_id);
+        } catch (\Throwable $e) {
             logger()->error("GoogleVisionSafeSearch CRASH: " . $e->getMessage());
         }
     }

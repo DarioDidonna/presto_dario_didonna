@@ -28,12 +28,12 @@
                         </div>
 
                         <div>
-                            <h5 class="category-title text-white fw-semibold mb-1 fs-7 text-uppercase tracking-wide truncate" title="{{ $category->name }}">
-                                {{ $category->name }}
+                            <h5 class="category-title text-white fw-semibold mb-1 fs-7 text-uppercase tracking-wide truncate" title="{{ $category->translated_name }}">
+                                {{ $category->translated_name }}
                             </h5>
                             
                             <span class="category-counter text-muted-custom fs-8 font-monospace">
-                                {{ $category->articles->count() }} {{ $category->articles->count() == 1 ? __('ui.single_ad') : __('ui.ads') }}
+                                {{ $category->accepted_articles_count }} {{ $category->accepted_articles_count == 1 ? __('ui.single_ad') : __('ui.ads') }}
                             </span>
                         </div>
 

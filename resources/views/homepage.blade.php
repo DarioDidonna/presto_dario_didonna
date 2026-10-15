@@ -1,7 +1,7 @@
 <x-layout>
 
     @if (session()->has('errorMessage'))
-        <div class="row justify-content-center mt-5">
+        <div class="container"><div class="row justify-content-center mt-5 pt-5">
             <div class="col-12 col-md-6">
                 <div
                     class="alert alert-danger text-center shadow rounded border-0 bg-danger bg-opacity-25 text-white d-flex align-items-center justify-content-center p-3">
@@ -9,27 +9,26 @@
                     <span class="font-monospace fs-7">{{ session('errorMessage') }}</span>
                 </div>
             </div>
-        </div>
+        </div></div>
     @endif
 
     @if (session()->has('message'))
-        <div class="row justify-content-center mt-5 pt-3">
+        <div class="container"><div class="row justify-content-center mt-5 pt-5">
             <div class="col-12 col-md-8 col-lg-6">
                 <div
                     class="alert bg-dark text-white shadow-lg rounded border border-info d-flex align-items-center justify-content-between p-3 font-monospace animate-fade-in">
                     <div class="d-flex align-items-center">
-                        <i class="bi bi-shield-lag text-neon-cyan fs-4 me-3 animate-pulse"></i>
+                        <i class="bi bi-check-circle text-neon-cyan fs-4 me-3"></i>
                         <div>
-                            <strong class="text-neon-cyan d-block text-uppercase tracking-wider fs-7 mb-0.5">Richiesta
-                                Inviata</strong>
-                            <span class="fs-8 text-white-50">{{ session('message') }}</span>
+                            <strong class="text-neon-cyan d-block text-uppercase tracking-wider fs-7 mb-1">{{ __('ui.notice') }}</strong>
+                            <span class="fs-7 text-white-50">{{ session('message') }}</span>
                         </div>
                     </div>
                     <button type="button" class="btn-close btn-close-white shadow-none fs-8 ps-2"
-                        data-bs-dismiss="alert" aria-label="Close"></button>
+                        data-bs-dismiss="alert" aria-label="{{ __('ui.close') }}"></button>
                 </div>
             </div>
-        </div>
+        </div></div>
     @endif
 
     <x-header />
@@ -66,12 +65,10 @@
                 </div>
             </div>
 
-            <div class="row g-4 row-cols-1 row-cols-md-2 row-cols-lg-3">
-                @foreach ($articles as $index => $article)
-                    <div class="col d-flex animate-fade-in" >
-                        <div class="w-100 h-100 p-0 transform-wrapper">
-                            <x-card :article="$article" />
-                        </div>
+            <div class="row g-4">
+                @foreach ($articles as $article)
+                    <div class="col-12 col-md-6 col-lg-4 d-flex animate-fade-in">
+                        <x-card :article="$article" />
                     </div>
                 @endforeach
             </div>

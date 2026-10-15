@@ -5,12 +5,18 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use App\Jobs\GoogleVisionLabelImage;
+use App\Jobs\GoogleVisionSafeSearch;
+use App\Jobs\RemoveFaces;
+use App\Jobs\ResizeImage;
 use Illuminate\Support\Facades\Storage;
-use Override;
 
 class Image extends Model
 {
     use HasFactory;
+
+    // Lato della versione grande (dettaglio annuncio e dashboard revisore); 300 resta per le card
+    public const DISPLAY_SIZE = 800;
 
     protected $fillable = [
         'path'
@@ -30,6 +36,70 @@ class Image extends Model
         $filename = basename($filePath);
         $file = "{$path}/crop_{$w}x{$h}_{$filename}";
         return Storage::url($file);
+    }
+
+    // I job Google Vision salvano i rating SafeSearch e le etichette: se mancano entrambi l'analisi non è avvenuta
+    public function hasVisionAnalysis(): bool
+    {
+        return $this->adult !== null || !empty($this->labels);
+    }
+
+    /**
+     * Catena di elaborazione: oscuramento volti, miniature 300/800 con watermark, analisi Google Vision.
+     */
+    public function process(): void
+    {
+        RemoveFaces::withChain([
+            new ResizeImage($this->path, 300, 300),
+            new ResizeImage($this->path, self::DISPLAY_SIZE, self::DISPLAY_SIZE),
+            new GoogleVisionSafeSearch($this->id),
+            new GoogleVisionLabelImage($this->id),
+        ])->dispatch($this->id);
+    }
+
+    /**
+     * Elimina il record e i file su disco (originale e versioni ritagliate).
+     */
+    public function deleteWithFiles(): void
+    {
+        $dir = dirname($this->path);
+        $name = basename($this->path);
+
+        Storage::disk('public')->delete([
+            $this->path,
+            "{$dir}/crop_300x300_{$name}",
+            "{$dir}/crop_" . self::DISPLAY_SIZE . 'x' . self::DISPLAY_SIZE . "_{$name}",
+        ]);
+
+        $this->delete();
+    }
+
+    // Il DB salva la classe CSS dell'icona SafeSearch: qui la si traduce in testo leggibile (title e screen reader)
+    public static function likelihoodLabel(?string $cssClass): string
+    {
+        return match (true) {
+            $cssClass === null => __('ui.likelihood_unknown'),
+            str_contains($cssClass, 'text-success') => __('ui.likelihood_unlikely'),
+            str_contains($cssClass, 'text-warning') => __('ui.likelihood_possible'),
+            str_contains($cssClass, 'text-danger') => __('ui.likelihood_likely'),
+            default => __('ui.likelihood_unknown'),
+        };
+    }
+
+    /**
+     * Versione grande con watermark; ripiega sulla miniatura o sull'originale se non è ancora stata generata.
+     */
+    public function getDisplayUrl(): string
+    {
+        $disk = Storage::disk('public');
+        foreach ([self::DISPLAY_SIZE, 300] as $size) {
+            $crop = dirname($this->path) . "/crop_{$size}x{$size}_" . basename($this->path);
+            if ($disk->exists($crop)) {
+                return Storage::url($crop);
+            }
+        }
+
+        return Storage::url($this->path);
     }
 
     public function getUrl($w = null, $h = null)

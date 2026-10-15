@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
+use Illuminate\Support\Facades\Storage;
 use Spatie\Image\Enums\AlignPosition;
 use Spatie\Image\Enums\Fit;
 use Spatie\Image\Enums\ImageDriver;
@@ -18,11 +19,9 @@ class ResizeImage implements ShouldQueue
     private $h;
     private $fileName;
     private $path;
-    private $fullPathForDb;
 
     public function __construct($filePath, $w, $h)
     {
-        $this->fullPathForDb = $filePath;
         $this->path = dirname($filePath);
         $this->fileName = basename($filePath);
         $this->w = $w;
@@ -34,8 +33,9 @@ class ResizeImage implements ShouldQueue
         $w = $this->w;
         $h = $this->h;
 
-        $srcPath = storage_path('app/public/' . $this->path . '/' . $this->fileName);
-        $destPath = storage_path('app/public/' . $this->path . "/crop_{$w}x{$h}_" . $this->fileName);
+        $disk = Storage::disk('public');
+        $srcPath = $disk->path($this->path . '/' . $this->fileName);
+        $destPath = $disk->path($this->path . "/crop_{$w}x{$h}_" . $this->fileName);
 
         if (!file_exists($srcPath)) {
             logger()->error("ResizeImage: file non trovato in {$srcPath}");
@@ -54,15 +54,17 @@ class ResizeImage implements ShouldQueue
                 ->fit(Fit::Crop, $w, $h);
 
             if (file_exists($watermarkPath)) {
+                // 20% del lato corto: 60px sulla 300x300 (come prima), 160px sulla 800x800
+                $watermarkSize = (int) round(min($w, $h) * 0.2);
                 $image->watermark(
                     $watermarkPath,
                     position: AlignPosition::TopRight,
                     paddingX: 10,
                     paddingY: 10,
                     paddingUnit: Unit::Pixel,
-                    width: 60,
+                    width: $watermarkSize,
                     widthUnit: Unit::Pixel,
-                    height: 60,
+                    height: $watermarkSize,
                     heightUnit: Unit::Pixel,
                     alpha: 100
                 );
@@ -76,15 +78,7 @@ class ResizeImage implements ShouldQueue
             $image->save($destPath);
 
             logger()->info("ResizeImage: immagine salvata in {$destPath}");
-
-            $pureFileName = $this->fileName;
-            $imageModel = \App\Models\Image::where('path', 'LIKE', '%' . $pureFileName)->first();
-
-            if ($imageModel) {
-                $imageModel->update(['is_processed' => true]);
-                logger()->info("ResizeImage: database aggiornato.");
-            }
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             logger()->error("ResizeImage CRASH: " . $e->getMessage());
         }
     }
