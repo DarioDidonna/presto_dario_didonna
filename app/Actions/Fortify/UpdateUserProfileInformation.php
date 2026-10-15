@@ -20,8 +20,11 @@ class UpdateUserProfileInformation implements UpdatesUserProfileInformation
      */
     public function update(User $user, array $input): void
     {
+        // L'email è facoltativa: il form del profilo modifica solo il nome e in quel caso resta quella attuale
+        $input['email'] ??= $user->email;
+
         Validator::make($input, [
-            'name' => ['required', 'string', 'max:255'],
+            'name' => ['required', 'string', 'min:2', 'max:255'],
 
             'email' => [
                 'required',
