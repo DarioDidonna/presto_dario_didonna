@@ -1,58 +1,176 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Presto.it
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+**Marketplace di annunci con moderazione umana e analisi delle immagini tramite intelligenza artificiale.**
 
-## About Laravel
+Ogni annuncio pubblicato da un utente passa da un revisore prima di diventare visibile. Le foto caricate vengono elaborate in background: i volti vengono oscurati, si generano miniature con watermark e Google Cloud Vision fornisce etichette e una valutazione dei contenuti sensibili per aiutare il revisore a decidere.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+Progetto finale del corso Hackademy (Aulab), ampliato con refactoring, test automatici e nuove funzionalità.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+<!--
+  SCREENSHOT: aggiungi le immagini in docs/screenshots/ e togli questo commento.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+  <p align="center">
+    <img src="docs/screenshots/homepage.png" width="49%" alt="Homepage">
+    <img src="docs/screenshots/revisor.png" width="49%" alt="Dashboard del revisore">
+  </p>
+-->
 
-## Learning Laravel
+![PHP](https://img.shields.io/badge/PHP-8.2%2B-777BB4?logo=php&logoColor=white)
+![Laravel](https://img.shields.io/badge/Laravel-13-FF2D20?logo=laravel&logoColor=white)
+![Livewire](https://img.shields.io/badge/Livewire-4-FB70A9?logo=livewire&logoColor=white)
+![Bootstrap](https://img.shields.io/badge/Bootstrap-5.3-7952B3?logo=bootstrap&logoColor=white)
+![Test](https://img.shields.io/badge/test-99%20passati-2ea44f)
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+---
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## Funzionalità
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+### Utenti
+- Registrazione, login e **reset della password via email** (Laravel Fortify)
+- **Pubblicazione di annunci** con fino a 6 foto, anteprima e validazione in tempo reale (Livewire)
+- **Modifica ed eliminazione** dei propri annunci: dopo una modifica l'annuncio torna in revisione
+- **Profilo personale**: dati dell'account, foto profilo (ritagliata e ripulita dai metadati EXIF), cambio nome e password, elenco dei propri annunci con lo stato di revisione
+- **Ricerca full-text** (Laravel Scout + TNTSearch) e navigazione per categoria
+- Candidatura per diventare revisore
 
-## Agentic Development
+### Revisori
+- **Dashboard di revisione** con coda in ordine di arrivo e conferma prima di accettare o rifiutare
+- Per ogni foto: **etichette** e **valutazioni SafeSearch** (adulti, violenza, contenuti espliciti…) di Google Vision
+- Promozione a revisore tramite **link firmato a tempo** inviato via email all'amministratore
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+### Elaborazione delle immagini (code)
 
-```bash
-composer require laravel/boost --dev
+Ogni foto caricata avvia una catena di job in coda:
 
-php artisan boost:install
+```mermaid
+flowchart LR
+    A[Upload foto] --> B[RemoveFaces<br/>oscura i volti]
+    B --> C[ResizeImage 300×300<br/>miniatura + watermark]
+    C --> D[ResizeImage 800×800<br/>dettaglio + watermark]
+    D --> E[GoogleVisionSafeSearch<br/>contenuti sensibili]
+    E --> F[GoogleVisionLabelImage<br/>etichette]
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+Un errore di Google Vision (credenziali mancanti, servizio non raggiungibile) non blocca la catena: le miniature vengono generate comunque e la dashboard del revisore segnala l'analisi mancante.
 
-## Contributing
+### Altro
+- Interfaccia in **italiano, inglese e spagnolo** (testi, validazione ed email)
+- Tema scuro coerente, layout responsive, attenzione all'accessibilità (testi per screen reader, link "vai al contenuto", `aria-*`)
+- Statistiche reali in homepage (annunci pubblicati, utenti online, ultimi annunci)
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+---
 
-## Code of Conduct
+## Tecnologie
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+| Ambito | Strumenti |
+|---|---|
+| Backend | PHP 8.2+, Laravel 13, Laravel Fortify, Laravel Scout + TNTSearch |
+| Frontend | Blade, Livewire 4, Bootstrap 5.3, Bootstrap Icons, Vite |
+| Immagini | Google Cloud Vision API, Spatie Image (GD) |
+| Dati | MySQL, code e sessioni su database |
+| Test | PHPUnit (99 test) |
 
-## Security Vulnerabilities
+---
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+## Installazione
 
-## License
+**Requisiti:** PHP 8.2+ con estensione GD, Composer, Node.js 20.19+ (o 22.12+), MySQL.
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+```bash
+git clone git@github.com:DarioDidonna/presto_dario_didonna.git
+cd presto_dario_didonna
+
+composer install
+npm install
+
+cp .env.example .env
+php artisan key:generate
+```
+
+Configura il database nel file `.env` (`DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD`), poi:
+
+```bash
+php artisan migrate --seed      # in locale crea anche utenti e annunci demo
+php artisan storage:link
+```
+
+Avvia l'applicazione (server, coda, log e Vite insieme):
+
+```bash
+composer run dev
+```
+
+Il sito è su [http://localhost:8000](http://localhost:8000).
+
+### Account demo
+
+| Ruolo | Email | Password |
+|---|---|---|
+| Utente | `demo@presto.it` | `password` |
+| Revisore | `revisore@presto.it` | `password` |
+
+I dati demo comprendono 24 annunci in tutti gli stati (pubblicati, in revisione, rifiutati). Si possono ricaricare con `php artisan db:seed --class=DemoSeeder`; per usare foto vere al posto delle immagini generate vedi [`database/seeders/demo-images`](database/seeders/demo-images/README.md).
+
+### Google Cloud Vision (facoltativo)
+
+Senza credenziali il sito funziona: solo l'oscuramento dei volti e l'analisi delle foto vengono saltati.
+
+1. Crea un service account con la **Cloud Vision API** abilitata e scarica la chiave JSON.
+2. Salvala come `google_credential.json` nella root del progetto (il file è già in `.gitignore`), oppure indica il percorso in `GOOGLE_VISION_CREDENTIALS` nel `.env`.
+3. Analizza le immagini già presenti: `php artisan app:analyze-images`.
+
+### Email
+
+In sviluppo le email (reset password, candidature revisore) finiscono nel log (`MAIL_MAILER=log`). Per vederle impaginate puoi usare un servizio come Mailtrap configurando le variabili `MAIL_*`.
+
+---
+
+## Comandi utili
+
+| Comando | Descrizione |
+|---|---|
+| `php artisan test` | Esegue la suite di test |
+| `php artisan app:make-user-revisor {email}` | Rende revisore un utente |
+| `php artisan app:analyze-images [--all]` | Rimette in coda l'analisi delle immagini (solo quelle mai analizzate, o tutte) |
+| `php artisan scout:import "App\Models\Article"` | Ricostruisce l'indice di ricerca |
+| `php artisan queue:work` | Avvia il worker delle code (già incluso in `composer run dev`) |
+
+---
+
+## Test
+
+```bash
+php artisan test
+```
+
+I 99 test coprono, tra l'altro:
+
+- **sicurezza e permessi**: solo i revisori approvano, link di promozione firmati e a scadenza, annunci non pubblicati invisibili agli altri utenti, modifica ed eliminazione riservate all'autore;
+- **flussi completi**: pubblicazione, revisione, reset password, profilo e foto profilo, catena di elaborazione delle immagini;
+- **qualità**: limite di query per pagina (contro i problemi N+1), HTML bilanciato, nessuna classe CSS non definita, nessun link morto, testi tradotti.
+
+I test usano un database SQLite in memoria e il driver Scout `collection`: non toccano il database né l'indice di ricerca di sviluppo.
+
+---
+
+## Struttura del codice
+
+```
+app/
+├── Console/Commands/        app:make-user-revisor, app:analyze-images
+├── Http/Controllers/        Article, Public, Revisor, Profile
+├── Jobs/                    RemoveFaces, ResizeImage, GoogleVision* (+ Concerns/CallsGoogleVision)
+├── Livewire/                CreateArticleForm, EditArticleForm (+ Concerns/HandlesArticleForm)
+├── Models/                  Article, Category, Image, User
+├── Policies/                ArticlePolicy (chi vede, modifica ed elimina un annuncio)
+└── View/Composers/          Statistiche della homepage
+resources/views/             Pagine Blade e componenti (layout, card, avatar, navbar…)
+lang/{it,en,es}/             Traduzioni dell'interfaccia e della validazione
+tests/Feature/               Test di funzionalità
+```
+
+---
+
+## Autore
+
+**Dario Didonna** — [GitHub](https://github.com/DarioDidonna)
