@@ -108,6 +108,21 @@
                         </li>
                     @endif
 
+                    @php($cartCount = once(fn () => Auth::user()->cart()->count()))
+                    <li class="nav-item me-xl-1 my-1 my-xl-0">
+                        <a href="{{ route('cart.index') }}"
+                            class="nav-link nav-link-custom position-relative d-inline-flex align-items-center gap-1 px-2 {{ request()->routeIs('cart.*') ? 'active' : '' }}"
+                            aria-label="{{ trans_choice('ui.cart_count', $cartCount, ['count' => $cartCount]) }}">
+                            <span class="position-relative">
+                                <i class="bi bi-bag fs-5 text-neon-cyan" aria-hidden="true"></i>
+                                @if ($cartCount > 0)
+                                    <span class="badge rounded-pill bg-warning text-dark cart-badge">{{ $cartCount }}</span>
+                                @endif
+                            </span>
+                            <span class="d-xl-none">{{ __('ui.cart_title') }}</span>
+                        </a>
+                    </li>
+
                     <li class="nav-item me-xl-1 my-1 my-xl-0">
                         <a class="btn btn-outline-neon-cyan btn-sm rounded px-2.5 py-1.5 fw-semibold d-flex align-items-center gap-1 text-uppercase tracking-wide fs-8 transition-all"
                             href="{{ route('create.article') }}">

@@ -40,8 +40,9 @@ class ArticleController extends Controller implements HasMiddleware
         abort_unless(Gate::allows('view', $article), 404);
 
         $article->load(['images', 'category', 'user']);
+        $inCart = (bool) request()->user()?->cart()->whereKey($article->id)->exists();
 
-        return view('article.show', compact('article'));
+        return view('article.show', compact('article', 'inCart'));
     }
 
     // Permesso verificato sulla rotta: ->can('update', 'article')

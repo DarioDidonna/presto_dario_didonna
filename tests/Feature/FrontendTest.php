@@ -187,6 +187,10 @@ class FrontendTest extends TestCase
         Storage::fake('public');
         $image = new Image(['path' => 'articles/1/foto.jpg']);
 
+        // Nessun file sul disco: segnaposto invece di un'immagine rotta
+        $this->assertStringEndsWith('media/placeholder.svg', $image->getDisplayUrl());
+
+        Storage::disk('public')->put('articles/1/foto.jpg', 'x');
         $this->assertStringEndsWith('articles/1/foto.jpg', $image->getDisplayUrl());
 
         Storage::disk('public')->put('articles/1/crop_300x300_foto.jpg', 'x');

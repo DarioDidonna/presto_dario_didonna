@@ -1579,3 +1579,16 @@ body {
 .assistant-card:focus-visible {
     border-color: var(--accent-cyan);
 }
+
+/* Carrello: il riepilogo resta visibile scorrendo la lista (sotto la navbar fissa) */
+.cart-summary {
+    top: calc(var(--navbar-offset) + 1rem);
+}
+
+.cart-badge {
+    position: absolute;
+    top: -0.35rem;
+    right: -0.45rem;
+    min-width: 1.15rem;
+    font-size: 0.65rem;
+}

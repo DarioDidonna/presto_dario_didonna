@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ArticleController;
+use App\Http\Controllers\CartController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PublicController;
 use App\Http\Controllers\RevisorController;
@@ -52,3 +53,11 @@ Route::post('/lingua/{lang}', [PublicController::class, 'setLanguage'])->whereIn
 Route::get('/profilo', [ProfileController::class, 'show'])->name('profile.show');
 Route::post('/profilo/avatar', [ProfileController::class, 'updateAvatar'])->middleware('throttle:10,1')->name('profile.avatar.update');
 Route::delete('/profilo/avatar', [ProfileController::class, 'destroyAvatar'])->name('profile.avatar.destroy');
+
+// CARRELLO (solo utenti registrati)
+Route::middleware('auth')->prefix('carrello')->name('cart.')->group(function () {
+    Route::get('/', [CartController::class, 'index'])->name('index');
+    Route::delete('/', [CartController::class, 'clear'])->name('clear');
+    Route::post('/{article}', [CartController::class, 'add'])->middleware('can:addToCart,article')->name('add');
+    Route::delete('/{article}', [CartController::class, 'remove'])->name('remove');
+});

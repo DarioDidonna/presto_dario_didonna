@@ -112,7 +112,8 @@ class Image extends Model
             }
         }
 
-        return Storage::url($this->path);
+        // File spariti dal disco (dati vecchi o cancellati a mano): segnaposto invece di un riquadro vuoto
+        return $disk->exists($this->path) ? Storage::url($this->path) : asset('media/placeholder.svg');
     }
 
     public function getUrl($w = null, $h = null)

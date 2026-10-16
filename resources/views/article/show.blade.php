@@ -168,6 +168,30 @@
                                         </div>
                                     </div>
                                 @elseif ($article->user)
+                                    {{-- Carrello: solo annunci pubblicati (ArticlePolicy::addToCart) --}}
+                                    @can('addToCart', $article)
+                                        @if ($inCart)
+                                            <form action="{{ route('cart.remove', $article) }}" method="POST" class="mb-2">
+                                                @csrf
+                                                @method('DELETE')
+                                                <div class="d-flex gap-2">
+                                                    <a href="{{ route('cart.index') }}" class="btn btn-success flex-grow-1 text-uppercase tracking-wider fs-7 fw-bold">
+                                                        <i class="bi bi-bag-check-fill me-2" aria-hidden="true"></i>{{ __('ui.cart_in') }}
+                                                    </a>
+                                                    <button type="submit" class="btn btn-outline-danger" title="{{ __('ui.cart_remove') }}" aria-label="{{ __('ui.cart_remove') }}">
+                                                        <i class="bi bi-x-lg" aria-hidden="true"></i>
+                                                    </button>
+                                                </div>
+                                            </form>
+                                        @else
+                                            <form action="{{ route('cart.add', $article) }}" method="POST" class="mb-2">
+                                                @csrf
+                                                <button type="submit" class="btn btn-warning w-100 text-uppercase tracking-wider fs-7 fw-bold text-dark">
+                                                    <i class="bi bi-bag-plus-fill me-2" aria-hidden="true"></i>{{ __('ui.cart_add') }}
+                                                </button>
+                                            </form>
+                                        @endif
+                                    @endcan
                                     <a href="mailto:{{ $article->user->email }}?subject={{ rawurlencode(__('ui.contact_subject', ['title' => $article->title])) }}"
                                         class="btn btn-cyber-gradient w-100 text-uppercase text-light tracking-wider fs-7 fw-bold">
                                         <i class="bi bi-envelope-fill me-2"></i> {{ __('ui.contact_seller') }}
