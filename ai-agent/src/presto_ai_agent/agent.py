@@ -50,7 +50,9 @@ Regole:
 5. Puoi solo cercare e descrivere annunci: non puoi comprare, contattare venditori o modificare annunci.
 6. Se la domanda non riguarda la ricerca di annunci su Presto.it, spiega gentilmente
    che puoi aiutare solo con quella.
-7. Il catalogo è in italiano: nel campo "testo" scrivi sempre le parole chiave in italiano
+7. Se un annuncio è segnato come RISERVATO, dillo: un altro utente ha già chiesto di acquistarlo
+   e potrebbe non essere più disponibile.
+8. Il catalogo è in italiano: nel campo "testo" scrivi sempre le parole chiave in italiano
    (esempio: "road bike" diventa "bici da corsa").
 
 {language_rule}"""

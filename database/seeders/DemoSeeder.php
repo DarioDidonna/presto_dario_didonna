@@ -6,6 +6,7 @@ use App\Jobs\ResizeImage;
 use App\Models\Article;
 use App\Models\Category;
 use App\Models\Image;
+use App\Models\PurchaseRequest;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\File;
@@ -109,8 +110,59 @@ class DemoSeeder extends Seeder
             }
         }
 
-        $this->command?->info(count(self::ARTICLES).' annunci demo creati.');
+        $this->seedPurchaseRequests($demo, $sellers);
+
+        $this->command?->info(count(self::ARTICLES).' annunci demo creati, con carrello e richieste d\'acquisto.');
         $this->printCredentials();
+    }
+
+    /**
+     * Carrello e richieste d'acquisto in tutti gli stati, per mostrare subito il flusso completo con l'utente demo:
+     * come venditore ha una richiesta da gestire e una vendita conclusa, come acquirente un ordine accettato,
+     * uno rifiutato e uno in attesa. Creati direttamente (senza Checkout) per non inviare email.
+     */
+    private function seedPurchaseRequests(User $demo, $sellers): void
+    {
+        [, $giulia, $marco, $sara] = $sellers->all();
+        $byTitle = Article::whereIn('user_id', $sellers->pluck('id'))->get()->keyBy('title');
+        // (only() di una Eloquent Collection filtra per id, non per chiave: si cercano i titoli a mano)
+        $articles = fn (string ...$titles) => collect($titles)->map(fn ($title) => $byTitle[$title]);
+
+        // Richiesta ricevuta dal demo, ancora da accettare o rifiutare: gli annunci sono riservati
+        $this->purchaseRequest($giulia, $demo, PurchaseRequest::PENDING, $articles('Smartphone 128 GB come nuovo', 'Costruzioni da 1000 pezzi'), 'Ciao! Posso passare a ritirarli sabato mattina?', 2);
+        // Vendita del demo già conclusa
+        $this->purchaseRequest($marco, $demo, PurchaseRequest::ACCEPTED, $articles('Tapis roulant pieghevole'), null, 6);
+        // Ordini del demo: accettato, rifiutato, in attesa
+        $this->purchaseRequest($demo, $marco, PurchaseRequest::ACCEPTED, $articles('Orologio automatico in acciaio'), 'Lo prendo volentieri, grazie!', 5);
+        $this->purchaseRequest($demo, $sara, PurchaseRequest::DECLINED, $articles('Casco integrale taglia M'), null, 4);
+        $this->purchaseRequest($demo, $giulia, PurchaseRequest::PENDING, $articles('Asciugacapelli professionale 2200W'), null, 1);
+
+        // Carrello del demo, pronto per l'invio
+        $demo->cart()->syncWithoutDetaching($articles('Cuffie wireless con cancellazione del rumore', 'Bicicletta da corsa in alluminio')->pluck('id')->all());
+    }
+
+    private function purchaseRequest(User $buyer, User $seller, string $status, $articles, ?string $message, int $daysAgo): void
+    {
+        $date = now()->subDays($daysAgo);
+        $request = PurchaseRequest::create([
+            'buyer_id' => $buyer->id,
+            'seller_id' => $seller->id,
+            'status' => $status,
+            'message' => $message,
+            'total' => $articles->sum('price'),
+        ]);
+        $request->forceFill(['created_at' => $date, 'updated_at' => $status === PurchaseRequest::PENDING ? $date : $date->copy()->addHours(5)])->save();
+
+        foreach ($articles as $article) {
+            $request->items()->create(['article_id' => $article->id, 'title' => $article->title, 'price' => $article->price]);
+
+            // Stesso stato che lascerebbero Checkout e PurchaseRequestWorkflow
+            match ($status) {
+                PurchaseRequest::PENDING => $article->forceFill(['reserved_at' => $date])->save(),
+                PurchaseRequest::ACCEPTED => $article->forceFill(['reserved_at' => $date, 'sold_at' => $date->copy()->addHours(5)])->save(),
+                default => null,
+            };
+        }
     }
 
     private function user(string $name, string $email, bool $revisor = false): User

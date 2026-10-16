@@ -110,10 +110,10 @@
 
                     @php($cartCount = Auth::user()->cart()->count())
                     <li class="nav-item me-xl-1 my-1 my-xl-0">
-                        <a href="{{ route('cart.index') }}"
+                        <a href="{{ route('cart.index') }}" data-cart-link
                             class="nav-link nav-link-custom position-relative d-inline-flex align-items-center gap-1 px-2 {{ request()->routeIs('cart.*') ? 'active' : '' }}"
                             aria-label="{{ trans_choice('ui.cart_count', $cartCount, ['count' => $cartCount]) }}">
-                            <span class="position-relative">
+                            <span class="position-relative" data-cart-icon>
                                 <i class="bi bi-bag fs-5 text-neon-cyan" aria-hidden="true"></i>
                                 @if ($cartCount > 0)
                                     <span class="badge rounded-pill bg-warning text-dark cart-badge">{{ $cartCount }}</span>

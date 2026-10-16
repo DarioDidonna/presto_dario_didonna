@@ -1576,7 +1576,7 @@ body {
 }
 
 .assistant-card:hover,
-.assistant-card:focus-visible {
+.assistant-card:focus-within {
     border-color: var(--accent-cyan);
 }
 

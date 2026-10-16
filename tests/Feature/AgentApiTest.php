@@ -104,6 +104,13 @@ class AgentApiTest extends TestCase
         $this->assertStringNotContainsString('password', $response->getContent());
     }
 
+    public function test_reserved_flag_is_exposed(): void
+    {
+        Article::factory()->accepted()->create(['reserved_at' => now()]);
+
+        $this->agent()->getJson('/api/agent/articles')->assertJsonPath('articles.0.reserved', true);
+    }
+
     public function test_unpublished_or_missing_articles_are_not_found(): void
     {
         foreach ([Article::factory()->create(), Article::factory()->rejected()->create()] as $article) {

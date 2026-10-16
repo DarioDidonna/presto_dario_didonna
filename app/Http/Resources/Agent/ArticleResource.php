@@ -27,6 +27,8 @@ class ArticleResource extends JsonResource
             'url' => route('article.show', $this->resource),
             'image_url' => $this->images->first() ? url($this->images->first()->thumbnailUrl()) : null,
             'published_at' => $this->created_at?->toDateString(),
+            // Richiesta d'acquisto in corso: l'agente lo dice all'utente (i venduti non arrivano proprio)
+            'reserved' => $this->isReserved(),
             $this->mergeWhen($this->detailed, fn () => [
                 'images' => $this->images->map(fn ($image) => url($image->getDisplayUrl()))->values(),
                 'seller' => $this->user?->name,

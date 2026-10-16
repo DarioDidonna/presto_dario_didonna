@@ -36,6 +36,13 @@ Progetto finale del corso Hackademy (Aulab), ampliato con refactoring, test auto
 - **Email con l'esito della revisione** (accettato o rifiutato), inviata in coda e nella lingua dell'utente
 - Candidatura per diventare revisore
 
+### Carrello e richieste d'acquisto
+- **Carrello** con gli annunci divisi per venditore: si aggiunge dalla pagina dell'annuncio o direttamente dalle schede dell'assistente AI
+- **Invio delle richieste d'acquisto**: una richiesta per ogni venditore, con messaggio facoltativo ed email al venditore. Il pagamento si accorda tra le parti, come sui siti di annunci tra privati
+- Gli annunci richiesti diventano **riservati** (nessun altro può ordinarli); accettati diventano **venduti** e spariscono dal catalogo, rifiutati o annullati tornano disponibili
+- **I miei ordini** (con annullamento finché la richiesta è in attesa) e **Richieste ricevute** per accettare o rifiutare, con email all'acquirente
+- Invio in una transazione con **lock sulle righe**: due acquirenti non possono riservare lo stesso annuncio nello stesso istante
+
 ### Revisori
 - **Dashboard di revisione** con coda in ordine di arrivo e conferma prima di accettare o rifiutare
 - **Annulla l'ultima decisione** entro 5 minuti: l'email all'autore parte solo allo scadere della finestra e solo se la decisione è ancora valida
@@ -59,7 +66,7 @@ Un errore di Google Vision (credenziali mancanti, servizio non raggiungibile) no
 
 ### Assistente AI (Python + Laravel)
 
-- **Assistente acquisti**: una chat in tutte le pagine. «Cerco una bici da corsa sotto i 500 euro» → l'agente usa la ricerca e i filtri del sito come *tool* e risponde con **annunci veri**, mostrati come schede cliccabili. Ricorda la conversazione («e quanto costa?») e risponde in italiano, inglese e spagnolo.
+- **Assistente acquisti**: una chat in tutte le pagine. «Cerco una bici da corsa sotto i 500 euro» → l'agente usa la ricerca e i filtri del sito come *tool* e risponde con **annunci veri**, mostrati come schede cliccabili da cui si aggiunge l'annuncio al carrello. Sa se un annuncio è già riservato. Ricorda la conversazione («e quanto costa?») e risponde in italiano, inglese e spagnolo.
 - **Parere per il revisore**: nella dashboard, «Chiedi un parere» restituisce *accetta / rifiuta / da controllare* con motivi e segnalazioni (contenuti vietati, truffe, contatti personali, foto inadatte). È solo un suggerimento: decide sempre il revisore.
 
 ```mermaid
@@ -91,7 +98,7 @@ flowchart LR
 | Immagini | Google Cloud Vision API, Spatie Image (GD) |
 | Agente AI | Python 3.12 (uv), FastAPI, LangChain + LangGraph, Ollama con `qwen2.5:3b` in locale |
 | Dati | MySQL, code e sessioni su database |
-| Test e qualità | PHPUnit (166 test), pytest (93 test), Laravel Pint, ruff, GitHub Actions |
+| Test e qualità | PHPUnit (204 test), pytest (94 test), Laravel Pint, ruff, GitHub Actions |
 
 ---
 
@@ -132,7 +139,7 @@ Il sito è su [http://localhost:8000](http://localhost:8000).
 | Utente | `demo@presto.it` | `password` |
 | Revisore | `revisore@presto.it` | `password` |
 
-I dati demo comprendono 24 annunci in tutti gli stati (pubblicati, in revisione, rifiutati).
+I dati demo comprendono 24 annunci in tutti gli stati (pubblicati, in revisione, rifiutati) e, per l'utente demo, un carrello pronto e richieste d'acquisto in ogni stato: una ricevuta da accettare o rifiutare, una vendita conclusa e ordini accettati, rifiutati e in attesa.
 
 Per riportare il sito allo stato demo iniziale (database, foto caricate e indice di ricerca da zero) basta un comando, che chiede conferma e non gira in produzione:
 
@@ -191,10 +198,11 @@ In sviluppo le email (reset password, candidature revisore) finiscono nel log (`
 php artisan test
 ```
 
-I 166 test Laravel coprono, tra l'altro:
+I 204 test Laravel coprono, tra l'altro:
 
 - **sicurezza e permessi**: solo i revisori approvano, link di promozione firmati e a scadenza, annunci non pubblicati invisibili agli altri utenti, modifica ed eliminazione riservate all'autore;
 - **flussi completi**: ricerca e filtri, pubblicazione, revisione con email all'autore e annullamento, reset password, profilo e foto profilo, catena di elaborazione delle immagini;
+- **carrello e richieste d'acquisto**: niente annunci propri, riservati o venduti nel carrello, una richiesta per venditore, accetta/rifiuta/annulla solo da chi ne ha diritto e solo se ancora in attesa, email alle due parti;
 - **pagine di errore** 403, 404, 419, 429, 500 e 503 nella lingua dell'utente;
 - **SEO e condivisione**: meta tag Open Graph per pagina, foto e prezzo dell'annuncio;
 - **assistente AI**: API interne protette da token e senza dati personali, chat e parere del revisore con l'agente simulato (schede solo di annunci pubblicati, agente spento, limiti di utilizzo);
@@ -202,7 +210,7 @@ I 166 test Laravel coprono, tra l'altro:
 
 I test usano un database SQLite in memoria e il driver Scout `collection`: non toccano il database né l'indice di ricerca di sviluppo.
 
-L'agente Python ha 93 test propri (`cd ai-agent && uv run pytest`) con un modello e un Laravel finti: tool, difese contro il prompt injection, memoria della conversazione, regole di moderazione, endpoint e autenticazione.
+L'agente Python ha 94 test propri (`cd ai-agent && uv run pytest`) con un modello e un Laravel finti: tool, difese contro il prompt injection, memoria della conversazione, regole di moderazione, endpoint e autenticazione.
 
 A ogni push e pull request **GitHub Actions** esegue le due suite (quella Laravel con il build del front-end) e controlla lo stile del codice con [Laravel Pint](https://laravel.com/docs/pint) e [ruff](https://docs.astral.sh/ruff/): vedi [`.github/workflows/tests.yml`](.github/workflows/tests.yml). Per formattare il codice in locale: `vendor/bin/pint` e `cd ai-agent && uv run ruff format .`.
 
@@ -213,14 +221,16 @@ A ogni push e pull request **GitHub Actions** esegue le due suite (quella Larave
 ```
 app/
 ├── Console/Commands/        app:make-user-revisor, app:analyze-images, app:demo-reset, app:ai-setup
-├── Http/Controllers/        Article, Public, Revisor, Profile (+ Api/AgentController per l'agente)
+├── Http/Controllers/        Article, Public, Revisor, Profile, Cart, PurchaseRequest, Sales
+│                            (+ Api/AgentController per l'agente)
 ├── Http/Requests/           UpdateAvatarRequest (Form Request)
 ├── Jobs/                    RemoveFaces, ResizeImage, GoogleVision* (+ Concerns/CallsGoogleVision)
 ├── Livewire/                CreateArticleForm, EditArticleForm (+ Forms/ArticleForm, Concerns/HandlesArticleForm),
 │                            ShoppingAssistant (chat), ReviewAssistant (parere AI)
-├── Models/                  Article, Category, Image, User
-├── Policies/                ArticlePolicy (chi vede, modifica ed elimina un annuncio)
-├── Services/                AiAgentClient (chiamate al servizio Python)
+├── Models/                  Article, Category, Image, User, PurchaseRequest, PurchaseRequestItem
+├── Notifications/           ArticleReviewed, PurchaseRequested, PurchaseRequestAnswered, PurchaseRequestCancelled
+├── Policies/                ArticlePolicy (vedere, modificare, eliminare, mettere nel carrello), PurchaseRequestPolicy
+├── Services/                AiAgentClient (servizio Python), Checkout e PurchaseRequestWorkflow (richieste d'acquisto)
 ├── Support/                 ArticleFilters (ricerca e filtri dell'elenco)
 └── View/Composers/          Statistiche della homepage
 resources/views/             Pagine Blade e componenti (layout, card, avatar, navbar…)

@@ -454,4 +454,6 @@ return [
     'answer_mail_contact' => 'Per accordarvi su pagamento e consegna scrivi a :email.',
     'cancel_mail_subject' => ':name ha annullato la richiesta d\'acquisto',
     'cancel_mail_line' => ':name ha annullato la richiesta per: :items. Gli oggetti sono di nuovo disponibili.',
+    'assistant_cart_unavailable' => 'Questo annuncio non si può aggiungere al carrello (è tuo, riservato o non più disponibile).',
+    'assistant_login_to_buy' => 'Accedi per aggiungerlo al carrello',
 ];

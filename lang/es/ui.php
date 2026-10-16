@@ -454,4 +454,6 @@ return [
     'answer_mail_contact' => 'Para acordar el pago y la entrega escribe a :email.',
     'cancel_mail_subject' => ':name ha cancelado la solicitud de compra',
     'cancel_mail_line' => ':name ha cancelado la solicitud de: :items. Los artículos vuelven a estar disponibles.',
+    'assistant_cart_unavailable' => 'Este anuncio no se puede añadir al carrito (es tuyo, está reservado o ya no está disponible).',
+    'assistant_login_to_buy' => 'Inicia sesión para añadirlo al carrito',
 ];

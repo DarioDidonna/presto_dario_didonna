@@ -454,4 +454,6 @@ return [
     'answer_mail_contact' => 'To arrange payment and delivery write to :email.',
     'cancel_mail_subject' => ':name cancelled the purchase request',
     'cancel_mail_line' => ':name cancelled the request for: :items. The items are available again.',
+    'assistant_cart_unavailable' => 'This ad can’t be added to the cart (it’s yours, reserved or no longer available).',
+    'assistant_login_to_buy' => 'Log in to add it to your cart',
 ];
