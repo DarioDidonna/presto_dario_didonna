@@ -215,10 +215,12 @@ return [
     'tntsearch' => [
         'storage' => storage_path(),
         'fuzziness' => env('TNTSEARCH_FUZZINESS', true),
+        // Tolleranza ai refusi più severa: con prefisso 2 e distanza 2 "cane" trovava anche "casa"
+        // (e quindi sedie e tosaerba); così "lampda" trova ancora "lampada"
         'fuzzy' => [
-            'prefix_length' => 2,
+            'prefix_length' => 3,
             'max_expansions' => 50,
-            'distance' => 2,
+            'distance' => 1,
             'no_limit' => true,
         ],
         'asYouType' => false,

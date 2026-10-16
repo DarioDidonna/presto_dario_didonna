@@ -64,10 +64,16 @@ def test_separate_conversations_do_not_share_memory(settings, client):
     assert [m.content for m in state_b if m.type == "human"] == ["Sono B"]
 
 
-def test_empty_model_reply_gets_a_fallback(settings, client):
-    agent = ShoppingAgent(settings, model=scripted(AIMessage("")), client=client)
+def test_empty_model_reply_is_retried_once(settings, client):
+    agent = ShoppingAgent(settings, model=scripted(AIMessage(""), AIMessage("Ciao!")), client=client)
 
-    assert "riformulare" in agent.chat("???").reply
+    assert agent.chat("ciao").reply == "Ciao!"
+
+
+def test_persistent_empty_reply_gets_a_fallback_in_the_user_language(settings, client):
+    agent = ShoppingAgent(settings, model=scripted(AIMessage(""), AIMessage("")), client=client)
+
+    assert agent.chat("???", lang="en").reply == "I could not answer that, could you rephrase your question?"
 
 
 def test_reply_with_a_price_not_in_the_results_is_replaced(settings, client):
@@ -102,4 +108,19 @@ def test_non_italian_messages_get_a_hint_to_search_in_italian(settings, client):
     result = agent.chat("road bike", lang="en")
 
     history = agent._graph("en").get_state({"configurable": {"thread_id": result.conversation_id}}).values["messages"]
-    assert "parole chiave in italiano" in history[0].content
+    assert "Italian keywords" in history[0].content
+    assert "answer in English" in history[0].content
+
+
+def test_follow_up_question_can_cite_prices_found_in_previous_turns(settings, client):
+    model = scripted(
+        tool_call("cerca_annunci", testo="bici"),
+        AIMessage("Ho trovato una bici."),
+        AIMessage("Costa 480 €."),  # nessuna nuova ricerca in questo turno
+    )
+    agent = ShoppingAgent(settings, model=model, client=client)
+
+    first = agent.chat("Cerco una bici")
+    second = agent.chat("e quanto costa?", conversation_id=first.conversation_id)
+
+    assert second.reply == "Costa 480 €."

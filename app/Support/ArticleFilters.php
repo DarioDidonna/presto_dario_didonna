@@ -93,19 +93,65 @@ class ArticleFilters
         };
     }
 
+    // Parole che compaiono quasi ovunque: cercandole ("bici DA corsa") si otteneva mezzo catalogo
+    private const STOPWORDS = [
+        'il', 'lo', 'la', 'le', 'gli', 'un', 'uno', 'una', 'di', 'da', 'in', 'con', 'su', 'per', 'tra', 'fra', 'ed',
+        'del', 'della', 'dei', 'degli', 'delle', 'al', 'alla', 'ai', 'agli', 'alle', 'dal', 'dalla', 'nel', 'nella',
+        'sul', 'sulla', 'che', 'non', 'come', 'cerco', 'vorrei', 'voglio',
+        'the', 'an', 'of', 'for', 'to', 'with', 'and', 'or', 'on', 'my', 'some',
+        'el', 'los', 'las', 'de', 'para', 'mi', 'busco',
+    ];
+
     /**
-     * ID degli annunci che corrispondono al testo, in ordine di pertinenza.
-     * TNTSearch confronta parole intere (con tolleranza ai refusi): "bici" non trova "bicicletta".
-     * Si aggiungono quindi, in coda, gli annunci il cui titolo contiene il testo cercato.
+     * Parole significative del testo cercato (minuscole, senza parole vuote, al massimo 6).
+     *
+     * @return list<string>
+     */
+    private function keywords(): array
+    {
+        $words = preg_split('/[^\p{L}\p{N}]+/u', mb_strtolower((string) $this->query), -1, PREG_SPLIT_NO_EMPTY);
+
+        return array_slice(array_values(array_unique(array_filter(
+            $words,
+            fn (string $word) => mb_strlen($word) >= 2 && ! in_array($word, self::STOPWORDS, true),
+        ))), 0, 6);
+    }
+
+    /**
+     * ID degli annunci che corrispondono a TUTTE le parole significative, in ordine di pertinenza.
+     * Per ogni parola: indice TNTSearch (testo, descrizione, categoria, con tolleranza ai refusi) oppure titolo
+     * che la contiene (TNTSearch confronta parole intere: "bici" non trova "bicicletta").
      */
     private function matchingIds(): array
     {
-        $fromIndex = Article::search($this->query)->keys()->map(fn ($id) => (int) $id);
+        $keywords = $this->keywords();
+        if ($keywords === []) {
+            return [];
+        }
 
-        $like = '%'.addcslashes($this->query, '\\%_').'%';
-        $fromTitle = Article::accepted()->where('title', 'like', $like)->latest()->limit(500)->pluck('id');
+        $perWord = array_map(function (string $word) {
+            $fromIndex = Article::search($word)->keys()->map(fn ($id) => (int) $id);
+            $fromTitle = Article::accepted()
+                ->where('title', 'like', '%'.addcslashes($word, '\\%_').'%')
+                ->limit(500)
+                ->pluck('id');
 
-        return $fromIndex->merge($fromTitle)->unique()->values()->all();
+            return $fromIndex->merge($fromTitle)->unique()->all();
+        }, $keywords);
+
+        $matching = array_values(array_intersect(...$perWord));
+
+        // Nessun annuncio con tutte le parole ("oggetti per cani"): quelli con più parole in comune, prima i migliori
+        if ($matching === [] && count($perWord) > 1) {
+            $hits = array_count_values(array_merge(...$perWord));
+            arsort($hits);
+            $matching = array_keys($hits);
+        }
+
+        // Ordine: prima quello che il motore di ricerca considera più pertinente per l'intera frase
+        $ranking = Article::search(implode(' ', $keywords))->keys()->map(fn ($id) => (int) $id)->all();
+
+        return array_values(array_unique([...array_intersect($ranking, $matching), ...$matching]));
     }
 
     // Stesso ordine restituito dal motore di ricerca (CASE portabile tra MySQL e SQLite)

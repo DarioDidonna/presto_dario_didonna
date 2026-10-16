@@ -48,8 +48,20 @@ REFUSALS = {
     "es": "Solo puedo ayudarte a buscar anuncios en Presto.it. ¡Dime qué estás buscando!",
 }
 
-# Promemoria aggiunto al messaggio dell'utente (non al prompt di sistema): i modelli piccoli lo seguono molto di più
-SEARCH_IN_ITALIAN_HINT = "\n\n(Nota per l'assistente: il catalogo è in italiano, cerca con parole chiave in italiano.)"
+FALLBACK_REPLIES = {
+    "it": "Non sono riuscito a rispondere, puoi riformulare la domanda?",
+    "en": "I could not answer that, could you rephrase your question?",
+    "es": "No he podido responder, ¿puedes reformular la pregunta?",
+}
+
+# Promemoria aggiunto al messaggio dell'utente (non al prompt di sistema): i modelli piccoli lo seguono molto di più.
+# Scritto nella lingua dell'utente: in italiano "trascinava" anche la risposta in italiano.
+SEARCH_IN_ITALIAN_HINTS = {
+    "en": "\n\n(Note for the assistant: the catalog is in Italian, so search with short Italian keywords; "
+    "answer in English.)",
+    "es": "\n\n(Nota para el asistente: el catálogo está en italiano, busca con palabras clave cortas en italiano; "
+    "responde en español.)",
+}
 
 
 def is_injection_attempt(message: str) -> bool:

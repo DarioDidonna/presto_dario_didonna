@@ -133,4 +133,23 @@ class SearchArticlesTest extends TestCase
                 ->assertViewHas('filters', fn ($f) => $f->query === null);
         }
     }
+
+    public function test_common_words_are_ignored_and_all_keywords_must_match(): void
+    {
+        Article::factory()->accepted()->create(['title' => 'Bicicletta da corsa', 'description' => 'Telaio leggero']);
+        Article::factory()->accepted()->create(['title' => 'Lampada da terra', 'description' => 'Stile industriale']);
+        Article::factory()->accepted()->create(['title' => 'Bici da bambino', 'description' => 'Con rotelle']);
+
+        // "da" compare in tutti i titoli: prima restituiva l'intero catalogo
+        $this->assertSame(['Bicicletta da corsa'], $this->titles('/article/index?query=bici%20da%20corsa'));
+        $this->assertSame([], $this->titles('/article/index?query=da'));
+    }
+
+    public function test_falls_back_to_partial_matches_when_no_ad_has_every_word(): void
+    {
+        Article::factory()->accepted()->create(['title' => 'Cuccia per cani', 'description' => 'Taglia media']);
+        Article::factory()->accepted()->create(['title' => 'Divano letto', 'description' => 'Tre posti']);
+
+        $this->assertSame(['Cuccia per cani'], $this->titles('/article/index?query=oggetti%20per%20cani'));
+    }
 }
