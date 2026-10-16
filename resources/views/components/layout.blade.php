@@ -51,5 +51,10 @@
 
     <x-footer />
 
+    {{-- Assistente AI: compare solo se l'agente è configurato (AI_AGENT_TOKEN) --}}
+    @if (app(\App\Services\AiAgentClient::class)->isEnabled())
+        <livewire:shopping-assistant />
+    @endif
+
 </body>
 </html>

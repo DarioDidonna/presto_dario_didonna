@@ -72,3 +72,32 @@ jobs:
 
       - name: Pint
         run: vendor/bin/pint --test
+
+  agent:
+    name: Agente AI (Python)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ai-agent
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # uv installa da solo il Python indicato in .python-version (3.12)
+      - name: uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+          cache-dependency-glob: ai-agent/uv.lock
+
+      - name: Dipendenze (versioni bloccate da uv.lock)
+        run: uv sync --locked
+
+      # I test usano un modello e un Laravel finti: Ollama non serve
+      - name: Test
+        run: uv run pytest
+
+      - name: Stile (ruff)
+        run: |
+          uv run ruff check .
+          uv run ruff format --check .

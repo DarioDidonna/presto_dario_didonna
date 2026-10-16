@@ -1,0 +1,41 @@
+[project]
+name = "presto-ai-agent"
+version = "0.1.0"
+description = "Agente AI di Presto.it (FastAPI + LangChain/LangGraph + Ollama)"
+readme = "README.md"
+authors = [
+    { name = "Dario Didonna" }
+]
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.143.2",
+    "httpx>=0.28.1",
+    "langchain>=1.4.6",
+    "langchain-ollama>=1.1.0",
+    "langgraph>=1.2.15",
+    "pydantic-settings>=2.16.0",
+    "uvicorn[standard]>=0.54.0",
+]
+
+[project.scripts]
+presto-ai-agent = "presto_ai_agent:main"
+
+[build-system]
+requires = ["uv_build>=0.13.1,<0.14.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1.1",
+    "ruff>=0.17.1",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]

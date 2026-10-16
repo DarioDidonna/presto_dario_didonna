@@ -208,6 +208,11 @@
                                     {{ $article_to_check->description }}
                                 </p>
                             </div>
+
+                            {{-- Parere dell'AI (solo se l'agente è configurato): non cambia lo stato dell'annuncio --}}
+                            @if (app(\App\Services\AiAgentClient::class)->isEnabled())
+                                <livewire:review-assistant :article-id="$article_to_check->id" :key="'review-'.$article_to_check->id" />
+                            @endif
                         </div>
 
                         <div class="mt-4">
