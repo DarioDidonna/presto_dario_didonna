@@ -1,5 +1,5 @@
 <x-layout :title="__('ui.reset_password_title')">
-    <div class="presto-auth-wrapper min-vh-100 d-flex align-items-center justify-content-center position-relative overflow-hidden pt-custom-navbar pb-5">
+    <div class="min-vh-100 d-flex align-items-center justify-content-center position-relative overflow-hidden pt-custom-navbar pb-5">
 
         <div class="presto-card-glow"></div>
 

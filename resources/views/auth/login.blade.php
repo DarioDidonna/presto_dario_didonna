@@ -1,6 +1,6 @@
 <x-layout :title="__('ui.login')">
     <div
-        class="presto-auth-wrapper min-vh-100 d-flex align-items-center justify-content-center position-relative overflow-hidden py-5 my-5 mb-0">
+        class="min-vh-100 d-flex align-items-center justify-content-center position-relative overflow-hidden py-5 my-5 mb-0">
 
         <div class="presto-card-glow"></div>
 
