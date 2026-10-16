@@ -415,7 +415,9 @@ body {
 }
 
 .presto-input-group {
-    background-color: var(--text-muted-custom);
+    /* Sfondo scuro come l'autocompletamento più sotto: prima usava --text-muted-custom (il colore dei TESTI,
+       grigio chiaro) e testo e segnaposto bianchi non si leggevano */
+    background-color: var(--bg-search);
     border: 1px solid var(--border-color-alpha);
     border-radius: 6px;
     overflow: hidden;
@@ -433,10 +435,20 @@ body {
 
 
 
+.presto-input {
+    color: #ffffff;
+}
+
 .presto-input:focus {
     box-shadow: none !important;
     outline: none !important;
     color: #ffffff !important;
+}
+
+/* Colore esplicito: con il tema scuro di Bootstrap il segnaposto diventava quasi bianco */
+.presto-input::placeholder {
+    color: #64748b;
+    opacity: 1;
 }
 
 .btn-toggle-password {
