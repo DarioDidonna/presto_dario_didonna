@@ -256,6 +256,19 @@ body {
     transform: translateY(0);
 }
 
+/* I menu si aprono anche al passaggio del mouse (regola sopra), quando Bootstrap non ha ancora calcolato la
+   posizione: senza questo il menu dell'avatar, a destra, partiva dal bordo sinistro e usciva dallo schermo */
+@media (min-width: 1200px) {
+    .navbar .dropdown-menu-end.custom-dropdown-animate {
+        right: 0;
+        left: auto;
+    }
+
+    .navbar .custom-dropdown-animate .dropdown-menu-item-custom {
+        white-space: nowrap;
+    }
+}
+
 .dropdown-menu-item-custom {
     display: block;
     width: 100%;
@@ -375,11 +388,6 @@ body {
    3. AUTHENTICATION VIEWS (Login / Register)
    ========================================================================== */
 
-/* Input nella login - testo digitato dall'utente (non placeholder) */
-.presto-auth-wrapper input.form-control.presto-input {
-    color: #000000 !important;
-}
-
 .text-accent-cyan {
     color: var(--accent-cyan) !important;
 }
@@ -436,7 +444,18 @@ body {
 
 
 .presto-input {
+    /* Safari, durante la compilazione automatica (icona della chiave), forza il testo nero con una regola
+       interna !important su "color": -webkit-text-fill-color vince in ogni stato */
     color: #ffffff;
+    -webkit-text-fill-color: #ffffff;
+    caret-color: var(--accent-cyan);
+    color-scheme: dark;
+}
+
+.presto-input::selection {
+    background-color: rgba(6, 182, 212, 0.45);
+    color: #ffffff;
+    -webkit-text-fill-color: #ffffff;
 }
 
 .presto-input:focus {
@@ -445,9 +464,11 @@ body {
     color: #ffffff !important;
 }
 
-/* Colore esplicito: con il tema scuro di Bootstrap il segnaposto diventava quasi bianco */
+/* Colore esplicito: con il tema scuro di Bootstrap il segnaposto diventava quasi bianco
+   (anche -webkit-text-fill-color, altrimenti eredita il bianco del testo) */
 .presto-input::placeholder {
     color: #64748b;
+    -webkit-text-fill-color: #64748b;
     opacity: 1;
 }
 
@@ -516,10 +537,18 @@ body {
 
 .presto-input:-webkit-autofill,
 .presto-input:-webkit-autofill:hover,
-.presto-input:-webkit-autofill:focus {
+.presto-input:-webkit-autofill:focus,
+.presto-input:autofill {
+    color: #ffffff !important;
     -webkit-text-fill-color: #ffffff !important;
     -webkit-box-shadow: 0 0 0px 1000px var(--bg-search) inset !important;
     transition: background-color 5000s ease-in-out 0s;
+}
+
+/* Pseudo-classe solo di Safari (password suggerita): regola a parte, perché un selettore sconosciuto
+   farebbe ignorare a Chrome e Firefox l'intera regola precedente */
+.presto-input:-webkit-autofill-strong-password {
+    -webkit-text-fill-color: #ffffff !important;
 }
 
 @keyframes authFadeIn {
