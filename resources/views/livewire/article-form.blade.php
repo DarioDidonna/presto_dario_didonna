@@ -61,7 +61,7 @@
                             @php($marked = in_array($existing->id, $imagesToRemove, true))
                             <div class="col-4 col-sm-3 col-md-2" wire:key="existing-{{ $existing->id }}">
                                 <div class="position-relative rounded overflow-hidden border {{ $marked ? 'border-danger' : 'border-secondary' }}">
-                                    <img src="{{ $existing->getUrl(300, 300) }}" alt="{{ __('ui.image_number', ['n' => $loop->iteration]) }}"
+                                    <img src="{{ $existing->thumbnailUrl() }}" alt="{{ __('ui.image_number', ['n' => $loop->iteration]) }}"
                                         class="w-100 object-fit-cover {{ $marked ? 'opacity-25' : '' }}" style="aspect-ratio: 1 / 1;">
                                     <button type="button" wire:click="toggleExistingImage({{ $existing->id }})"
                                         class="btn btn-sm {{ $marked ? 'btn-secondary' : 'btn-danger' }} p-0 d-flex align-items-center justify-content-center border-0 position-absolute top-0 end-0 m-1 rounded-circle btn-remove-preview"

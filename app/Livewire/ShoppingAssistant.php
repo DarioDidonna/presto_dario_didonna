@@ -5,6 +5,7 @@ namespace App\Livewire;
 use App\Models\Article;
 use App\Services\AgentUnavailableException;
 use App\Services\AiAgentClient;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
 use Livewire\Component;
@@ -80,6 +81,23 @@ class ShoppingAssistant extends Component
         $this->persist();
     }
 
+    // "Aggiungi al carrello" dalle schede della chat: stesse regole della pagina dell'annuncio
+    public function addToCart(int $articleId): void
+    {
+        $user = auth()->user();
+        $article = Article::find($articleId);
+
+        if (! $user || ! $article || ! Gate::forUser($user)->allows('addToCart', $article)) {
+            $this->addError('cart', __('ui.assistant_cart_unavailable'));
+
+            return;
+        }
+
+        $user->cart()->syncWithoutDetaching([$article->id]);
+        // Aggiorna il contatore nella navbar senza ricaricare la pagina (resources/js/script.js)
+        $this->dispatch('cart-updated', count: $user->cart()->count());
+    }
+
     public function resetConversation(): void
     {
         $this->messages = [];
@@ -107,10 +125,11 @@ class ShoppingAssistant extends Component
             ->map(fn (int $id) => $articles->get($id))
             ->filter()
             ->map(fn (Article $article) => [
+                'id' => $article->id,
                 'title' => $article->title,
                 'price' => number_format((float) $article->price, 2, ',', '.'),
                 'url' => route('article.show', $article),
-                'image' => $article->images->first()?->getUrl(300, 300) ?? asset('media/placeholder.svg'),
+                'image' => $article->images->first()?->thumbnailUrl() ?? asset('media/placeholder.svg'),
             ])
             ->values()
             ->all();
@@ -135,6 +154,9 @@ class ShoppingAssistant extends Component
 
     public function render()
     {
-        return view('livewire.shopping-assistant');
+        return view('livewire.shopping-assistant', [
+            // Per mostrare "nel carrello" sulle schede già aggiunte (una query, solo se la chat è aperta)
+            'cartIds' => $this->open && auth()->check() ? auth()->user()->cart()->pluck('articles.id')->all() : [],
+        ]);
     }
 }

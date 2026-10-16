@@ -46,13 +46,33 @@
                         <p class="mb-0 text-pre-wrap">{{ $message['text'] }}</p>
 
                         @foreach ($message['articles'] ?? [] as $card)
-                            <a href="{{ $card['url'] }}" class="assistant-card d-flex align-items-center gap-2 mt-2 p-2 rounded text-decoration-none">
-                                <img src="{{ $card['image'] }}" alt="" width="48" height="48" loading="lazy" class="rounded object-fit-cover flex-shrink-0">
-                                <span class="min-w-0">
-                                    <span class="d-block text-white fs-7 fw-semibold text-truncate">{{ $card['title'] }}</span>
-                                    <span class="d-block text-neon-cyan fs-8 font-monospace">{{ $card['price'] }} €</span>
-                                </span>
-                            </a>
+                            <div class="assistant-card d-flex align-items-center gap-2 mt-2 p-2 rounded">
+                                <a href="{{ $card['url'] }}" class="d-flex align-items-center gap-2 text-decoration-none flex-grow-1 min-w-0">
+                                    <img src="{{ $card['image'] }}" alt="" width="48" height="48" loading="lazy" class="rounded object-fit-cover flex-shrink-0">
+                                    <span class="min-w-0">
+                                        <span class="d-block text-white fs-7 fw-semibold text-truncate">{{ $card['title'] }}</span>
+                                        <span class="d-block text-neon-cyan fs-8 font-monospace">{{ $card['price'] }} €</span>
+                                    </span>
+                                </a>
+                                @isset($card['id'])
+                                    @auth
+                                        @if (in_array($card['id'], $cartIds, true))
+                                            <a href="{{ route('cart.index') }}" class="btn btn-sm btn-success flex-shrink-0" title="{{ __('ui.cart_in') }}">
+                                                <i class="bi bi-bag-check-fill" aria-hidden="true"></i><span class="visually-hidden">{{ __('ui.cart_in') }}</span>
+                                            </a>
+                                        @else
+                                            <button type="button" wire:click="addToCart({{ $card['id'] }})" class="btn btn-sm btn-warning flex-shrink-0"
+                                                title="{{ __('ui.cart_add') }}" wire:loading.attr="disabled" wire:target="addToCart({{ $card['id'] }})">
+                                                <i class="bi bi-bag-plus-fill" aria-hidden="true"></i><span class="visually-hidden">{{ __('ui.cart_add') }}: {{ $card['title'] }}</span>
+                                            </button>
+                                        @endif
+                                    @else
+                                        <a href="{{ route('login') }}" class="btn btn-sm btn-outline-warning flex-shrink-0" title="{{ __('ui.assistant_login_to_buy') }}">
+                                            <i class="bi bi-bag-plus" aria-hidden="true"></i><span class="visually-hidden">{{ __('ui.assistant_login_to_buy') }}</span>
+                                        </a>
+                                    @endauth
+                                @endisset
+                            </div>
                         @endforeach
                     </div>
                 @endforeach
@@ -75,6 +95,9 @@
                 </div>
                 @error('input')
                     <div class="text-danger fs-8 mt-1">{{ $message }}</div>
+                @enderror
+                @error('cart')
+                    <div class="text-warning fs-8 mt-1">{{ $message }}</div>
                 @enderror
                 <p class="text-muted-custom fs-9 mb-0 mt-2">{{ __('ui.assistant_disclaimer') }}</p>
             </form>

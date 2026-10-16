@@ -16,6 +16,12 @@ class ArticlePolicy
             || ($user && ($user->is_revisor || $user->id === $article->user_id));
     }
 
+    // Carrello: solo annunci pubblicati, non riservati e non propri
+    public function addToCart(User $user, Article $article): bool
+    {
+        return $article->isAvailable() && $user->id !== $article->user_id;
+    }
+
     public function update(User $user, Article $article): bool
     {
         return $user->id === $article->user_id;

@@ -30,6 +30,19 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    // Carrello aggiornato senza ricaricare la pagina (es. dalla chat): aggiorna il contatore nella navbar
+    window.addEventListener('cart-updated', (event) => {
+        const icon = document.querySelector('[data-cart-icon]');
+        if (!icon) return;
+        let badge = icon.querySelector('.cart-badge');
+        if (!badge) {
+            badge = document.createElement('span');
+            badge.className = 'badge rounded-pill bg-warning text-dark cart-badge';
+            icon.appendChild(badge);
+        }
+        badge.textContent = event.detail.count;
+    });
+
     // I dropdown (anche su mobile) sono gestiti da Bootstrap tramite data-bs-toggle="dropdown":
     // un secondo gestore qui li apriva e richiudeva subito.
 

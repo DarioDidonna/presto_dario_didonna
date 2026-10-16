@@ -229,7 +229,7 @@
                         @forelse ($articles as $article)
                             <a href="{{ route('article.show', $article) }}"
                                 class="d-flex align-items-center gap-3 p-2 rounded text-decoration-none profile-article-row {{ $loop->last ? '' : 'border-bottom border-secondary-subtle' }}">
-                                <img src="{{ $article->images->first()?->getUrl(300, 300) ?? asset('media/placeholder.svg') }}"
+                                <img src="{{ $article->images->first()?->thumbnailUrl() ?? asset('media/placeholder.svg') }}"
                                     alt="" width="56" height="56" loading="lazy" class="rounded object-fit-cover flex-shrink-0">
                                 <div class="flex-grow-1 min-w-0">
                                     <div class="text-white fw-semibold text-truncate">{{ $article->title }}</div>
@@ -239,7 +239,11 @@
                                         {{ $article->created_at->format('d/m/Y') }}
                                     </div>
                                 </div>
-                                @if ($article->is_accepted === true)
+                                @if ($article->isSold())
+                                    <span class="badge bg-secondary">{{ __('ui.sold') }}</span>
+                                @elseif ($article->isReserved())
+                                    <span class="badge bg-warning text-dark">{{ __('ui.reserved') }}</span>
+                                @elseif ($article->is_accepted === true)
                                     <span class="badge bg-success bg-opacity-10 text-success border border-success">{{ __('ui.status_published') }}</span>
                                 @elseif ($article->is_accepted === false)
                                     <span class="badge bg-danger bg-opacity-10 text-danger border border-danger">{{ __('ui.status_rejected') }}</span>

@@ -1,5 +1,12 @@
 <div class="card bg-navbar border-neon-cyan shadow-lg h-100 w-100 transition-all card-hover">
-    <img src="{{ $article->images->isNotEmpty() ? $article->images->first()->getUrl(300, 300) : asset('media/placeholder.svg') }}" class="card-img-top border-bottom border-secondary-subtle" alt="{{ $article->title }}" width="300" height="300" loading="lazy">
+    <div class="position-relative">
+        <img src="{{ $article->images->isNotEmpty() ? $article->images->first()->thumbnailUrl() : asset('media/placeholder.svg') }}" class="card-img-top border-bottom border-secondary-subtle" alt="{{ $article->title }}" width="300" height="300" loading="lazy">
+        @if ($article->isReserved())
+            <span class="badge bg-warning text-dark position-absolute top-0 start-0 m-2 shadow">
+                <i class="bi bi-lock-fill me-1" aria-hidden="true"></i>{{ __('ui.reserved') }}
+            </span>
+        @endif
+    </div>
     
     <div class="card-body d-flex flex-column p-4">
         <div class="mb-2">

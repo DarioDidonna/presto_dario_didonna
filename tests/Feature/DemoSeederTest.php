@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\Article;
 use App\Models\Category;
 use App\Models\Image;
+use App\Models\PurchaseRequest;
 use App\Models\User;
 use Database\Seeders\DemoSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -53,6 +54,29 @@ class DemoSeederTest extends TestCase
         }
         $this->get('/article/index?query=bicicletta')->assertOk()->assertSee('Bicicletta da corsa');
 
+        // Carrello e richieste d'acquisto in tutti gli stati, coerenti con gli annunci
+        $demo = User::where('email', 'demo@presto.it')->first();
+        $this->assertSame(2, $demo->cart()->count());
+        $this->assertSame(0, $demo->cart()->where(fn ($q) => $q->whereNotNull('reserved_at')->orWhereNotNull('sold_at'))->count());
+        $this->assertEqualsCanonicalizing(
+            [PurchaseRequest::PENDING, PurchaseRequest::ACCEPTED, PurchaseRequest::DECLINED],
+            $demo->purchaseRequests()->pluck('status')->all(),
+        );
+        $this->assertSame(1, $demo->receivedPurchaseRequests()->where('status', PurchaseRequest::PENDING)->count());
+        foreach (PurchaseRequest::with('items.article')->get() as $request) {
+            foreach ($request->items as $item) {
+                $this->assertSame($request->seller_id, $item->article->user_id);
+                $this->assertSame($request->status === PurchaseRequest::ACCEPTED, $item->article->isSold());
+                $this->assertSame($request->status !== PurchaseRequest::DECLINED, $item->article->isReserved());
+            }
+        }
+
+        $this->actingAs($demo);
+        foreach ([route('cart.index'), route('orders.index'), route('sales.index')] as $url) {
+            $this->get($url)->assertOk();
+        }
+        auth()->logout();
+
         // Le credenziali demo funzionano
         $this->post('/login', ['email' => 'revisore@presto.it', 'password' => DemoSeeder::PASSWORD]);
         $this->assertAuthenticatedAs(User::where('email', 'revisore@presto.it')->first());
@@ -67,5 +91,6 @@ class DemoSeederTest extends TestCase
         $this->assertSame(10, Category::count());
         $this->assertSame(5, User::count());
         $this->assertSame(24, Article::count());
+        $this->assertSame(5, PurchaseRequest::count());
     }
 }

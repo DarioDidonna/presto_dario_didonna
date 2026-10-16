@@ -25,8 +25,10 @@ class ArticleResource extends JsonResource
             'category' => $this->category?->translated_name,
             'description' => $this->detailed ? Str::limit($description, 2000) : Str::limit($description, 200),
             'url' => route('article.show', $this->resource),
-            'image_url' => $this->images->first() ? url($this->images->first()->getUrl(300, 300)) : null,
+            'image_url' => $this->images->first() ? url($this->images->first()->thumbnailUrl()) : null,
             'published_at' => $this->created_at?->toDateString(),
+            // Richiesta d'acquisto in corso: l'agente lo dice all'utente (i venduti non arrivano proprio)
+            'reserved' => $this->isReserved(),
             $this->mergeWhen($this->detailed, fn () => [
                 'images' => $this->images->map(fn ($image) => url($image->getDisplayUrl()))->values(),
                 'seller' => $this->user?->name,

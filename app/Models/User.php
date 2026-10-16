@@ -8,6 +8,7 @@ use Illuminate\Contracts\Translation\HasLocalePreference;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -39,10 +40,26 @@ class User extends Authenticatable implements HasLocalePreference
         return $this->hasMany(Article::class);
     }
 
+    // Annunci nel carrello (tabella cart_items), dal più recente
+    public function cart(): BelongsToMany
+    {
+        return $this->belongsToMany(Article::class, 'cart_items')->withTimestamps()->latest('cart_items.created_at');
+    }
+
     // Lingua delle notifiche email: quella scelta dall'utente, altrimenti l'italiano come il sito
     public function preferredLocale(): string
     {
         return in_array($this->locale, config('app.available_locales'), true) ? $this->locale : 'it';
+    }
+
+    public function purchaseRequests(): HasMany
+    {
+        return $this->hasMany(PurchaseRequest::class, 'buyer_id');
+    }
+
+    public function receivedPurchaseRequests(): HasMany
+    {
+        return $this->hasMany(PurchaseRequest::class, 'seller_id');
     }
 
     public function avatarUrl(): ?string

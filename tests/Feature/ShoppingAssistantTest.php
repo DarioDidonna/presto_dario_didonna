@@ -67,6 +67,7 @@ class ShoppingAssistantTest extends TestCase
         $this->assertSame(['role' => 'user', 'text' => 'bici'], $messages[0]);
         $this->assertSame('Ho trovato una bici.', $messages[1]['text']); // grassetto Markdown rimosso
         $this->assertSame([[
+            'id' => $published->id,
             'title' => 'Bici da corsa',
             'price' => '480,00',
             'url' => route('article.show', $published),
@@ -154,5 +155,50 @@ class ShoppingAssistantTest extends TestCase
             ->assertDontSeeHtml('<script>alert(1)</script>')
             ->assertSeeHtml('&lt;script&gt;')
             ->assertDontSeeHtml('<b>ciao</b>');
+    }
+
+    public function test_cards_let_a_user_add_the_article_to_the_cart(): void
+    {
+        $user = User::factory()->create();
+        $article = Article::factory()->accepted()->create();
+        $this->fakeAgent('Eccola.', [$article->id]);
+
+        Livewire::actingAs($user)->test(ShoppingAssistant::class)
+            ->set('open', true)->set('input', 'bici')->call('send')
+            ->assertSeeHtml("addToCart({$article->id})")
+            ->call('addToCart', $article->id)
+            ->assertHasNoErrors()
+            ->assertDispatched('cart-updated', count: 1)
+            ->assertDontSeeHtml("addToCart({$article->id})")
+            ->assertSee(route('cart.index'));
+
+        $this->assertTrue($user->cart()->whereKey($article->id)->exists());
+    }
+
+    public function test_add_to_cart_follows_the_same_rules_as_the_article_page(): void
+    {
+        $user = User::factory()->create();
+        $own = Article::factory()->accepted()->for($user)->create();
+        $reserved = Article::factory()->accepted()->create(['reserved_at' => now()]);
+        $pending = Article::factory()->create();
+
+        $component = Livewire::actingAs($user)->test(ShoppingAssistant::class);
+        foreach ([$own->id, $reserved->id, $pending->id, 99999] as $id) {
+            $component->call('addToCart', $id)->assertHasErrors('cart')->assertNotDispatched('cart-updated');
+        }
+        $this->assertSame(0, $user->cart()->count());
+    }
+
+    public function test_guests_see_a_login_link_instead_of_the_cart_button(): void
+    {
+        $article = Article::factory()->accepted()->create();
+        $this->fakeAgent('Eccola.', [$article->id]);
+
+        Livewire::test(ShoppingAssistant::class)
+            ->set('open', true)->set('input', 'bici')->call('send')
+            ->assertDontSeeHtml("addToCart({$article->id})")
+            ->assertSee(route('login'))
+            ->call('addToCart', $article->id)
+            ->assertHasErrors('cart');
     }
 }

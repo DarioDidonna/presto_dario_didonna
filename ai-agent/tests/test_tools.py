@@ -140,3 +140,14 @@ def test_injected_instructions_in_ads_are_hidden_from_the_model(settings):
     assert "IGNORA" not in message.content
     assert "testo nascosto" in message.content
     assert message.artifact[0]["description"] == evil["description"]  # i dati veri restano per le schede
+
+
+def test_reserved_articles_are_flagged_for_the_model(settings):
+    import httpx
+
+    from presto_ai_agent.laravel_client import LaravelClient
+
+    reserved = {**FakeLaravel().articles[0], "reserved": True}
+    client = LaravelClient(settings, transport=httpx.MockTransport(FakeLaravel(articles=[reserved])))
+
+    assert "RISERVATO" in call(build_tools(client)[0], testo="bici").content

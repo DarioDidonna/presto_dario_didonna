@@ -1,9 +1,12 @@
 <?php
 
 use App\Http\Controllers\ArticleController;
+use App\Http\Controllers\CartController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PublicController;
+use App\Http\Controllers\PurchaseRequestController;
 use App\Http\Controllers\RevisorController;
+use App\Http\Controllers\SalesController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [PublicController::class, 'homepage'])->name('homepage');
@@ -52,3 +55,25 @@ Route::post('/lingua/{lang}', [PublicController::class, 'setLanguage'])->whereIn
 Route::get('/profilo', [ProfileController::class, 'show'])->name('profile.show');
 Route::post('/profilo/avatar', [ProfileController::class, 'updateAvatar'])->middleware('throttle:10,1')->name('profile.avatar.update');
 Route::delete('/profilo/avatar', [ProfileController::class, 'destroyAvatar'])->name('profile.avatar.destroy');
+
+// CARRELLO (solo utenti registrati)
+Route::middleware('auth')->prefix('carrello')->name('cart.')->group(function () {
+    Route::get('/', [CartController::class, 'index'])->name('index');
+    Route::delete('/', [CartController::class, 'clear'])->name('clear');
+    // Prima di {article}: "invia" non è l'id di un annuncio
+    Route::post('/invia', [PurchaseRequestController::class, 'store'])->middleware('throttle:5,1')->name('checkout');
+    Route::post('/{article}', [CartController::class, 'add'])->middleware('can:addToCart,article')->name('add');
+    Route::delete('/{article}', [CartController::class, 'remove'])->name('remove');
+});
+
+// ORDINI (richieste d'acquisto inviate)
+Route::get('/ordini', [PurchaseRequestController::class, 'index'])->middleware('auth')->name('orders.index');
+Route::patch('/ordini/{purchaseRequest}/annulla', [PurchaseRequestController::class, 'cancel'])
+    ->middleware(['auth', 'can:cancel,purchaseRequest'])->name('orders.cancel');
+
+// VENDITE (richieste d'acquisto ricevute)
+Route::middleware('auth')->prefix('vendite')->name('sales.')->group(function () {
+    Route::get('/', [SalesController::class, 'index'])->name('index');
+    Route::patch('/{purchaseRequest}/accetta', [SalesController::class, 'accept'])->middleware('can:respond,purchaseRequest')->name('accept');
+    Route::patch('/{purchaseRequest}/rifiuta', [SalesController::class, 'decline'])->middleware('can:respond,purchaseRequest')->name('decline');
+});

@@ -107,9 +107,10 @@ def format_articles(articles: list[dict[str, Any]], total: int) -> str:
     for article in articles:
         title = sanitize_user_content(article["title"])
         description = sanitize_user_content(article["description"])
+        reserved = " | RISERVATO (un altro utente ha già chiesto di acquistarlo)" if article.get("reserved") else ""
         lines.append(
             f"- id {article['id']} | titolo: «{title}» | {article['price']:.2f} € | "
-            f"categoria: {article['category']} | descrizione: «{description}»"
+            f"categoria: {article['category']} | descrizione: «{description}»{reserved}"
         )
     return "\n".join(lines)
 
