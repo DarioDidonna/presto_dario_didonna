@@ -63,6 +63,31 @@ uv run python evals/shopping.py            # 10 casi, catalogo finto in memoria 
 Con `qwen2.5:3b` su Mac M3 / 8 GB: **6/10** prima delle difese, **29/30** su tre esecuzioni dopo
 (l'unico errore residuo: una risposta al caso in inglese), ~3–5 s per risposta.
 
+## Assistente del revisore
+
+`POST /review` riceve da Laravel i dati di un annuncio in revisione (titolo, descrizione, prezzo, categoria,
+numero di foto, etichette e valutazioni SafeSearch di Google Vision) e restituisce un **suggerimento**:
+
+```json
+{"recommendation": "reject", "confidence": 0.9, "reasons": ["Pagamento fuori dal sito"], "flags": [], "model_used": true}
+```
+
+- **Regole deterministiche** (`review.py`): contenuti vietati (armi, droghe, farmaci, contraffazioni, animali),
+  SafeSearch "probabile", tentativi di manipolazione, contatti personali, prezzi sospetti, descrizioni povere.
+- **Giudizio del modello** con output strutturato (Pydantic) per i casi che le regole non vedono: truffe,
+  annunci incoerenti con foto e categoria, contenuti vietati descritti in modo velato.
+- **Le regole bloccanti vincono sempre**: un annuncio scritto per manipolare il modello non può ottenere "accept".
+  Se il modello non risponde, il suggerimento si basa sulle sole regole (`model_used: false`).
+- È solo un suggerimento: nella dashboard la decisione resta al revisore.
+
+```bash
+uv run python evals/review.py      # 8 annunci (regolari, vietati, truffa, incoerente, droga velata, manipolazione)
+```
+
+Risultato con `qwen2.5:3b`: **8/8**, anche dal solo modello, ~1–3 s per annuncio.
+Un problema emerso dalla valutazione: il modello a volte esprime la fiducia in scala 0–10 ("confidence": 8)
+e la risposta veniva scartata; ora viene normalizzata.
+
 ## Test e stile
 
 ```bash

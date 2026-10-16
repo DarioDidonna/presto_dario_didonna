@@ -75,6 +75,18 @@ class Image extends Model
         $this->delete();
     }
 
+    // Livello leggibile da una macchina (per l'assistente del revisore) a partire dalla classe CSS salvata
+    public static function likelihoodLevel(?string $cssClass): string
+    {
+        return match (true) {
+            $cssClass === null => 'unknown',
+            str_contains($cssClass, 'text-success') => 'unlikely',
+            str_contains($cssClass, 'text-warning') => 'possible',
+            str_contains($cssClass, 'text-danger') => 'likely',
+            default => 'unknown',
+        };
+    }
+
     // Il DB salva la classe CSS dell'icona SafeSearch: qui la si traduce in testo leggibile (title e screen reader)
     public static function likelihoodLabel(?string $cssClass): string
     {

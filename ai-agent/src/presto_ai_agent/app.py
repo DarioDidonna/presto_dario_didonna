@@ -6,10 +6,12 @@ from typing import Annotated, Any, Literal
 
 import httpx
 from fastapi import Depends, FastAPI, Header, HTTPException
+from langchain_ollama import ChatOllama
 from pydantic import BaseModel, Field
 
 from .agent import ChatResult, ShoppingAgent
 from .config import Settings, get_settings
+from .review import ArticleForReview, Judge, ReviewSuggestion, ollama_judge, review
 
 app = FastAPI(title="Presto.it AI agent", version="0.1.0")
 
@@ -17,6 +19,13 @@ app = FastAPI(title="Presto.it AI agent", version="0.1.0")
 @lru_cache
 def get_agent() -> ShoppingAgent:
     return ShoppingAgent(get_settings())
+
+
+@lru_cache
+def get_judge() -> Judge:
+    settings = get_settings()
+    # Temperatura 0: per una valutazione serve la risposta più stabile possibile
+    return ollama_judge(ChatOllama(model=settings.model, base_url=settings.ollama_base_url, temperature=0))
 
 
 def require_token(
@@ -70,3 +79,9 @@ def chat(request: ChatRequest, agent: Annotated[ShoppingAgent, Depends(get_agent
         raise HTTPException(503, "Il modello locale non è raggiungibile (Ollama è acceso?).") from error
 
     return ChatResponse(reply=result.reply, conversation_id=result.conversation_id, articles=result.articles)
+
+
+@app.post("/review", dependencies=[Depends(require_token)])
+def review_article(article: ArticleForReview, judge: Annotated[Judge, Depends(get_judge)]) -> ReviewSuggestion:
+    """Suggerimento per il revisore. Se il modello non risponde, si basa sulle sole regole (model_used=false)."""
+    return review(article, judge)
