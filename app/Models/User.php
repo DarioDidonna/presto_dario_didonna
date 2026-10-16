@@ -52,6 +52,16 @@ class User extends Authenticatable implements HasLocalePreference
         return in_array($this->locale, config('app.available_locales'), true) ? $this->locale : 'it';
     }
 
+    public function purchaseRequests(): HasMany
+    {
+        return $this->hasMany(PurchaseRequest::class, 'buyer_id');
+    }
+
+    public function receivedPurchaseRequests(): HasMany
+    {
+        return $this->hasMany(PurchaseRequest::class, 'seller_id');
+    }
+
     public function avatarUrl(): ?string
     {
         return $this->avatar ? Storage::disk('public')->url($this->avatar) : null;

@@ -146,6 +146,12 @@
                                 <div class="text-muted fs-7 truncate">{{ Auth::user()->email }}</div>
                             </li>
                             <li>
+                                <a class="dropdown-menu-item-custom text-white-50 py-2 px-3 rounded d-block text-decoration-none"
+                                    href="{{ route('orders.index') }}">
+                                    <i class="bi bi-receipt me-2 text-light"></i> {{ __('ui.orders_title') }}
+                                </a>
+                            </li>
+                            <li>
                                 <a class="dropdown-menu-item-custom text-white-50 py-2 px-3 rounded d-block text-decoration-none {{ request()->routeIs('profile.show') ? 'text-white' : '' }}"
                                     href="{{ route('profile.show') }}">
                                     <i class="bi bi-person-workspace me-2 text-light"></i> {{ __('ui.my_profile') }}

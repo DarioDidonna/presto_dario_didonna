@@ -200,6 +200,20 @@ class FrontendTest extends TestCase
         $this->assertStringEndsWith('crop_800x800_foto.jpg', $image->getDisplayUrl());
     }
 
+    public function test_thumbnail_falls_back_to_original_then_placeholder(): void
+    {
+        Storage::fake('public');
+        $image = new Image(['path' => 'articles/1/foto.jpg']);
+
+        $this->assertStringEndsWith('media/placeholder.svg', $image->thumbnailUrl());
+
+        Storage::disk('public')->put('articles/1/foto.jpg', 'x'); // caricata, miniatura non ancora generata
+        $this->assertStringEndsWith('articles/1/foto.jpg', $image->thumbnailUrl());
+
+        Storage::disk('public')->put('articles/1/crop_300x300_foto.jpg', 'x');
+        $this->assertStringEndsWith('crop_300x300_foto.jpg', $image->thumbnailUrl());
+    }
+
     public function test_every_css_class_used_in_views_is_defined(): void
     {
         // Classi che servono solo come aggancio per JS/Bootstrap, senza stile proprio

@@ -12,8 +12,8 @@ class CartController extends Controller
         $user = $request->user();
         $articles = $user->cart()->with(['images', 'category', 'user'])->get();
 
-        // Annunci non più pubblicati (rifiutati, o tornati in revisione dopo una modifica): tolti con un avviso
-        $unavailable = $articles->filter(fn (Article $article) => $article->is_accepted !== true);
+        // Annunci non più acquistabili (rifiutati, tornati in revisione, riservati da altri): tolti con un avviso
+        $unavailable = $articles->reject(fn (Article $article) => $article->isAvailable());
         if ($unavailable->isNotEmpty()) {
             $user->cart()->detach($unavailable->modelKeys());
             $articles = $articles->diff($unavailable);

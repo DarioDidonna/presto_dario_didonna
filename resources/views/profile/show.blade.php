@@ -229,7 +229,7 @@
                         @forelse ($articles as $article)
                             <a href="{{ route('article.show', $article) }}"
                                 class="d-flex align-items-center gap-3 p-2 rounded text-decoration-none profile-article-row {{ $loop->last ? '' : 'border-bottom border-secondary-subtle' }}">
-                                <img src="{{ $article->images->first()?->getUrl(300, 300) ?? asset('media/placeholder.svg') }}"
+                                <img src="{{ $article->images->first()?->thumbnailUrl() ?? asset('media/placeholder.svg') }}"
                                     alt="" width="56" height="56" loading="lazy" class="rounded object-fit-cover flex-shrink-0">
                                 <div class="flex-grow-1 min-w-0">
                                     <div class="text-white fw-semibold text-truncate">{{ $article->title }}</div>

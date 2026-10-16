@@ -116,6 +116,22 @@ class Image extends Model
         return $disk->exists($this->path) ? Storage::url($this->path) : asset('media/placeholder.svg');
     }
 
+    /**
+     * Miniatura 300x300 con watermark; se non esiste ancora (la coda non l'ha generata) l'originale,
+     * se manca anche quello il segnaposto: mai un'immagine rotta.
+     */
+    public function thumbnailUrl(): string
+    {
+        $disk = Storage::disk('public');
+        $crop = dirname($this->path).'/crop_300x300_'.basename($this->path);
+
+        return match (true) {
+            $disk->exists($crop) => Storage::url($crop),
+            $disk->exists($this->path) => Storage::url($this->path),
+            default => asset('media/placeholder.svg'),
+        };
+    }
+
     public function getUrl($w = null, $h = null)
     {
         return self::getUrlByFilePath($this->path, $w, $h);

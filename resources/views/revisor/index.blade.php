@@ -98,7 +98,7 @@
                                                 class="btn p-0 w-100 rounded overflow-hidden border {{ $key === 0 ? 'border-neon-cyan' : 'border-secondary' }} opacity-75 hover-opacity-100"
                                                 aria-current="{{ $key === 0 ? 'true' : 'false' }}"
                                                 aria-label="{{ __('ui.image_number', ['n' => $key + 1]) }}">
-                                                <img src="{{ $image->getUrl(300, 300) }}"
+                                                <img src="{{ $image->thumbnailUrl() }}"
                                                     class="img-fluid object-fit-cover" alt="" loading="lazy">
                                             </button>
                                         </div>

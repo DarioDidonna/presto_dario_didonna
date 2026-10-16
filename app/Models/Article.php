@@ -36,8 +36,20 @@ class Article extends Model
     {
         return [
             'is_accepted' => 'boolean',
+            'reserved_at' => 'datetime',
             'price' => 'decimal:2',
         ];
+    }
+
+    // Acquistabile: pubblicato e non riservato da una richiesta d'acquisto in attesa
+    public function isAvailable(): bool
+    {
+        return $this->is_accepted === true && $this->reserved_at === null;
+    }
+
+    public function isReserved(): bool
+    {
+        return $this->reserved_at !== null;
     }
 
     public function setAccepted($value)

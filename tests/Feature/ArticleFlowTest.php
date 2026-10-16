@@ -34,9 +34,14 @@ class ArticleFlowTest extends TestCase
 
     public function test_revisor_carousel_shows_every_image(): void
     {
+        Storage::fake('public');
         $article = Article::factory()->create();
-        $article->images()->create(['path' => 'articles/1/a.jpg']);
-        $article->images()->create(['path' => 'articles/1/b.jpg']);
+        foreach (['a', 'b'] as $name) {
+            $article->images()->create(['path' => "articles/1/{$name}.jpg"]);
+            Storage::disk('public')->put("articles/1/{$name}.jpg", 'x');
+            Storage::disk('public')->put("articles/1/crop_300x300_{$name}.jpg", 'x');
+            Storage::disk('public')->put("articles/1/crop_800x800_{$name}.jpg", 'x');
+        }
 
         $this->actingAs(User::factory()->revisor()->create())->get(route('revisor.index'))
             ->assertOk()

@@ -52,7 +52,7 @@
                                 @foreach ($group['articles'] as $article)
                                     <div class="d-flex align-items-center gap-3 py-3 {{ $loop->last ? '' : 'border-bottom border-secondary-subtle' }}">
                                         <a href="{{ route('article.show', $article) }}" class="flex-shrink-0">
-                                            <img src="{{ $article->images->first()?->getUrl(300, 300) ?? asset('media/placeholder.svg') }}"
+                                            <img src="{{ $article->images->first()?->thumbnailUrl() ?? asset('media/placeholder.svg') }}"
                                                 alt="" width="72" height="72" loading="lazy" class="rounded object-fit-cover">
                                         </a>
                                         <div class="flex-grow-1 min-w-0">
@@ -93,6 +93,22 @@
                                 <span class="fs-3 fw-bold text-neon-cyan font-monospace">{{ number_format($total, 2, ',', '.') }} €</span>
                             </div>
                             <p class="text-muted-custom fs-8 mb-3">{{ __('ui.cart_note') }}</p>
+
+                            <form action="{{ route('cart.checkout') }}" method="POST" class="mb-3">
+                                @csrf
+                                <label for="checkoutMessage" class="form-label text-muted-custom fs-8 text-uppercase tracking-wide fw-semibold">
+                                    {{ __('ui.checkout_message_label') }}
+                                </label>
+                                <textarea name="message" id="checkoutMessage" rows="3" maxlength="500"
+                                    placeholder="{{ __('ui.checkout_message_placeholder') }}"
+                                    class="form-control bg-dark border-secondary text-white mb-2 @error('message') is-invalid @enderror">{{ old('message') }}</textarea>
+                                @error('message')
+                                    <div class="invalid-feedback d-block fs-8 mb-2">{{ $message }}</div>
+                                @enderror
+                                <button type="submit" class="btn btn-cyber-gradient w-100 text-uppercase tracking-wider fs-7 fw-bold">
+                                    <i class="bi bi-send-check me-2" aria-hidden="true"></i>{{ __('ui.checkout_submit') }}
+                                </button>
+                            </form>
 
                             <a href="{{ route('article.index') }}" class="btn btn-outline-neon-cyan w-100 mb-2">
                                 <i class="bi bi-arrow-left me-1" aria-hidden="true"></i>{{ __('ui.cart_continue') }}

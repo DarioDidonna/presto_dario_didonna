@@ -4,6 +4,7 @@ use App\Http\Controllers\ArticleController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PublicController;
+use App\Http\Controllers\PurchaseRequestController;
 use App\Http\Controllers\RevisorController;
 use Illuminate\Support\Facades\Route;
 
@@ -58,6 +59,11 @@ Route::delete('/profilo/avatar', [ProfileController::class, 'destroyAvatar'])->n
 Route::middleware('auth')->prefix('carrello')->name('cart.')->group(function () {
     Route::get('/', [CartController::class, 'index'])->name('index');
     Route::delete('/', [CartController::class, 'clear'])->name('clear');
+    // Prima di {article}: "invia" non è l'id di un annuncio
+    Route::post('/invia', [PurchaseRequestController::class, 'store'])->middleware('throttle:5,1')->name('checkout');
     Route::post('/{article}', [CartController::class, 'add'])->middleware('can:addToCart,article')->name('add');
     Route::delete('/{article}', [CartController::class, 'remove'])->name('remove');
 });
+
+// ORDINI (richieste d'acquisto inviate)
+Route::get('/ordini', [PurchaseRequestController::class, 'index'])->middleware('auth')->name('orders.index');

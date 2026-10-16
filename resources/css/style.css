@@ -1417,7 +1417,7 @@ body {
 .network-node.node-pos-4 { top: 62%; left: 64%; }
 
 /* Card: immagini sempre quadrate (come le miniature 300x300), senza deformazioni */
-.card > .card-img-top {
+.card .card-img-top {
     aspect-ratio: 1 / 1;
     height: auto;
     object-fit: cover;
