@@ -56,7 +56,7 @@ class AgentController extends Controller
         $this->setLocale($request);
 
         // Annunci in revisione o rifiutati: per l'agente non esistono
-        abort_unless($article->is_accepted === true, 404);
+        abort_unless($article->is_accepted === true && ! $article->isSold(), 404);
 
         $article->load(['images', 'category', 'user']);
 

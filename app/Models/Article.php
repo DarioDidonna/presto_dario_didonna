@@ -37,6 +37,7 @@ class Article extends Model
         return [
             'is_accepted' => 'boolean',
             'reserved_at' => 'datetime',
+            'sold_at' => 'datetime',
             'price' => 'decimal:2',
         ];
     }
@@ -44,7 +45,12 @@ class Article extends Model
     // Acquistabile: pubblicato e non riservato da una richiesta d'acquisto in attesa
     public function isAvailable(): bool
     {
-        return $this->is_accepted === true && $this->reserved_at === null;
+        return $this->is_accepted === true && $this->reserved_at === null && $this->sold_at === null;
+    }
+
+    public function isSold(): bool
+    {
+        return $this->sold_at !== null;
     }
 
     public function isReserved(): bool
@@ -60,9 +66,11 @@ class Article extends Model
         return true;
     }
 
+    // Elenchi pubblici (ricerca, categorie, homepage, statistiche, agente AI): pubblicati e non ancora venduti.
+    // La pagina di un annuncio venduto resta raggiungibile (ArticlePolicy::view), con l'etichetta "Venduto".
     public function scopeAccepted($query)
     {
-        return $query->where('is_accepted', true);
+        return $query->where('is_accepted', true)->whereNull('sold_at');
     }
 
     public function scopeWithCardRelations($query)

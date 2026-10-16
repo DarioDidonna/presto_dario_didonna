@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\PurchaseRequest;
 use App\Services\Checkout;
 use App\Services\CheckoutException;
+use App\Services\PurchaseRequestNotPendingException;
+use App\Services\PurchaseRequestWorkflow;
 use Illuminate\Http\Request;
 
 class PurchaseRequestController extends Controller
@@ -32,5 +35,17 @@ class PurchaseRequestController extends Controller
 
         return redirect()->route('orders.index')
             ->with('message', trans_choice('ui.checkout_done', $requests->count(), ['count' => $requests->count()]));
+    }
+
+    // Autorizzazione sulla rotta: can:cancel,purchaseRequest (acquirente e richiesta in attesa)
+    public function cancel(PurchaseRequest $purchaseRequest, PurchaseRequestWorkflow $workflow)
+    {
+        try {
+            $workflow->cancel($purchaseRequest);
+        } catch (PurchaseRequestNotPendingException $error) {
+            return redirect()->route('orders.index')->with('warning', $error->getMessage());
+        }
+
+        return redirect()->route('orders.index')->with('message', __('ui.orders_cancelled'));
     }
 }

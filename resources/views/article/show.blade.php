@@ -90,7 +90,11 @@
                     <div
                         class="p-4 rounded-3 border border-secondary-subtle bg-navbar-card shadow-lg h-100 d-flex flex-column">
 
-                        @if ($article->isReserved())
+                        @if ($article->isSold())
+                            <div class="alert alert-secondary bg-secondary bg-opacity-25 border-secondary text-light fs-7 py-2 mb-3" role="status">
+                                <i class="bi bi-bag-check-fill me-1" aria-hidden="true"></i> {{ __('ui.sold_notice') }}
+                            </div>
+                        @elseif ($article->isReserved())
                             <div class="alert alert-warning bg-warning bg-opacity-10 border-warning text-warning fs-7 py-2 mb-3" role="status">
                                 <i class="bi bi-lock-fill me-1" aria-hidden="true"></i> {{ __('ui.reserved_notice') }}
                             </div>

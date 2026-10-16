@@ -6,6 +6,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PublicController;
 use App\Http\Controllers\PurchaseRequestController;
 use App\Http\Controllers\RevisorController;
+use App\Http\Controllers\SalesController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [PublicController::class, 'homepage'])->name('homepage');
@@ -67,3 +68,12 @@ Route::middleware('auth')->prefix('carrello')->name('cart.')->group(function () 
 
 // ORDINI (richieste d'acquisto inviate)
 Route::get('/ordini', [PurchaseRequestController::class, 'index'])->middleware('auth')->name('orders.index');
+Route::patch('/ordini/{purchaseRequest}/annulla', [PurchaseRequestController::class, 'cancel'])
+    ->middleware(['auth', 'can:cancel,purchaseRequest'])->name('orders.cancel');
+
+// VENDITE (richieste d'acquisto ricevute)
+Route::middleware('auth')->prefix('vendite')->name('sales.')->group(function () {
+    Route::get('/', [SalesController::class, 'index'])->name('index');
+    Route::patch('/{purchaseRequest}/accetta', [SalesController::class, 'accept'])->middleware('can:respond,purchaseRequest')->name('accept');
+    Route::patch('/{purchaseRequest}/rifiuta', [SalesController::class, 'decline'])->middleware('can:respond,purchaseRequest')->name('decline');
+});

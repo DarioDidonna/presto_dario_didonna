@@ -108,7 +108,7 @@
                         </li>
                     @endif
 
-                    @php($cartCount = once(fn () => Auth::user()->cart()->count()))
+                    @php($cartCount = Auth::user()->cart()->count())
                     <li class="nav-item me-xl-1 my-1 my-xl-0">
                         <a href="{{ route('cart.index') }}"
                             class="nav-link nav-link-custom position-relative d-inline-flex align-items-center gap-1 px-2 {{ request()->routeIs('cart.*') ? 'active' : '' }}"
@@ -134,7 +134,15 @@
                         <a class="nav-link profile-dropdown-toggle d-flex align-items-center gap-2 ps-1 text-white"
                             href="#" id="userDropdown" role="button" data-bs-toggle="dropdown"
                             aria-expanded="false" aria-label="{{ __('ui.account_menu', ['name' => Auth::user()->name]) }}">
-                            <x-avatar :user="Auth::user()" :size="32" />
+                            @php($pendingSales = Auth::user()->receivedPurchaseRequests()->where('status', 'pending')->count())
+                            <span class="position-relative d-inline-flex">
+                                <x-avatar :user="Auth::user()" :size="32" />
+                                @if ($pendingSales > 0)
+                                    {{-- Richieste d'acquisto ricevute in attesa di risposta --}}
+                                    <span class="position-absolute top-0 end-0 p-1 bg-warning border border-dark rounded-circle"
+                                        title="{{ trans_choice('ui.sales_pending_count', $pendingSales, ['count' => $pendingSales]) }}"></span>
+                                @endif
+                            </span>
                             <span
                                 class="text-white fw-medium max-w-100 truncate d-none d-xl-inline-block">{{ Auth::user()->name }}</span>
                             <i class="bi bi-chevron-down text-muted fs-8 d-none d-xl-inline-block"></i>
@@ -149,6 +157,15 @@
                                 <a class="dropdown-menu-item-custom text-white-50 py-2 px-3 rounded d-block text-decoration-none"
                                     href="{{ route('orders.index') }}">
                                     <i class="bi bi-receipt me-2 text-light"></i> {{ __('ui.orders_title') }}
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-menu-item-custom text-white-50 py-2 px-3 rounded d-flex align-items-center justify-content-between text-decoration-none"
+                                    href="{{ route('sales.index') }}">
+                                    <span><i class="bi bi-shop me-2 text-light"></i> {{ __('ui.sales_title') }}</span>
+                                    @if ($pendingSales > 0)
+                                        <span class="badge bg-warning text-dark rounded-pill ms-2">{{ $pendingSales }}</span>
+                                    @endif
                                 </a>
                             </li>
                             <li>

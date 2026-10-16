@@ -52,7 +52,7 @@ class PurchaseRequested extends Notification implements ShouldQueue
         // L'email dell'acquirente serve al venditore per accordarsi su pagamento e consegna
         return $mail
             ->line(__('ui.purchase_mail_contact', ['email' => $buyer->email]))
-            ->action(__('ui.purchase_mail_action'), route('profile.show'))
+            ->action(__('ui.purchase_mail_action'), route('sales.index'))
             ->line(__('ui.purchase_mail_reserved'));
     }
 }

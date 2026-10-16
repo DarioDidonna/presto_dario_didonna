@@ -239,7 +239,11 @@
                                         {{ $article->created_at->format('d/m/Y') }}
                                     </div>
                                 </div>
-                                @if ($article->is_accepted === true)
+                                @if ($article->isSold())
+                                    <span class="badge bg-secondary">{{ __('ui.sold') }}</span>
+                                @elseif ($article->isReserved())
+                                    <span class="badge bg-warning text-dark">{{ __('ui.reserved') }}</span>
+                                @elseif ($article->is_accepted === true)
                                     <span class="badge bg-success bg-opacity-10 text-success border border-success">{{ __('ui.status_published') }}</span>
                                 @elseif ($article->is_accepted === false)
                                     <span class="badge bg-danger bg-opacity-10 text-danger border border-danger">{{ __('ui.status_rejected') }}</span>
