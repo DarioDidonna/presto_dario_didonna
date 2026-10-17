@@ -40,8 +40,8 @@
             <div class="col-12 col-md-6 mb-3">
                 <label for="category"
                     class="form-label text-uppercase tracking-wide fs-8 fw-semibold text-neon-cyan">{{ __('ui.category') }}</label>
-                <select wire:model.live="form.category" id="category"
-                    class="form-select bg-dark border-secondary text-white @error('form.category') is-invalid @enderror">
+                <select wire:model.live="form.category" id="category" @if ($categoryToCheck ?? false) aria-describedby="category-ai-hint" @endif
+                    class="form-select bg-dark text-white {{ ($categoryToCheck ?? false) ? 'border-warning' : 'border-secondary' }} @error('form.category') is-invalid @enderror">
                     <option value="">{{ __('ui.select_category') }}</option>
 
                     @foreach ($categories as $cat)
@@ -51,6 +51,11 @@
                 @error('form.category')
                     <div class="invalid-feedback font-monospace fs-8">{{ $message }}</div>
                 @enderror
+                @if ($categoryToCheck ?? false)
+                    <div id="category-ai-hint" class="text-warning fs-8 mt-1">
+                        <i class="bi bi-stars me-1" aria-hidden="true"></i>{{ __('ui.ai_draft_category_check') }}
+                    </div>
+                @endif
             </div>
 
             @if ($existingImages->isNotEmpty())
@@ -133,6 +138,33 @@
                         @endforeach
                     </div>
                 </div>
+
+                @if ($aiDraft ?? false)
+                    {{-- Bozza dalla prima foto (CreateArticleForm::suggestFromPhoto): riempie solo i campi vuoti --}}
+                    <div class="col-12 mt-3">
+                        <div class="ai-draft-box d-flex flex-column flex-sm-row align-items-sm-center gap-3 p-3 rounded-3">
+                            <div class="flex-grow-1">
+                                <div class="text-white fw-semibold fs-7"><i class="bi bi-stars text-neon-cyan me-1" aria-hidden="true"></i>{{ __('ui.ai_draft_title') }}</div>
+                                <div class="text-muted-custom fs-8">{{ __('ui.ai_draft_help') }}</div>
+                            </div>
+                            <button type="button" wire:click="suggestFromPhoto" wire:loading.attr="disabled" wire:target="suggestFromPhoto, temporary_images"
+                                class="btn btn-cyber-gradient text-light fw-semibold fs-7 flex-shrink-0">
+                                <span wire:loading.remove wire:target="suggestFromPhoto"><i class="bi bi-magic me-1" aria-hidden="true"></i>{{ __('ui.ai_draft_button') }}</span>
+                                <span wire:loading wire:target="suggestFromPhoto"><span class="spinner-border spinner-border-sm me-1" aria-hidden="true"></span>{{ __('ui.ai_draft_working') }}</span>
+                            </button>
+                        </div>
+                        <div role="status" aria-live="polite">
+                            @error('ai')
+                                <p class="text-warning fs-8 mt-2 mb-0"><i class="bi bi-exclamation-triangle me-1" aria-hidden="true"></i>{{ $message }}</p>
+                            @enderror
+                            @if (($suggestion ?? null) === 'filled')
+                                <p class="text-success fs-8 mt-2 mb-0"><i class="bi bi-check-circle me-1" aria-hidden="true"></i>{{ __('ui.ai_draft_filled') }}</p>
+                            @elseif (($suggestion ?? null) === 'kept')
+                                <p class="text-muted-custom fs-8 mt-2 mb-0"><i class="bi bi-info-circle me-1" aria-hidden="true"></i>{{ __('ui.ai_draft_kept') }}</p>
+                            @endif
+                        </div>
+                    </div>
+                @endif
             @endif
         </div>
 
