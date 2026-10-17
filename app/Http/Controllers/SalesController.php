@@ -16,6 +16,7 @@ class SalesController extends Controller
     {
         $requests = $request->user()->receivedPurchaseRequests()
             ->with(['buyer', 'items.article.images'])
+            ->withUnreadMessagesCount($request->user())
             // Prima quelle in attesa di risposta, poi le altre dalla più recente
             ->orderByRaw('case when status = ? then 0 else 1 end', [PurchaseRequest::PENDING])
             ->latest()

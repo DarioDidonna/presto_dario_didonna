@@ -62,6 +62,27 @@ class User extends Authenticatable implements HasLocalePreference
         return $this->hasMany(PurchaseRequest::class, 'seller_id');
     }
 
+    /**
+     * Messaggi non letti scritti dall'altra persona, divisi tra ordini (sono l'acquirente) e vendite
+     * (sono il venditore). Una sola query: la navbar la esegue a ogni pagina.
+     *
+     * @return array{orders: int, sales: int}
+     */
+    public function unreadMessageCounts(): array
+    {
+        $counts = Message::query()
+            ->join('purchase_requests', 'purchase_requests.id', '=', 'messages.purchase_request_id')
+            ->where('messages.user_id', '!=', $this->id)
+            ->whereNull('messages.read_at')
+            ->where(fn ($query) => $query->where('purchase_requests.buyer_id', $this->id)->orWhere('purchase_requests.seller_id', $this->id))
+            ->selectRaw('sum(case when purchase_requests.buyer_id = ? then 1 else 0 end) as orders', [$this->id])
+            ->selectRaw('sum(case when purchase_requests.seller_id = ? then 1 else 0 end) as sales', [$this->id])
+            ->toBase()
+            ->first();
+
+        return ['orders' => (int) $counts?->orders, 'sales' => (int) $counts?->sales];
+    }
+
     public function avatarUrl(): ?string
     {
         return $this->avatar ? Storage::disk('public')->url($this->avatar) : null;

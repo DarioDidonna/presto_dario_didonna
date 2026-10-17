@@ -16,6 +16,7 @@ class PurchaseRequestController extends Controller
     {
         $orders = $request->user()->purchaseRequests()
             ->with(['seller', 'items.article.images'])
+            ->withUnreadMessagesCount($request->user())
             ->latest()
             ->get();
 

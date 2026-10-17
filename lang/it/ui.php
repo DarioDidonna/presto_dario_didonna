@@ -466,4 +466,8 @@ return [
     'messages_too_many' => 'Troppi messaggi in poco tempo: riprova tra :seconds secondi.',
     'messages_closed_declined' => 'La richiesta è stata rifiutata: la conversazione è chiusa.',
     'messages_closed_cancelled' => 'La richiesta è stata annullata: la conversazione è chiusa.',
+    'messages_unread' => 'messaggi non letti',
+    'messages_mail_subject' => 'Nuovo messaggio da :name',
+    'messages_mail_line' => ':name ti ha scritto su Presto.it:',
+    'messages_mail_action' => 'Leggi e rispondi',
 ];

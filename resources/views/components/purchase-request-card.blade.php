@@ -65,6 +65,9 @@
             @if ($conversationLink)
                 <a href="{{ route('conversations.show', $request) }}" class="btn btn-sm btn-outline-neon-cyan">
                     <i class="bi bi-chat-dots me-1" aria-hidden="true"></i>{{ __('ui.messages_open') }}
+                    @if ($request->unread_messages_count)
+                        <span class="badge bg-info text-dark rounded-pill ms-1">{{ $request->unread_messages_count }}<span class="visually-hidden"> {{ __('ui.messages_unread') }}</span></span>
+                    @endif
                 </a>
             @endif
             {{ $slot }}

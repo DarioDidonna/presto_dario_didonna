@@ -9,8 +9,9 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Foundation\Events\Dispatchable;
 
 /**
- * Nuovo messaggio in una conversazione, inviato subito (non in coda) all'altra persona tramite Reverb.
- * Trasmette solo l'id: il testo lo rilegge il componente Livewire, con i suoi controlli di accesso.
+ * Nuovo messaggio in una conversazione, inviato subito (non in coda) tramite Reverb su due canali privati:
+ * quello della conversazione (la chat aperta si aggiorna) e quello personale del destinatario (contatore nella navbar).
+ * Niente testo: lo rilegge il componente Livewire, con i suoi controlli di accesso.
  */
 class MessageSent implements ShouldBroadcastNow
 {
@@ -18,13 +19,28 @@ class MessageSent implements ShouldBroadcastNow
 
     public function __construct(public Message $message) {}
 
-    public function broadcastOn(): PrivateChannel
+    /**
+     * @return array<int, PrivateChannel>
+     */
+    public function broadcastOn(): array
     {
-        return new PrivateChannel('conversations.'.$this->message->purchase_request_id);
+        $request = $this->message->purchaseRequest;
+
+        return [
+            new PrivateChannel('conversations.'.$request->id),
+            new PrivateChannel('App.Models.User.'.$request->counterpart($this->message->user)?->id),
+        ];
     }
 
     public function broadcastWith(): array
     {
-        return ['id' => $this->message->id];
+        $request = $this->message->purchaseRequest;
+
+        return [
+            'id' => $this->message->id,
+            'purchase_request_id' => $request->id,
+            // Voce del menu da aggiornare per il destinatario: "I miei ordini" o "Richieste ricevute"
+            'box' => $request->buyer_id === $this->message->user_id ? 'sales' : 'orders',
+        ];
     }
 }

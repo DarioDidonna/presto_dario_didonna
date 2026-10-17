@@ -466,4 +466,8 @@ return [
     'messages_too_many' => 'Demasiados mensajes en poco tiempo: inténtalo de nuevo en :seconds segundos.',
     'messages_closed_declined' => 'La solicitud fue rechazada: la conversación está cerrada.',
     'messages_closed_cancelled' => 'La solicitud fue cancelada: la conversación está cerrada.',
+    'messages_unread' => 'mensajes no leídos',
+    'messages_mail_subject' => 'Nuevo mensaje de :name',
+    'messages_mail_line' => ':name te ha escrito en Presto.it:',
+    'messages_mail_action' => 'Leer y responder',
 ];

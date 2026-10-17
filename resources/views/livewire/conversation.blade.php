@@ -1,4 +1,4 @@
-<section class="conversation-box rounded-3 border border-secondary-subtle bg-navbar-card shadow-lg" aria-label="{{ __('ui.messages_title') }}">
+<section data-conversation-id="{{ $purchaseRequestId }}" class="conversation-box rounded-3 border border-secondary-subtle bg-navbar-card shadow-lg" aria-label="{{ __('ui.messages_title') }}">
     <div class="conversation-messages p-3 p-md-4 d-flex flex-column gap-3" role="log" aria-live="polite"
         x-data x-init="$el.scrollTop = $el.scrollHeight" @conversation-updated.window="$nextTick(() => $el.scrollTop = $el.scrollHeight)">
         @forelse ($messages as $message)

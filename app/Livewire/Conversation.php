@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use App\Events\MessageSent;
 use App\Models\PurchaseRequest;
+use App\Notifications\NewMessage;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\RateLimiter;
 use Livewire\Attributes\Locked;
@@ -18,6 +19,9 @@ use Livewire\Component;
 class Conversation extends Component
 {
     public const MAX_MESSAGES_PER_MINUTE = 10;
+
+    // Email al destinatario solo se dopo questo tempo il messaggio è ancora non letto
+    public const EMAIL_DELAY_MINUTES = 5;
 
     #[Locked]
     public int $purchaseRequestId;
@@ -50,6 +54,7 @@ class Conversation extends Component
 
         $message = $request->messages()->create(['user_id' => auth()->id(), 'body' => $this->body]);
         $this->reset('body');
+        $request->counterpart(auth()->user())?->notify((new NewMessage($message))->delay(now()->addMinutes(self::EMAIL_DELAY_MINUTES)));
         $this->dispatch('conversation-updated');
 
         // Se Reverb è spento il messaggio è comunque salvato: l'altra persona lo vedrà ricaricando la pagina.

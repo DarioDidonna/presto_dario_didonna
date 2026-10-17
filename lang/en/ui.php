@@ -466,4 +466,8 @@ return [
     'messages_too_many' => 'Too many messages in a short time: try again in :seconds seconds.',
     'messages_closed_declined' => 'The request was declined: the conversation is closed.',
     'messages_closed_cancelled' => 'The request was cancelled: the conversation is closed.',
+    'messages_unread' => 'unread messages',
+    'messages_mail_subject' => 'New message from :name',
+    'messages_mail_line' => ':name sent you a message on Presto.it:',
+    'messages_mail_action' => 'Read and reply',
 ];
