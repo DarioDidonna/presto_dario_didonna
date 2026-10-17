@@ -32,7 +32,18 @@ def test_health_ok_when_model_is_available(client, monkeypatch):
         "ollama": True,
         "model": "qwen3:4b",
         "model_available": True,
+        "vision_model": "qwen2.5vl:3b",
+        "vision_model_available": False,
     }
+
+
+def test_health_reports_the_vision_model_separately(client, monkeypatch):
+    # Il modello di visione è facoltativo: senza, lo stato resta "ok"
+    fake_ollama(monkeypatch, models=["qwen3:4b", "qwen2.5vl:3b"])
+
+    body = client.get("/health").json()
+    assert body["status"] == "ok"
+    assert body["vision_model_available"] is True
 
 
 def test_health_degraded_when_model_is_missing(client, monkeypatch):
@@ -47,4 +58,11 @@ def test_health_degraded_when_ollama_is_down(client, monkeypatch):
     fake_ollama(monkeypatch, error=True)
 
     body = client.get("/health").json()
-    assert body == {"status": "degraded", "ollama": False, "model": "qwen3:4b", "model_available": False}
+    assert body == {
+        "status": "degraded",
+        "ollama": False,
+        "model": "qwen3:4b",
+        "model_available": False,
+        "vision_model": "qwen2.5vl:3b",
+        "vision_model_available": False,
+    }

@@ -9,12 +9,17 @@ use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
+use Spatie\Image\Enums\Fit;
+use Spatie\Image\Enums\ImageDriver;
+use Spatie\Image\Image as SpatieImage;
 
 /**
  * Client del servizio Python dell'agente (ai-agent/). Il browser non lo chiama mai direttamente: passa da qui.
  */
 class AiAgentClient
 {
+    public const DESCRIBE_SIZE = 768;
+
     public function isEnabled(): bool
     {
         return (string) config('services.ai_agent.token') !== '';
@@ -104,6 +109,56 @@ class AiAgentClient
             'reasons' => array_values(array_filter($response['reasons'] ?? [], 'is_string')),
             'flags' => array_values(array_filter($response['flags'] ?? [], fn ($flag) => is_array($flag) && is_string($flag['code'] ?? null))),
             'model_used' => (bool) ($response['model_used'] ?? false),
+        ];
+    }
+
+    /**
+     * Bozza di annuncio da una foto: il servizio restituisce solo fatti visibili, composti in titolo e descrizione.
+     * La foto viene ridotta a 768 px e ricodificata in JPEG prima dell'invio (più veloce, senza metadati EXIF).
+     *
+     * @param  list<string>  $categories  nomi delle categorie del sito: il modello può proporre solo una di queste
+     * @return array{found: bool, title: string, description: string, category: ?string}
+     *
+     * @throws AgentUnavailableException
+     */
+    public function describe(string $imagePath, array $categories, string $lang): array
+    {
+        $resized = tempnam(sys_get_temp_dir(), 'presto-describe-').'.jpg';
+
+        try {
+            SpatieImage::useImageDriver(ImageDriver::Gd)
+                ->load($imagePath)
+                ->fit(Fit::Max, self::DESCRIBE_SIZE, self::DESCRIBE_SIZE)
+                ->background('#ffffff')
+                ->quality(85)
+                ->save($resized);
+
+            $response = $this->http()
+                ->post('/describe', [
+                    'image' => base64_encode((string) file_get_contents($resized)),
+                    'categories' => array_values($categories),
+                    'lang' => $lang,
+                ])
+                ->throw()
+                ->json();
+        } catch (ConnectionException|RequestException $error) {
+            throw new AgentUnavailableException('Assistente non disponibile: '.$error->getMessage(), previous: $error);
+        } finally {
+            @unlink($resized);
+        }
+
+        if (! is_array($response) || ! is_bool($response['found'] ?? null)) {
+            throw new AgentUnavailableException('Risposta non valida dall\'assistente.');
+        }
+
+        $category = $response['category'] ?? null;
+
+        return [
+            'found' => $response['found'],
+            'title' => Str::limit((string) ($response['title'] ?? ''), 100, ''),
+            'description' => Str::limit((string) ($response['description'] ?? ''), 5000, ''),
+            // Solo una categoria inviata da noi: tutto il resto viene ignorato
+            'category' => is_string($category) && in_array($category, $categories, true) ? $category : null,
         ];
     }
 
