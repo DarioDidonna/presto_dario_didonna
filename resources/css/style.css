@@ -359,6 +359,12 @@ body {
         border-top: 1px solid var(--border-color-alpha);
         margin-top: 0.75rem;
         border-radius: 8px;
+        /* La navbar è fissa: un menu più alto dello schermo non si poteva scorrere e il dito muoveva la pagina sotto.
+           Altezza massima = schermo meno la riga del logo, scorrimento interno che non passa alla pagina */
+        max-height: calc(100vh - 5.5rem);
+        max-height: calc(100dvh - 5.5rem);
+        overflow-y: auto;
+        overscroll-behavior: contain;
     }
 
     .active-custom {
