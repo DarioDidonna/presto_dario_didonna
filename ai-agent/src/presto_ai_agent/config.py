@@ -13,6 +13,9 @@ class Settings(BaseSettings):
     # qwen2.5:3b: 1-2 s per risposta e ~2,2 GB su un M3 con 8 GB (qwen3:4b: 17-73 s, va in swap)
     model: str = "qwen2.5:3b"
     temperature: float = 0.2
+    # Modello di visione per la bozza di annuncio dalla foto: ~3,3 GB, 3 s a foto se già caricato (12-16 s se
+    # Ollama deve alternarlo con il modello della chat: in 8 GB non stanno insieme)
+    vision_model: str = "qwen2.5vl:3b"
 
     # API interne di Laravel (sola lettura) usate dai tool dell'agente
     laravel_url: str = "http://localhost:8000"
