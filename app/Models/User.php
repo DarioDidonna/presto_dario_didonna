@@ -62,6 +62,30 @@ class User extends Authenticatable implements HasLocalePreference
         return $this->hasMany(PurchaseRequest::class, 'seller_id');
     }
 
+    // Recensioni ricevute come venditore
+    public function reviewsReceived(): HasMany
+    {
+        return $this->hasMany(Review::class, 'seller_id');
+    }
+
+    /**
+     * Media (arrotondata a un decimale, null senza recensioni) e numero delle recensioni ricevute.
+     * Usa i valori di withAvg/withCount se già caricati, altrimenti una query.
+     *
+     * @return array{average: ?float, count: int}
+     */
+    public function reviewSummary(): array
+    {
+        if (array_key_exists('reviews_received_count', $this->attributes)) {
+            [$average, $count] = [$this->reviews_received_avg_rating, $this->reviews_received_count];
+        } else {
+            $row = $this->reviewsReceived()->toBase()->selectRaw('avg(rating) as average, count(*) as total')->first();
+            [$average, $count] = [$row?->average, $row?->total];
+        }
+
+        return ['average' => $count ? round((float) $average, 1) : null, 'count' => (int) $count];
+    }
+
     /**
      * Messaggi non letti scritti dall'altra persona, divisi tra ordini (sono l'acquirente) e vendite
      * (sono il venditore). Una sola query: la navbar la esegue a ogni pagina.

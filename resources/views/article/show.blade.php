@@ -127,14 +127,19 @@
                             </span>
                         </div>
 
-                        <h1
-                            class="h2 fw-black text-white text-uppercase tracking-tight mb-3 d-flex flex-wrap align-items-baseline gap-2">
-                            <span>{{ $article->title }}</span>
-                            <span class="fs-7 text-neon-cyan font-monospace fw-normal text-none-transform">
-                                <i
-                                    class="bi bi-person-fill me-1"></i>{{ __('ui.published_by', ['name' => $article->user->name ?? __('ui.anonymous_user')]) }}
-                            </span>
-                        </h1>
+                        <h1 class="h2 fw-black text-white text-uppercase tracking-tight mb-2">{{ $article->title }}</h1>
+
+                        {{-- Venditore: link al profilo pubblico con media delle recensioni --}}
+                        <div class="d-flex flex-wrap align-items-center gap-3 mb-3">
+                            @if ($article->user)
+                                <a href="{{ route('sellers.show', $article->user) }}" class="d-inline-flex align-items-center gap-2 fs-7 text-neon-cyan font-monospace text-decoration-none">
+                                    <x-avatar :user="$article->user" :size="24" />{{ __('ui.published_by', ['name' => $article->user->name]) }}
+                                </a>
+                                <x-seller-rating :summary="$article->user->reviewSummary()" />
+                            @else
+                                <span class="fs-7 text-neon-cyan font-monospace">{{ __('ui.published_by', ['name' => __('ui.anonymous_user')]) }}</span>
+                            @endif
+                        </div>
 
                         <div
                             class="py-3 px-4 rounded-3 bg-cyber-dark border-start border-3 border-neon-cyan mb-4 shadow-sm">

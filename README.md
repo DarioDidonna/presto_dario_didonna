@@ -43,6 +43,11 @@ Progetto finale del corso Hackademy (Aulab), ampliato con refactoring, test auto
 - **I miei ordini** (con annullamento finché la richiesta è in attesa) e **Richieste ricevute** per accettare o rifiutare, con email all'acquirente
 - Invio in una transazione con **lock sulle righe**: due acquirenti non possono riservare lo stesso annuncio nello stesso istante
 
+### Recensioni dei venditori
+- Dopo una vendita **accettata** l'acquirente valuta il venditore da 1 a 5 stelle, con un commento facoltativo: **una sola volta**, garantito anche da un indice unico nel database
+- **Pagina pubblica del venditore**: media delle stelle, recensioni e annunci in vendita, senza email né dati personali
+- Media e numero di recensioni accanto al venditore nella pagina di ogni annuncio; email al venditore per ogni nuova recensione
+
 ### Messaggi in tempo reale
 - Ogni richiesta d'acquisto ha la sua **conversazione** tra acquirente e venditore, per accordarsi su ritiro e pagamento
 - I messaggi arrivano **senza ricaricare la pagina** (Laravel Reverb + Echo, canali privati autorizzati con la stessa policy della pagina)
@@ -119,7 +124,7 @@ flowchart LR
 | Immagini | Google Cloud Vision API, Spatie Image (GD) |
 | Agente AI | Python 3.12 (uv), FastAPI, LangChain + LangGraph, Ollama con `qwen2.5:3b` in locale |
 | Dati | MySQL, code e sessioni su database |
-| Test e qualità | PHPUnit (222 test), pytest (94 test), Laravel Pint, ruff, GitHub Actions |
+| Test e qualità | PHPUnit (231 test), pytest (94 test), Laravel Pint, ruff, GitHub Actions |
 
 ---
 
@@ -160,7 +165,7 @@ Il sito è su [http://localhost:8000](http://localhost:8000).
 | Utente | `demo@presto.it` | `password` |
 | Revisore | `revisore@presto.it` | `password` |
 
-I dati demo comprendono 24 annunci in tutti gli stati (pubblicati, in revisione, rifiutati) e, per l'utente demo, un carrello pronto, richieste d'acquisto in ogni stato (una ricevuta da accettare o rifiutare, una vendita conclusa e ordini accettati, rifiutati e in attesa) e conversazioni con messaggi non letti.
+I dati demo comprendono 24 annunci in tutti gli stati (pubblicati, in revisione, rifiutati) e, per l'utente demo, un carrello pronto, richieste d'acquisto in ogni stato (una ricevuta da accettare o rifiutare, una vendita conclusa e ordini accettati, rifiutati e in attesa) conversazioni con messaggi non letti, una recensione ricevuta e un acquisto ancora da recensire.
 
 Per vedere i messaggi in tempo reale apri due browser (o una finestra privata): `demo@presto.it` e `giulia.romano@presto.it`, password `password`.
 
@@ -222,10 +227,11 @@ In sviluppo le email (reset password, candidature revisore) finiscono nel log (`
 php artisan test
 ```
 
-I 222 test Laravel coprono, tra l'altro:
+I 231 test Laravel coprono, tra l'altro:
 
 - **sicurezza e permessi**: solo i revisori approvano, link di promozione firmati e a scadenza, annunci non pubblicati invisibili agli altri utenti, modifica ed eliminazione riservate all'autore;
 - **flussi completi**: ricerca e filtri, pubblicazione, revisione con email all'autore e annullamento, reset password, profilo e foto profilo, catena di elaborazione delle immagini;
+- **recensioni**: solo l'acquirente di una vendita accettata e una sola volta, errori di validazione sotto il modulo giusto, media calcolata correttamente, pagina pubblica senza dati privati;
 - **messaggi**: solo acquirente e venditore leggono e scrivono, conversazione chiusa dopo rifiuto o annullamento, evento trasmesso sui canali giusti senza il testo, contatori dei non letti, email ritardata e saltata se il messaggio è stato letto;
 - **carrello e richieste d'acquisto**: niente annunci propri, riservati o venduti nel carrello, una richiesta per venditore, accetta/rifiuta/annulla solo da chi ne ha diritto e solo se ancora in attesa, email alle due parti;
 - **pagine di errore** 403, 404, 419, 429, 500 e 503 nella lingua dell'utente;
@@ -247,14 +253,16 @@ A ogni push e pull request **GitHub Actions** esegue le due suite (quella Larave
 app/
 ├── Console/Commands/        app:make-user-revisor, app:analyze-images, app:demo-reset, app:ai-setup
 ├── Events/                  MessageSent (trasmesso con Reverb)
-├── Http/Controllers/        Article, Public, Revisor, Profile, Cart, PurchaseRequest, Sales, Conversation
+├── Http/Controllers/        Article, Public, Revisor, Profile, Cart, PurchaseRequest, Sales, Conversation,
+│                            Review, Seller
 │                            (+ Api/AgentController per l'agente)
-├── Http/Requests/           UpdateAvatarRequest (Form Request)
+├── Http/Requests/           UpdateAvatarRequest, StoreReviewRequest (Form Request)
 ├── Jobs/                    RemoveFaces, ResizeImage, GoogleVision* (+ Concerns/CallsGoogleVision)
 ├── Livewire/                CreateArticleForm, EditArticleForm (+ Forms/ArticleForm, Concerns/HandlesArticleForm),
 │                            ShoppingAssistant (chat), ReviewAssistant (parere AI), Conversation (messaggi)
-├── Models/                  Article, Category, Image, User, PurchaseRequest, PurchaseRequestItem, Message
-├── Notifications/           ArticleReviewed, PurchaseRequested, PurchaseRequestAnswered, PurchaseRequestCancelled, NewMessage
+├── Models/                  Article, Category, Image, User, PurchaseRequest, PurchaseRequestItem, Message, Review
+├── Notifications/           ArticleReviewed, PurchaseRequested, PurchaseRequestAnswered, PurchaseRequestCancelled, NewMessage,
+│                            ReviewReceived
 ├── Policies/                ArticlePolicy (vedere, modificare, eliminare, mettere nel carrello), PurchaseRequestPolicy
 ├── Services/                AiAgentClient (servizio Python), Checkout e PurchaseRequestWorkflow (richieste d'acquisto)
 ├── Support/                 ArticleFilters (ricerca e filtri dell'elenco)

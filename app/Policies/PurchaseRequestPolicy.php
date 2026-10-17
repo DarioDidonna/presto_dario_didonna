@@ -18,6 +18,15 @@ class PurchaseRequestPolicy
         return $request->involves($user) && $request->acceptsMessages();
     }
 
+    // Recensione del venditore: solo l'acquirente, solo dopo una vendita accettata, una volta sola
+    public function review(User $user, PurchaseRequest $request): bool
+    {
+        return $user->id === $request->buyer_id
+            && $request->status === PurchaseRequest::ACCEPTED
+            // Relazione già caricata nelle liste (niente query per ogni scheda)
+            && ($request->relationLoaded('review') ? $request->review === null : ! $request->review()->exists());
+    }
+
     // Il venditore accetta o rifiuta, solo finché la richiesta è in attesa
     public function respond(User $user, PurchaseRequest $request): bool
     {

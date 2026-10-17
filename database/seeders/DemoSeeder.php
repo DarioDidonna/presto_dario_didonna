@@ -131,7 +131,13 @@ class DemoSeeder extends Seeder
         // Richiesta ricevuta dal demo, ancora da accettare o rifiutare: gli annunci sono riservati
         $received = $this->purchaseRequest($giulia, $demo, PurchaseRequest::PENDING, $articles('Smartphone 128 GB come nuovo', 'Costruzioni da 1000 pezzi'), 'Ciao! Posso passare a ritirarli sabato mattina?', 2);
         // Vendita del demo già conclusa
-        $this->purchaseRequest($marco, $demo, PurchaseRequest::ACCEPTED, $articles('Tapis roulant pieghevole'), null, 6);
+        $sold = $this->purchaseRequest($marco, $demo, PurchaseRequest::ACCEPTED, $articles('Tapis roulant pieghevole'), null, 6);
+        // Vendita tra altri utenti, per dare una recensione anche a Giulia
+        $other = $this->purchaseRequest($sara, $giulia, PurchaseRequest::ACCEPTED, $articles('Collezione di romanzi gialli (12 volumi)'), null, 8);
+
+        // Recensioni: il demo ne ha ricevuta una; il suo acquisto da Marco resta da recensire, per mostrare il modulo
+        $this->review($sold, 5, 'Tapis roulant identico alla descrizione, venditore puntuale e disponibile. Consigliato!', 5);
+        $this->review($other, 4, 'Libri in ottimo stato. Consegna un po\' in ritardo, ma tutto bene.', 7);
         // Ordini del demo: accettato, rifiutato, in attesa
         $bought = $this->purchaseRequest($demo, $marco, PurchaseRequest::ACCEPTED, $articles('Orologio automatico in acciaio'), 'Lo prendo volentieri, grazie!', 5);
         $this->purchaseRequest($demo, $sara, PurchaseRequest::DECLINED, $articles('Casco integrale taglia M'), null, 4);
@@ -179,6 +185,14 @@ class DemoSeeder extends Seeder
         }
 
         return $request;
+    }
+
+    private function review(PurchaseRequest $request, int $rating, string $comment, int $daysAgo): void
+    {
+        $date = now()->subDays($daysAgo);
+        $request->review()->make(['rating' => $rating, 'comment' => $comment])
+            ->forceFill(['reviewer_id' => $request->buyer_id, 'seller_id' => $request->seller_id, 'created_at' => $date, 'updated_at' => $date])
+            ->save();
     }
 
     /**

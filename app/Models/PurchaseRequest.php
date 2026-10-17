@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class PurchaseRequest extends Model
 {
@@ -45,6 +46,11 @@ class PurchaseRequest extends Model
     public function messages(): HasMany
     {
         return $this->hasMany(Message::class)->oldest()->orderBy('id');
+    }
+
+    public function review(): HasOne
+    {
+        return $this->hasOne(Review::class);
     }
 
     // Acquirente o venditore: le uniche due persone che vedono la richiesta e i suoi messaggi
