@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ArticleController;
 use App\Http\Controllers\CartController;
+use App\Http\Controllers\ConversationController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PublicController;
 use App\Http\Controllers\PurchaseRequestController;
@@ -70,6 +71,10 @@ Route::middleware('auth')->prefix('carrello')->name('cart.')->group(function () 
 Route::get('/ordini', [PurchaseRequestController::class, 'index'])->middleware('auth')->name('orders.index');
 Route::patch('/ordini/{purchaseRequest}/annulla', [PurchaseRequestController::class, 'cancel'])
     ->middleware(['auth', 'can:cancel,purchaseRequest'])->name('orders.cancel');
+
+// MESSAGGI tra acquirente e venditore di una richiesta d'acquisto
+Route::get('/richieste/{purchaseRequest}/messaggi', [ConversationController::class, 'show'])
+    ->middleware(['auth', 'can:view,purchaseRequest'])->name('conversations.show');
 
 // VENDITE (richieste d'acquisto ricevute)
 Route::middleware('auth')->prefix('vendite')->name('sales.')->group(function () {
