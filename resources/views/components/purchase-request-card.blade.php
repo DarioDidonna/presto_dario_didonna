@@ -17,7 +17,13 @@
                 <x-avatar :user="$other" :size="32" />
             @endif
             <div>
-                <h2 class="h6 text-white fw-bold mb-0">{{ __($label, ['name' => $other?->name ?? __('ui.anonymous_user')]) }}</h2>
+                <h2 class="h6 text-white fw-bold mb-0">
+                    @if ($other && $perspective === 'buyer')
+                        <a href="{{ route('sellers.show', $other) }}" class="text-white text-decoration-none">{{ __($label, ['name' => $other->name]) }}</a>
+                    @else
+                        {{ __($label, ['name' => $other?->name ?? __('ui.anonymous_user')]) }}
+                    @endif
+                </h2>
                 <span class="text-muted-custom fs-8">{{ __('ui.orders_sent_on', ['date' => $request->created_at->translatedFormat('j F Y, H:i')]) }}</span>
             </div>
         </div>

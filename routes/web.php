@@ -9,6 +9,7 @@ use App\Http\Controllers\PurchaseRequestController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\RevisorController;
 use App\Http\Controllers\SalesController;
+use App\Http\Controllers\SellerController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [PublicController::class, 'homepage'])->name('homepage');
@@ -28,6 +29,7 @@ Route::delete('/article/{article}', [ArticleController::class, 'destroy'])->midd
 
 // CATEGORY
 Route::get('/category/{category}', [ArticleController::class, 'byCategory'])->name('byCategory');
+Route::get('/venditore/{user}', [SellerController::class, 'show'])->name('sellers.show');
 
 // REVISOR
 Route::get('/revisor/index', [RevisorController::class, 'index'])->middleware('isRevisor')->name('revisor.index');

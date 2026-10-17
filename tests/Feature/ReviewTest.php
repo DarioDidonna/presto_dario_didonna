@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Article;
 use App\Models\PurchaseRequest;
 use App\Models\Review;
 use App\Models\User;
@@ -112,5 +113,70 @@ class ReviewTest extends TestCase
         $this->assertSame(__('ui.reviews_mail_subject', ['name' => $this->request->buyer->name]), $mail->subject);
         $this->assertContains('«Ottimo»', $mail->introLines);
         $this->assertSame(route('sales.index'), $mail->actionUrl);
+    }
+
+    private function reviewsFor(User $seller, array $ratings): void
+    {
+        foreach ($ratings as $rating) {
+            $request = PurchaseRequest::factory()->status(PurchaseRequest::ACCEPTED)->create(['seller_id' => $seller->id]);
+            Review::factory()->create(['purchase_request_id' => $request->id, 'rating' => $rating]);
+        }
+    }
+
+    public function test_review_summary_with_and_without_preloaded_aggregates(): void
+    {
+        $seller = User::factory()->create();
+        $this->assertSame(['average' => null, 'count' => 0], $seller->reviewSummary());
+
+        $this->reviewsFor($seller, [5, 4, 4]);
+        $this->assertSame(['average' => 4.3, 'count' => 3], $seller->reviewSummary());
+
+        $preloaded = User::whereKey($seller->id)->withAvg('reviewsReceived', 'rating')->withCount('reviewsReceived')->first();
+        $this->assertSame(['average' => 4.3, 'count' => 3], $preloaded->reviewSummary());
+    }
+
+    public function test_public_seller_page_shows_ads_for_sale_and_reviews_but_no_private_data(): void
+    {
+        $seller = User::factory()->create(['name' => 'Giulia Romano', 'email' => 'giulia@example.com']);
+        Article::factory()->accepted()->for($seller)->create(['title' => 'Bici da corsa']);
+        Article::factory()->for($seller)->create(['title' => 'In revisione']);
+        Article::factory()->accepted()->for($seller)->create(['title' => 'Già venduto', 'sold_at' => now()]);
+        $this->reviewsFor($seller, [5, 3]);
+        Review::first()->update(['comment' => 'Gentilissima, tutto perfetto']);
+
+        $this->get(route('sellers.show', $seller))
+            ->assertOk()
+            ->assertSee('Giulia Romano')
+            ->assertSee('Bici da corsa')
+            ->assertDontSee('In revisione')
+            ->assertDontSee('Già venduto')
+            ->assertSee(trans_choice('ui.reviews_count', 2, ['count' => 2]))
+            ->assertSee('4,0')
+            ->assertSee('Gentilissima, tutto perfetto')
+            ->assertDontSee('giulia@example.com');
+
+        $this->get('/venditore/999999')->assertNotFound();
+    }
+
+    public function test_seller_without_ads_or_reviews(): void
+    {
+        $this->get(route('sellers.show', User::factory()->create()))
+            ->assertOk()
+            ->assertSee(__('ui.seller_no_ads'))
+            ->assertSee(__('ui.seller_no_reviews'))
+            ->assertSee(__('ui.reviews_none_yet'));
+    }
+
+    public function test_article_page_links_to_the_seller_with_the_rating(): void
+    {
+        $article = Article::factory()->accepted()->create();
+        $this->get(route('article.show', $article))
+            ->assertSee(route('sellers.show', $article->user))
+            ->assertSee(__('ui.reviews_none_yet'));
+
+        $this->reviewsFor($article->user, [5, 4]);
+        $this->get(route('article.show', $article))
+            ->assertSee('4,5')
+            ->assertSee(trans_choice('ui.reviews_count', 2, ['count' => 2]));
     }
 }

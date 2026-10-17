@@ -39,7 +39,9 @@ class ArticleController extends Controller implements HasMiddleware
         // 404 (non 403) per non rivelare l'esistenza di annunci non pubblicati: regola in ArticlePolicy::view
         abort_unless(Gate::allows('view', $article), 404);
 
-        $article->load(['images', 'category', 'user']);
+        $article->load(['images', 'category', 'user' => fn ($user) => $user
+            ->withAvg('reviewsReceived', 'rating')
+            ->withCount('reviewsReceived')]);
         $inCart = (bool) request()->user()?->cart()->whereKey($article->id)->exists();
 
         return view('article.show', compact('article', 'inCart'));
