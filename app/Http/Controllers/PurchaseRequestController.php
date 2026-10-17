@@ -15,7 +15,7 @@ class PurchaseRequestController extends Controller
     public function index(Request $request)
     {
         $orders = $request->user()->purchaseRequests()
-            ->with(['seller', 'items.article.images'])
+            ->with(['seller', 'items.article.images', 'review'])
             ->withUnreadMessagesCount($request->user())
             ->latest()
             ->get();

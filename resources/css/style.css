@@ -1689,3 +1689,49 @@ body {
 .conversation-input::placeholder {
     color: #64748b;
 }
+
+
+/* ==========================================================================
+   RECENSIONI DEI VENDITORI
+   ========================================================================== */
+
+.review-box {
+    background-color: var(--bg-amber-alpha);
+    border: 1px solid rgba(245, 158, 11, 0.25);
+}
+
+.review-comment {
+    white-space: pre-line;
+    overflow-wrap: anywhere;
+}
+
+/* Stelle da scegliere: in ordine da 1 a 5, si accendono quella scelta (o sotto il mouse) e le precedenti */
+.star-input label {
+    color: #475569;
+    font-size: 1.5rem;
+    line-height: 1;
+    cursor: pointer;
+    transition: color 0.15s ease, transform 0.15s ease;
+}
+
+.star-input label:has(~ input:checked),
+.star-input input:checked + label {
+    color: var(--accent-amber);
+}
+
+.star-input:hover label {
+    color: #475569;
+}
+
+.star-input label:hover,
+.star-input label:has(~ label:hover) {
+    color: var(--accent-amber);
+    transform: scale(1.08);
+}
+
+.star-input input:focus-visible + label {
+    outline: 2px solid var(--accent-cyan);
+    outline-offset: 2px;
+    border-radius: 4px;
+}
+

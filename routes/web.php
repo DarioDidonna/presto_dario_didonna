@@ -6,6 +6,7 @@ use App\Http\Controllers\ConversationController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PublicController;
 use App\Http\Controllers\PurchaseRequestController;
+use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\RevisorController;
 use App\Http\Controllers\SalesController;
 use Illuminate\Support\Facades\Route;
@@ -71,6 +72,9 @@ Route::middleware('auth')->prefix('carrello')->name('cart.')->group(function () 
 Route::get('/ordini', [PurchaseRequestController::class, 'index'])->middleware('auth')->name('orders.index');
 Route::patch('/ordini/{purchaseRequest}/annulla', [PurchaseRequestController::class, 'cancel'])
     ->middleware(['auth', 'can:cancel,purchaseRequest'])->name('orders.cancel');
+
+Route::post('/ordini/{purchaseRequest}/recensione', [ReviewController::class, 'store'])
+    ->middleware(['auth', 'can:review,purchaseRequest', 'throttle:10,1'])->name('reviews.store');
 
 // MESSAGGI tra acquirente e venditore di una richiesta d'acquisto
 Route::get('/richieste/{purchaseRequest}/messaggi', [ConversationController::class, 'show'])

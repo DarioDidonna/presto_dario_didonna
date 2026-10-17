@@ -62,6 +62,12 @@ class User extends Authenticatable implements HasLocalePreference
         return $this->hasMany(PurchaseRequest::class, 'seller_id');
     }
 
+    // Recensioni ricevute come venditore
+    public function reviewsReceived(): HasMany
+    {
+        return $this->hasMany(Review::class, 'seller_id');
+    }
+
     /**
      * Messaggi non letti scritti dall'altra persona, divisi tra ordini (sono l'acquirente) e vendite
      * (sono il venditore). Una sola query: la navbar la esegue a ogni pagina.

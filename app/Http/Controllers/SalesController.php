@@ -15,7 +15,7 @@ class SalesController extends Controller
     public function index(Request $request)
     {
         $requests = $request->user()->receivedPurchaseRequests()
-            ->with(['buyer', 'items.article.images'])
+            ->with(['buyer', 'items.article.images', 'review'])
             ->withUnreadMessagesCount($request->user())
             // Prima quelle in attesa di risposta, poi le altre dalla più recente
             ->orderByRaw('case when status = ? then 0 else 1 end', [PurchaseRequest::PENDING])

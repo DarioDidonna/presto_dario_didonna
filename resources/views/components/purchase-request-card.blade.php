@@ -55,6 +55,54 @@
         </p>
     @endif
 
+    @if ($request->status === 'accepted')
+        @if ($request->review)
+            {{-- Recensione già scritta: l'acquirente vede la sua, il venditore quella ricevuta --}}
+            <div class="review-box mt-3 p-3 rounded-3">
+                <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
+                    <span class="text-white fw-semibold fs-7">
+                        {{ $perspective === 'buyer' ? __('ui.reviews_yours') : __('ui.reviews_from', ['name' => $other?->name ?? __('ui.anonymous_user')]) }}
+                    </span>
+                    <x-stars :rating="$request->review->rating" />
+                </div>
+                @if ($request->review->comment)
+                    <p class="text-muted-custom fs-7 mb-0 mt-2 review-comment">{{ $request->review->comment }}</p>
+                @endif
+            </div>
+        @elseif ($perspective === 'buyer' && auth()->user()?->can('review', $request))
+            @php($bag = $errors->getBag('review'.$request->id))
+            <form method="POST" action="{{ route('reviews.store', $request) }}" class="review-box mt-3 p-3 rounded-3">
+                @csrf
+                <fieldset>
+                    <legend class="fs-7 fw-bold text-white mb-2">{{ __('ui.reviews_question', ['name' => $other?->name ?? __('ui.anonymous_user')]) }}</legend>
+                    <div class="star-input d-inline-flex gap-1" role="radiogroup" aria-label="{{ __('ui.reviews_rating') }}">
+                        @for ($i = 1; $i <= \App\Models\Review::MAX_RATING; $i++)
+                            <input type="radio" name="rating" value="{{ $i }}" id="rating-{{ $request->id }}-{{ $i }}" class="visually-hidden" required
+                                @checked($bag->any() && (int) old('rating') === $i)>
+                            <label for="rating-{{ $request->id }}-{{ $i }}" title="{{ trans_choice('ui.reviews_star_label', $i, ['count' => $i]) }}">
+                                <i class="bi bi-star-fill" aria-hidden="true"></i><span class="visually-hidden">{{ trans_choice('ui.reviews_star_label', $i, ['count' => $i]) }}</span>
+                            </label>
+                        @endfor
+                    </div>
+                </fieldset>
+                @if ($bag->has('rating'))
+                    <div class="text-danger fs-8 mt-1">{{ $bag->first('rating') }}</div>
+                @endif
+                <label for="comment-{{ $request->id }}" class="visually-hidden">{{ __('ui.reviews_comment') }}</label>
+                <textarea name="comment" id="comment-{{ $request->id }}" rows="2" maxlength="1000"
+                    class="form-control conversation-input fs-7 mt-2" placeholder="{{ __('ui.reviews_comment') }}">{{ $bag->any() ? old('comment') : '' }}</textarea>
+                @if ($bag->has('comment'))
+                    <div class="text-danger fs-8 mt-1">{{ $bag->first('comment') }}</div>
+                @endif
+                <div class="d-flex justify-content-end mt-2">
+                    <button type="submit" class="btn btn-sm btn-warning fw-semibold">
+                        <i class="bi bi-star-fill me-1" aria-hidden="true"></i>{{ __('ui.reviews_submit') }}
+                    </button>
+                </div>
+            </form>
+        @endif
+    @endif
+
     <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 border-top border-secondary-subtle pt-3 mt-3">
         <span class="text-muted-custom fs-7">{{ __('ui.'.($perspective === 'buyer' ? 'order' : 'sales').'_status_help_'.$request->status) }}</span>
         <span class="text-white fw-bold font-monospace">{{ __('ui.cart_total') }}: {{ number_format((float) $request->total, 2, ',', '.') }} €</span>
