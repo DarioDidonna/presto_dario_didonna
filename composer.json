@@ -13,6 +13,7 @@
         "google/cloud-vision": "^2.2",
         "laravel/fortify": "^1.36",
         "laravel/framework": "^13.8",
+        "laravel/reverb": "^1.0",
         "laravel/scout": "^11.3",
         "laravel/tinker": "^3.0",
         "livewire/livewire": "^4.3",
@@ -52,7 +53,7 @@
         ],
         "dev": [
             "Composer\\Config::disableProcessTimeout",
-            "npx concurrently -c \"#93c5fd,#c4b5fd,#fb7185,#fdba74,#86efac\" \"php artisan serve --no-reload\" \"php artisan queue:listen --tries=1 --timeout=0\" \"php artisan pail --timeout=0\" \"npm run dev\" \"bash scripts/ai-agent.sh\" --names=server,queue,logs,vite,agent --kill-others"
+            "npx concurrently -c \"#93c5fd,#c4b5fd,#fb7185,#fdba74,#86efac,#f9a8d4\" \"php artisan serve --no-reload\" \"php artisan queue:listen --tries=1 --timeout=0\" \"php artisan pail --timeout=0\" \"npm run dev\" \"bash scripts/ai-agent.sh\" \"php artisan reverb:start\" --names=server,queue,logs,vite,agent,reverb --kill-others"
         ],
         "demo": [
             "@php artisan app:demo-reset"

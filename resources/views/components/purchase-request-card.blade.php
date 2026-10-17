@@ -1,4 +1,4 @@
-@props(['request', 'perspective' => 'buyer'])
+@props(['request', 'perspective' => 'buyer', 'conversationLink' => true])
 {{-- Una richiesta d'acquisto vista dall'acquirente ("I miei ordini") o dal venditore ("Richieste ricevute") --}}
 @php
     $other = $perspective === 'buyer' ? $request->seller : $request->buyer;
@@ -60,7 +60,17 @@
         <span class="text-white fw-bold font-monospace">{{ __('ui.cart_total') }}: {{ number_format((float) $request->total, 2, ',', '.') }} €</span>
     </div>
 
-    @if (trim($slot))
-        <div class="d-flex flex-wrap justify-content-end gap-2 mt-3">{{ $slot }}</div>
+    @if ($conversationLink || trim($slot))
+        <div class="d-flex flex-wrap justify-content-end gap-2 mt-3">
+            @if ($conversationLink)
+                <a href="{{ route('conversations.show', $request) }}" class="btn btn-sm btn-outline-neon-cyan">
+                    <i class="bi bi-chat-dots me-1" aria-hidden="true"></i>{{ __('ui.messages_open') }}
+                    @if ($request->unread_messages_count)
+                        <span class="badge bg-info text-dark rounded-pill ms-1">{{ $request->unread_messages_count }}<span class="visually-hidden"> {{ __('ui.messages_unread') }}</span></span>
+                    @endif
+                </a>
+            @endif
+            {{ $slot }}
+        </div>
     @endif
 </article>

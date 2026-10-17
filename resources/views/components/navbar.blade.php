@@ -1,4 +1,4 @@
-<nav class="navbar navbar-expand-xl navbar-dark bg-dark border-bottom border-secondary fixed-top shadow-sm transition-all py-1"
+<nav @auth data-user-id="{{ Auth::id() }}" @endauth class="navbar navbar-expand-xl navbar-dark bg-dark border-bottom border-secondary fixed-top shadow-sm transition-all py-1"
     id="mainNavbar">
     <div class="container-fluid px-2 px-sm-4">
 
@@ -135,13 +135,12 @@
                             href="#" id="userDropdown" role="button" data-bs-toggle="dropdown"
                             aria-expanded="false" aria-label="{{ __('ui.account_menu', ['name' => Auth::user()->name]) }}">
                             @php($pendingSales = Auth::user()->receivedPurchaseRequests()->where('status', 'pending')->count())
+                            @php($unread = Auth::user()->unreadMessageCounts())
                             <span class="position-relative d-inline-flex">
                                 <x-avatar :user="Auth::user()" :size="32" />
-                                @if ($pendingSales > 0)
-                                    {{-- Richieste d'acquisto ricevute in attesa di risposta --}}
-                                    <span class="position-absolute top-0 end-0 p-1 bg-warning border border-dark rounded-circle"
-                                        title="{{ trans_choice('ui.sales_pending_count', $pendingSales, ['count' => $pendingSales]) }}"></span>
-                                @endif
+                                {{-- Qualcosa da guardare: richieste ricevute in attesa o messaggi non letti (anche in tempo reale, resources/js/echo.js) --}}
+                                <span class="position-absolute top-0 end-0 p-1 bg-warning border border-dark rounded-circle" data-attention-dot
+                                    @if ($pendingSales + array_sum($unread) === 0) hidden @endif></span>
                             </span>
                             <span
                                 class="text-white fw-medium max-w-100 truncate d-none d-xl-inline-block">{{ Auth::user()->name }}</span>
@@ -156,16 +155,23 @@
                             <li>
                                 <a class="dropdown-menu-item-custom text-white-50 py-2 px-3 rounded d-block text-decoration-none"
                                     href="{{ route('orders.index') }}">
-                                    <i class="bi bi-receipt me-2 text-light"></i> {{ __('ui.orders_title') }}
+                                    <span class="d-flex align-items-center justify-content-between">
+                                        <span><i class="bi bi-receipt me-2 text-light"></i> {{ __('ui.orders_title') }}</span>
+                                        <x-unread-badge box="orders" :count="$unread['orders']" />
+                                    </span>
                                 </a>
                             </li>
                             <li>
                                 <a class="dropdown-menu-item-custom text-white-50 py-2 px-3 rounded d-flex align-items-center justify-content-between text-decoration-none"
                                     href="{{ route('sales.index') }}">
                                     <span><i class="bi bi-shop me-2 text-light"></i> {{ __('ui.sales_title') }}</span>
-                                    @if ($pendingSales > 0)
-                                        <span class="badge bg-warning text-dark rounded-pill ms-2">{{ $pendingSales }}</span>
-                                    @endif
+                                    <span class="d-flex gap-1">
+                                        <x-unread-badge box="sales" :count="$unread['sales']" />
+                                        @if ($pendingSales > 0)
+                                            <span class="badge bg-warning text-dark rounded-pill ms-1"
+                                                title="{{ trans_choice('ui.sales_pending_count', $pendingSales, ['count' => $pendingSales]) }}">{{ $pendingSales }}</span>
+                                        @endif
+                                    </span>
                                 </a>
                             </li>
                             <li>

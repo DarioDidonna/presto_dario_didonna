@@ -1633,3 +1633,59 @@ body {
     min-width: 1.15rem;
     font-size: 0.65rem;
 }
+
+
+/* ==========================================================================
+   MESSAGGI TRA ACQUIRENTE E VENDITORE
+   ========================================================================== */
+
+.conversation-box {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* L'elenco scorre al suo interno: il modulo di invio resta sempre visibile */
+.conversation-messages {
+    min-height: 320px;
+    max-height: min(60vh, 560px);
+    overflow-y: auto;
+}
+
+.message-bubble {
+    max-width: min(85%, 560px);
+    font-size: 0.9rem;
+    white-space: pre-line;
+    overflow-wrap: anywhere;
+}
+
+.message-mine {
+    background: linear-gradient(90deg, var(--accent-cyan), #3b82f6);
+    color: #ffffff;
+    border-bottom-right-radius: 4px !important;
+}
+
+.message-theirs {
+    background-color: var(--bg-search);
+    border: 1px solid var(--border-color-alpha);
+    color: var(--text-muted-custom);
+    border-bottom-left-radius: 4px !important;
+}
+
+.conversation-input {
+    background-color: var(--bg-search);
+    border-color: var(--border-color-alpha);
+    color: #ffffff;
+    resize: none;
+}
+
+.conversation-input:focus {
+    background-color: var(--bg-search);
+    border-color: var(--accent-cyan);
+    box-shadow: 0 0 0 0.2rem rgba(6, 182, 212, 0.15);
+    color: #ffffff;
+}
+
+.conversation-input::placeholder {
+    color: #64748b;
+}
