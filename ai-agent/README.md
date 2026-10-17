@@ -88,6 +88,37 @@ Risultato con `qwen2.5:3b`: **8/8**, anche dal solo modello, ~1–3 s per annunc
 Un problema emerso dalla valutazione: il modello a volte esprime la fiducia in scala 0–10 ("confidence": 8)
 e la risposta veniva scartata; ora viene normalizzata.
 
+## Bozza di annuncio dalla foto
+
+`POST /describe` riceve da Laravel una foto (ridotta a 768 px) e le categorie del sito, e restituisce una bozza:
+
+```json
+{"found": true, "title": "Lavatrice Bosch", "description": "Lavatrice Bosch. Colore: bianco. Caratteristiche visibili: oblò, display.", "category": "Elettronica"}
+```
+
+Modello di visione **facoltativo** (`ollama pull qwen2.5vl:3b`, ~3,3 GB; si cambia con `PRESTO_AI_VISION_MODEL`):
+senza, il sito funziona e manca solo il pulsante «Compila con l'AI».
+
+**Misura, restringi, rimisura.** Nella prova iniziale il modello, lasciato libero di scrivere l'annuncio, inventava
+misure, taglia, condizioni, un prezzo e perfino un numero di telefono. Ora fa solo ciò che sa fare:
+
+- dice **cosa vede** (oggetto, marca solo se scritta, colore, al massimo 3 dettagli) con output strutturato e
+  **tutti i campi obbligatori** (con campi facoltativi lasciava vuoti colore e categoria);
+- la **categoria** è una lista chiusa costruita a ogni richiesta con le categorie inviate da Laravel;
+- il **codice** scarta prezzi, contatti, link, misure, taglie, condizioni e tentativi di prompt injection, poi
+  compone titolo e descrizione: nel testo non può finire nulla che il modello non abbia "visto";
+- Laravel riempie solo i campi vuoti, mai il prezzo, e segna la categoria come **da controllare**.
+
+```bash
+uv run python evals/describe.py    # 8 foto libere di Wikimedia Commons, scaricate al primo avvio in evals/.cache/
+```
+
+Con `qwen2.5vl:3b` su Mac M3 / 8 GB: oggetto **6/8**, categoria **6/7** (la chitarra non conta: il sito non ha una
+categoria per gli strumenti), testo senza dati inventati **8/8**, italiano **7/8**. ~11 s a foto (3 s se il modello è
+già in memoria e il sistema è scarico; in 8 GB Ollama lo alterna con il modello della chat).
+Limiti rimasti: a volte un nome in inglese («Couch») e oggetti simili confusi (un bollitore descritto come «tazza»):
+per questo la bozza resta sempre da rileggere.
+
 ## Test e stile
 
 ```bash

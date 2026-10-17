@@ -41,13 +41,16 @@ class AiSetup extends Command
         $this->writeValue($agentEnv, 'PRESTO_AI_LARAVEL_URL', rtrim((string) config('app.url'), '/'));
 
         $this->components->info('Token condiviso configurato in .env e ai-agent/.env.');
-        $this->checks($this->readValue($agentEnv, 'PRESTO_AI_MODEL') ?: 'qwen2.5:3b');
+        $this->checks(
+            $this->readValue($agentEnv, 'PRESTO_AI_MODEL') ?: 'qwen2.5:3b',
+            $this->readValue($agentEnv, 'PRESTO_AI_VISION_MODEL') ?: 'qwen2.5vl:3b',
+        );
         $this->callSilently('config:clear');
 
         return self::SUCCESS;
     }
 
-    private function checks(string $model): void
+    private function checks(string $model, string $visionModel): void
     {
         $this->components->twoColumnDetail('uv', (new ExecutableFinder)->find('uv') ? '<fg=green>installato</>' : '<fg=yellow>mancante: brew install uv</>');
 
@@ -57,6 +60,10 @@ class AiSetup extends Command
             $this->components->twoColumnDetail("Modello {$model}", $models->contains($model)
                 ? '<fg=green>scaricato</>'
                 : "<fg=yellow>mancante: ollama pull {$model}</>");
+            // Facoltativo: serve solo a "Compila con l'AI" nel modulo di inserimento (~3 GB)
+            $this->components->twoColumnDetail("Modello di visione {$visionModel}", $models->contains($visionModel)
+                ? '<fg=green>scaricato</>'
+                : "<fg=gray>facoltativo: ollama pull {$visionModel}</>");
         } catch (\Throwable) {
             $this->components->twoColumnDetail('Ollama', '<fg=yellow>non raggiungibile: installa e avvia Ollama</>');
         }

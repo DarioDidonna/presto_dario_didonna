@@ -92,6 +92,7 @@ Un errore di Google Vision (credenziali mancanti, servizio non raggiungibile) no
 ### Assistente AI (Python + Laravel)
 
 - **Assistente acquisti**: una chat in tutte le pagine. «Cerco una bici da corsa sotto i 500 euro» → l'agente usa la ricerca e i filtri del sito come *tool* e risponde con **annunci veri**, mostrati come schede cliccabili da cui si aggiunge l'annuncio al carrello. Sa se un annuncio è già riservato. Ricorda la conversazione («e quanto costa?») e risponde in italiano, inglese e spagnolo.
+- **Annuncio dalla foto**: nel modulo di inserimento, «Compila con l'AI» guarda la prima foto con un modello di visione locale (`qwen2.5vl:3b`) e riempie titolo, descrizione e categoria, solo nei campi vuoti e mai il prezzo. Il modello dice solo cosa vede; il testo lo compone il codice, così non può contenere prezzi, contatti o misure inventate. La categoria proposta è segnata da controllare.
 - **Parere per il revisore**: nella dashboard, «Chiedi un parere» restituisce *accetta / rifiuta / da controllare* con motivi e segnalazioni (contenuti vietati, truffe, contatti personali, foto inadatte). È solo un suggerimento: decide sempre il revisore.
 
 ```mermaid
@@ -104,7 +105,7 @@ flowchart LR
 
 - Il browser non parla mai con il servizio Python; l'agente non accede mai al database: legge solo annunci **pubblicati** tramite API interne protette da token.
 - **Difese nel codice, non solo nelle istruzioni**: un modello da 3B parametri non è affidabile da solo. Argomenti dei tool validati e ancorati al messaggio dell'utente, prompt injection bloccato sia nei messaggi sia negli annunci, prezzi e link della risposta verificati sui dati veri, regole di moderazione che prevalgono sul modello.
-- **Valutazioni con il modello vero** (`ai-agent/evals/`): assistente acquisti da 6/10 a 29/30 su tre esecuzioni, parere del revisore 8/8. Dettagli in [`ai-agent/README.md`](ai-agent/README.md).
+- **Valutazioni con il modello vero** (`ai-agent/evals/`): assistente acquisti da 6/10 a 29/30 su tre esecuzioni, parere del revisore 8/8, bozza dalla foto con testo senza dati inventati 8/8. Dettagli in [`ai-agent/README.md`](ai-agent/README.md).
 
 ### Altro
 - Interfaccia in **italiano, inglese e spagnolo** (testi, validazione ed email)
@@ -122,9 +123,9 @@ flowchart LR
 | Frontend | Blade, Livewire 4, Bootstrap 5.3, Bootstrap Icons, Vite (nessuna dipendenza da CDN) |
 | Tempo reale | Laravel Reverb (WebSocket), Laravel Echo |
 | Immagini | Google Cloud Vision API, Spatie Image (GD) |
-| Agente AI | Python 3.12 (uv), FastAPI, LangChain + LangGraph, Ollama con `qwen2.5:3b` in locale |
+| Agente AI | Python 3.12 (uv), FastAPI, LangChain + LangGraph, Ollama con `qwen2.5:3b` (testo) e `qwen2.5vl:3b` (visione, facoltativo) in locale |
 | Dati | MySQL, code e sessioni su database |
-| Test e qualità | PHPUnit (231 test), pytest (94 test), Laravel Pint, ruff, GitHub Actions |
+| Test e qualità | PHPUnit (239 test), pytest (121 test), Laravel Pint, ruff, GitHub Actions |
 
 ---
 
@@ -227,7 +228,7 @@ In sviluppo le email (reset password, candidature revisore) finiscono nel log (`
 php artisan test
 ```
 
-I 231 test Laravel coprono, tra l'altro:
+I 239 test Laravel coprono, tra l'altro:
 
 - **sicurezza e permessi**: solo i revisori approvano, link di promozione firmati e a scadenza, annunci non pubblicati invisibili agli altri utenti, modifica ed eliminazione riservate all'autore;
 - **flussi completi**: ricerca e filtri, pubblicazione, revisione con email all'autore e annullamento, reset password, profilo e foto profilo, catena di elaborazione delle immagini;
@@ -241,7 +242,7 @@ I 231 test Laravel coprono, tra l'altro:
 
 I test usano un database SQLite in memoria e il driver Scout `collection`: non toccano il database né l'indice di ricerca di sviluppo.
 
-L'agente Python ha 94 test propri (`cd ai-agent && uv run pytest`) con un modello e un Laravel finti: tool, difese contro il prompt injection, memoria della conversazione, regole di moderazione, endpoint e autenticazione.
+L'agente Python ha 121 test propri (`cd ai-agent && uv run pytest`) con un modello e un Laravel finti: tool, difese contro il prompt injection, memoria della conversazione, regole di moderazione, endpoint e autenticazione.
 
 A ogni push e pull request **GitHub Actions** esegue le due suite (quella Laravel con il build del front-end) e controlla lo stile del codice con [Laravel Pint](https://laravel.com/docs/pint) e [ruff](https://docs.astral.sh/ruff/): vedi [`.github/workflows/tests.yml`](.github/workflows/tests.yml). Per formattare il codice in locale: `vendor/bin/pint` e `cd ai-agent && uv run ruff format .`.
 

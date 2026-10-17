@@ -68,4 +68,13 @@ class AiSetupCommandTest extends TestCase
             ->assertFailed();
         $this->assertNull($this->value('laravel.env', 'AI_AGENT_TOKEN') ?: null);
     }
+
+    public function test_reports_the_optional_vision_model(): void
+    {
+        $this->artisan('app:ai-setup', ['--env' => "{$this->dir}/laravel.env", '--agent-env' => "{$this->dir}/agent.env"])
+            ->expectsOutputToContain('qwen2.5vl:3b')
+            ->assertSuccessful();
+
+        $this->assertSame('qwen2.5vl:3b', $this->value('agent.env', 'PRESTO_AI_VISION_MODEL')); // da ai-agent/.env.example
+    }
 }
