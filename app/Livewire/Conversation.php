@@ -2,10 +2,12 @@
 
 namespace App\Livewire;
 
+use App\Events\MessageSent;
 use App\Models\PurchaseRequest;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\RateLimiter;
 use Livewire\Attributes\Locked;
+use Livewire\Attributes\On;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
 
@@ -46,9 +48,23 @@ class Conversation extends Component
         }
         RateLimiter::hit($key);
 
-        $request->messages()->create(['user_id' => auth()->id(), 'body' => $this->body]);
+        $message = $request->messages()->create(['user_id' => auth()->id(), 'body' => $this->body]);
         $this->reset('body');
-        $this->dispatch('message-sent');
+        $this->dispatch('conversation-updated');
+
+        // Se Reverb è spento il messaggio è comunque salvato: l'altra persona lo vedrà ricaricando la pagina.
+        // Niente arrow function: broadcast() invia alla distruzione dell'oggetto, che deve avvenire dentro rescue()
+        rescue(function () use ($message) {
+            broadcast(new MessageSent($message))->toOthers();
+        });
+    }
+
+    // Messaggio arrivato dall'altra persona: il componente si ridisegna da solo, qui resta da segnarlo come letto
+    #[On('echo-private:conversations.{purchaseRequestId},MessageSent')]
+    public function messageReceived(): void
+    {
+        $this->markAsRead($this->purchaseRequest());
+        $this->dispatch('conversation-updated');
     }
 
     public function render()

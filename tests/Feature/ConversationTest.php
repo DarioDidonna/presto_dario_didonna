@@ -2,11 +2,14 @@
 
 namespace Tests\Feature;
 
+use App\Events\MessageSent;
 use App\Livewire\Conversation;
 use App\Models\Message;
 use App\Models\PurchaseRequest;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Broadcast;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\RateLimiter;
 use Livewire\Features\SupportLockedProperties\CannotUpdateLockedPropertyException;
 use Livewire\Livewire;
@@ -41,7 +44,7 @@ class ConversationTest extends TestCase
             ->call('send')
             ->assertHasNoErrors()
             ->assertSet('body', '')
-            ->assertDispatched('message-sent');
+            ->assertDispatched('conversation-updated');
 
         Livewire::actingAs($this->request->seller)->test(Conversation::class, ['purchaseRequest' => $this->request])
             ->assertSee("Posso passare sabato?\nVerso le 10")
@@ -136,5 +139,50 @@ class ConversationTest extends TestCase
 
         $this->actingAs($this->request->buyer)->get(route('orders.index'))->assertSee($link);
         $this->actingAs($this->request->seller)->get(route('sales.index'))->assertSee($link);
+    }
+
+    public function test_a_new_message_is_broadcast_on_the_private_channel_of_the_conversation(): void
+    {
+        Event::fake([MessageSent::class]);
+
+        Livewire::actingAs($this->request->buyer)->test(Conversation::class, ['purchaseRequest' => $this->request])
+            ->set('body', 'Ciao')->call('send');
+
+        Event::assertDispatched(MessageSent::class, function (MessageSent $event) {
+            return $event->broadcastOn()->name === 'private-conversations.'.$this->request->id
+                && $event->broadcastWith() === ['id' => $event->message->id]; // solo l'id, mai il testo
+        });
+    }
+
+    public function test_message_is_saved_even_if_reverb_is_down(): void
+    {
+        config([
+            'broadcasting.default' => 'reverb',
+            'broadcasting.connections.reverb.options' => ['host' => '127.0.0.1', 'port' => 1, 'scheme' => 'http', 'useTLS' => false],
+        ]);
+
+        Livewire::actingAs($this->request->buyer)->test(Conversation::class, ['purchaseRequest' => $this->request])
+            ->set('body', 'Ci sei?')->call('send')->assertHasNoErrors();
+
+        $this->assertSame('Ci sei?', Message::sole()->body);
+    }
+
+    public function test_only_buyer_and_seller_can_listen_to_the_channel(): void
+    {
+        $canListen = Broadcast::getChannels()['conversations.{purchaseRequest}'];
+
+        $this->assertTrue($canListen($this->request->buyer, $this->request));
+        $this->assertTrue($canListen($this->request->seller, $this->request));
+        $this->assertFalse($canListen(User::factory()->create(), $this->request));
+    }
+
+    public function test_an_incoming_message_is_marked_as_read_while_the_conversation_is_open(): void
+    {
+        $component = Livewire::actingAs($this->request->seller)->test(Conversation::class, ['purchaseRequest' => $this->request]);
+        $message = Message::factory()->create(['purchase_request_id' => $this->request->id, 'user_id' => $this->request->buyer_id, 'body' => 'Appena arrivato']);
+
+        $component->call('messageReceived')->assertSee('Appena arrivato')->assertDispatched('conversation-updated');
+
+        $this->assertNotNull($message->fresh()->read_at);
     }
 }

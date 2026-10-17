@@ -1,6 +1,6 @@
 <section class="conversation-box rounded-3 border border-secondary-subtle bg-navbar-card shadow-lg" aria-label="{{ __('ui.messages_title') }}">
     <div class="conversation-messages p-3 p-md-4 d-flex flex-column gap-3" role="log" aria-live="polite"
-        x-data x-init="$el.scrollTop = $el.scrollHeight" @message-sent.window="$nextTick(() => $el.scrollTop = $el.scrollHeight)">
+        x-data x-init="$el.scrollTop = $el.scrollHeight" @conversation-updated.window="$nextTick(() => $el.scrollTop = $el.scrollHeight)">
         @forelse ($messages as $message)
             @php($mine = $message->user_id === auth()->id())
             <div class="d-flex flex-column {{ $mine ? 'align-items-end' : 'align-items-start' }}" wire:key="message-{{ $message->id }}">
