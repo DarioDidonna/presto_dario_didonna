@@ -43,6 +43,26 @@ Progetto finale del corso Hackademy (Aulab), ampliato con refactoring, test auto
 - **I miei ordini** (con annullamento finché la richiesta è in attesa) e **Richieste ricevute** per accettare o rifiutare, con email all'acquirente
 - Invio in una transazione con **lock sulle righe**: due acquirenti non possono riservare lo stesso annuncio nello stesso istante
 
+### Messaggi in tempo reale
+- Ogni richiesta d'acquisto ha la sua **conversazione** tra acquirente e venditore, per accordarsi su ritiro e pagamento
+- I messaggi arrivano **senza ricaricare la pagina** (Laravel Reverb + Echo, canali privati autorizzati con la stessa policy della pagina)
+- **Contatori dei non letti** nel menu e sulle schede, aggiornati dal vivo anche mentre si è su altre pagine
+- **Email solo se serve**: parte dopo 5 minuti, solo se il messaggio è ancora non letto, una per ogni raffica di messaggi
+- Se Reverb è spento i messaggi vengono salvati comunque e compaiono ricaricando la pagina
+
+```mermaid
+sequenceDiagram
+    participant A as Acquirente (Livewire)
+    participant L as Laravel
+    participant R as Reverb
+    participant V as Venditore (Echo)
+    A->>L: invia il messaggio
+    L->>L: salva + email ritardata di 5 min
+    L->>R: MessageSent (solo id, canali privati)
+    R-->>V: evento sulla chat aperta o sul canale personale
+    V->>L: rilegge i messaggi (controllo dei permessi)
+```
+
 ### Revisori
 - **Dashboard di revisione** con coda in ordine di arrivo e conferma prima di accettare o rifiutare
 - **Annulla l'ultima decisione** entro 5 minuti: l'email all'autore parte solo allo scadere della finestra e solo se la decisione è ancora valida
@@ -95,10 +115,11 @@ flowchart LR
 |---|---|
 | Backend | PHP 8.2+, Laravel 13, Laravel Fortify, Laravel Scout + TNTSearch |
 | Frontend | Blade, Livewire 4, Bootstrap 5.3, Bootstrap Icons, Vite (nessuna dipendenza da CDN) |
+| Tempo reale | Laravel Reverb (WebSocket), Laravel Echo |
 | Immagini | Google Cloud Vision API, Spatie Image (GD) |
 | Agente AI | Python 3.12 (uv), FastAPI, LangChain + LangGraph, Ollama con `qwen2.5:3b` in locale |
 | Dati | MySQL, code e sessioni su database |
-| Test e qualità | PHPUnit (204 test), pytest (94 test), Laravel Pint, ruff, GitHub Actions |
+| Test e qualità | PHPUnit (222 test), pytest (94 test), Laravel Pint, ruff, GitHub Actions |
 
 ---
 
@@ -124,7 +145,7 @@ php artisan migrate --seed      # in locale crea anche utenti e annunci demo
 php artisan storage:link
 ```
 
-Avvia l'applicazione (server, coda, log e Vite insieme):
+Avvia l'applicazione (server, coda, log, Vite, Reverb per i messaggi in tempo reale e agente AI insieme):
 
 ```bash
 composer run dev
@@ -139,7 +160,9 @@ Il sito è su [http://localhost:8000](http://localhost:8000).
 | Utente | `demo@presto.it` | `password` |
 | Revisore | `revisore@presto.it` | `password` |
 
-I dati demo comprendono 24 annunci in tutti gli stati (pubblicati, in revisione, rifiutati) e, per l'utente demo, un carrello pronto e richieste d'acquisto in ogni stato: una ricevuta da accettare o rifiutare, una vendita conclusa e ordini accettati, rifiutati e in attesa.
+I dati demo comprendono 24 annunci in tutti gli stati (pubblicati, in revisione, rifiutati) e, per l'utente demo, un carrello pronto, richieste d'acquisto in ogni stato (una ricevuta da accettare o rifiutare, una vendita conclusa e ordini accettati, rifiutati e in attesa) e conversazioni con messaggi non letti.
+
+Per vedere i messaggi in tempo reale apri due browser (o una finestra privata): `demo@presto.it` e `giulia.romano@presto.it`, password `password`.
 
 Per riportare il sito allo stato demo iniziale (database, foto caricate e indice di ricerca da zero) basta un comando, che chiede conferma e non gira in produzione:
 
@@ -189,6 +212,7 @@ In sviluppo le email (reset password, candidature revisore) finiscono nel log (`
 | `php artisan app:analyze-images [--all]` | Rimette in coda l'analisi delle immagini (solo quelle mai analizzate, o tutte) |
 | `php artisan scout:import "App\Models\Article"` | Ricostruisce l'indice di ricerca |
 | `php artisan queue:work` | Avvia il worker delle code (già incluso in `composer run dev`) |
+| `php artisan reverb:start` | Avvia il server WebSocket dei messaggi sulla porta 8080 (già incluso in `composer run dev`) |
 
 ---
 
@@ -198,10 +222,11 @@ In sviluppo le email (reset password, candidature revisore) finiscono nel log (`
 php artisan test
 ```
 
-I 204 test Laravel coprono, tra l'altro:
+I 222 test Laravel coprono, tra l'altro:
 
 - **sicurezza e permessi**: solo i revisori approvano, link di promozione firmati e a scadenza, annunci non pubblicati invisibili agli altri utenti, modifica ed eliminazione riservate all'autore;
 - **flussi completi**: ricerca e filtri, pubblicazione, revisione con email all'autore e annullamento, reset password, profilo e foto profilo, catena di elaborazione delle immagini;
+- **messaggi**: solo acquirente e venditore leggono e scrivono, conversazione chiusa dopo rifiuto o annullamento, evento trasmesso sui canali giusti senza il testo, contatori dei non letti, email ritardata e saltata se il messaggio è stato letto;
 - **carrello e richieste d'acquisto**: niente annunci propri, riservati o venduti nel carrello, una richiesta per venditore, accetta/rifiuta/annulla solo da chi ne ha diritto e solo se ancora in attesa, email alle due parti;
 - **pagine di errore** 403, 404, 419, 429, 500 e 503 nella lingua dell'utente;
 - **SEO e condivisione**: meta tag Open Graph per pagina, foto e prezzo dell'annuncio;
@@ -221,14 +246,15 @@ A ogni push e pull request **GitHub Actions** esegue le due suite (quella Larave
 ```
 app/
 ├── Console/Commands/        app:make-user-revisor, app:analyze-images, app:demo-reset, app:ai-setup
-├── Http/Controllers/        Article, Public, Revisor, Profile, Cart, PurchaseRequest, Sales
+├── Events/                  MessageSent (trasmesso con Reverb)
+├── Http/Controllers/        Article, Public, Revisor, Profile, Cart, PurchaseRequest, Sales, Conversation
 │                            (+ Api/AgentController per l'agente)
 ├── Http/Requests/           UpdateAvatarRequest (Form Request)
 ├── Jobs/                    RemoveFaces, ResizeImage, GoogleVision* (+ Concerns/CallsGoogleVision)
 ├── Livewire/                CreateArticleForm, EditArticleForm (+ Forms/ArticleForm, Concerns/HandlesArticleForm),
-│                            ShoppingAssistant (chat), ReviewAssistant (parere AI)
-├── Models/                  Article, Category, Image, User, PurchaseRequest, PurchaseRequestItem
-├── Notifications/           ArticleReviewed, PurchaseRequested, PurchaseRequestAnswered, PurchaseRequestCancelled
+│                            ShoppingAssistant (chat), ReviewAssistant (parere AI), Conversation (messaggi)
+├── Models/                  Article, Category, Image, User, PurchaseRequest, PurchaseRequestItem, Message
+├── Notifications/           ArticleReviewed, PurchaseRequested, PurchaseRequestAnswered, PurchaseRequestCancelled, NewMessage
 ├── Policies/                ArticlePolicy (vedere, modificare, eliminare, mettere nel carrello), PurchaseRequestPolicy
 ├── Services/                AiAgentClient (servizio Python), Checkout e PurchaseRequestWorkflow (richieste d'acquisto)
 ├── Support/                 ArticleFilters (ricerca e filtri dell'elenco)
@@ -236,6 +262,7 @@ app/
 resources/views/             Pagine Blade e componenti (layout, card, avatar, navbar…)
 lang/{it,en,es}/             Traduzioni dell'interfaccia e della validazione
 routes/api.php               API interne per l'agente (/api/agent/*)
+routes/channels.php          Canali privati di Reverb (conversazioni, utente)
 tests/Feature/               Test di funzionalità
 ai-agent/                    Servizio Python dell'agente AI
 ├── src/presto_ai_agent/     app (FastAPI), agent (LangGraph), tools, guardrails, review, laravel_client

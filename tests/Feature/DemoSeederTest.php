@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\Article;
 use App\Models\Category;
 use App\Models\Image;
+use App\Models\Message;
 use App\Models\PurchaseRequest;
 use App\Models\User;
 use Database\Seeders\DemoSeeder;
@@ -71,6 +72,9 @@ class DemoSeederTest extends TestCase
             }
         }
 
+        // Messaggi demo: uno non letto tra gli ordini e uno tra le vendite
+        $this->assertSame(['orders' => 1, 'sales' => 1], $demo->unreadMessageCounts());
+
         $this->actingAs($demo);
         foreach ([route('cart.index'), route('orders.index'), route('sales.index')] as $url) {
             $this->get($url)->assertOk();
@@ -92,5 +96,6 @@ class DemoSeederTest extends TestCase
         $this->assertSame(5, User::count());
         $this->assertSame(24, Article::count());
         $this->assertSame(5, PurchaseRequest::count());
+        $this->assertSame(6, Message::count());
     }
 }

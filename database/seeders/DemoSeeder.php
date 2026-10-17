@@ -129,19 +129,33 @@ class DemoSeeder extends Seeder
         $articles = fn (string ...$titles) => collect($titles)->map(fn ($title) => $byTitle[$title]);
 
         // Richiesta ricevuta dal demo, ancora da accettare o rifiutare: gli annunci sono riservati
-        $this->purchaseRequest($giulia, $demo, PurchaseRequest::PENDING, $articles('Smartphone 128 GB come nuovo', 'Costruzioni da 1000 pezzi'), 'Ciao! Posso passare a ritirarli sabato mattina?', 2);
+        $received = $this->purchaseRequest($giulia, $demo, PurchaseRequest::PENDING, $articles('Smartphone 128 GB come nuovo', 'Costruzioni da 1000 pezzi'), 'Ciao! Posso passare a ritirarli sabato mattina?', 2);
         // Vendita del demo già conclusa
         $this->purchaseRequest($marco, $demo, PurchaseRequest::ACCEPTED, $articles('Tapis roulant pieghevole'), null, 6);
         // Ordini del demo: accettato, rifiutato, in attesa
-        $this->purchaseRequest($demo, $marco, PurchaseRequest::ACCEPTED, $articles('Orologio automatico in acciaio'), 'Lo prendo volentieri, grazie!', 5);
+        $bought = $this->purchaseRequest($demo, $marco, PurchaseRequest::ACCEPTED, $articles('Orologio automatico in acciaio'), 'Lo prendo volentieri, grazie!', 5);
         $this->purchaseRequest($demo, $sara, PurchaseRequest::DECLINED, $articles('Casco integrale taglia M'), null, 4);
-        $this->purchaseRequest($demo, $giulia, PurchaseRequest::PENDING, $articles('Asciugacapelli professionale 2200W'), null, 1);
+        $waiting = $this->purchaseRequest($demo, $giulia, PurchaseRequest::PENDING, $articles('Asciugacapelli professionale 2200W'), null, 1);
+
+        // Messaggi: due non letti per il demo (uno come venditore, uno come acquirente) e una conversazione già letta
+        $this->conversation($received, [
+            [$giulia, 'Ciao! Le costruzioni sono complete di tutti i pezzi? Sono per mio nipote.', 30],
+        ]);
+        $this->conversation($bought, [
+            [$demo, 'Grazie per aver accettato! Quando posso passare a ritirarlo?', 60 * 24 * 4],
+            [$marco, 'Sabato tra le 10 e le 12 va benissimo. Ti porto anche la scatola e la garanzia.', 60 * 24 * 4 - 45],
+            [$demo, 'Perfetto, a sabato!', 60 * 24 * 4 - 50],
+            [$marco, 'Ti scrivo il citofono: Esposito, secondo piano. A presto!', 90],
+        ]);
+        $this->conversation($waiting, [
+            [$demo, 'Ciao Giulia, l\'asciugacapelli ha ancora la garanzia?', 60 * 20],
+        ]);
 
         // Carrello del demo, pronto per l'invio
         $demo->cart()->syncWithoutDetaching($articles('Cuffie wireless con cancellazione del rumore', 'Bicicletta da corsa in alluminio')->pluck('id')->all());
     }
 
-    private function purchaseRequest(User $buyer, User $seller, string $status, $articles, ?string $message, int $daysAgo): void
+    private function purchaseRequest(User $buyer, User $seller, string $status, $articles, ?string $message, int $daysAgo): PurchaseRequest
     {
         $date = now()->subDays($daysAgo);
         $request = PurchaseRequest::create([
@@ -162,6 +176,24 @@ class DemoSeeder extends Seeder
                 PurchaseRequest::ACCEPTED => $article->forceFill(['reserved_at' => $date, 'sold_at' => $date->copy()->addHours(5)])->save(),
                 default => null,
             };
+        }
+
+        return $request;
+    }
+
+    /**
+     * Messaggi di una richiesta: [mittente, testo, minuti fa]. Letti tutti tranne l'ultimo dell'altra persona
+     * rispetto al demo, così il demo vede subito i contatori dei non letti.
+     */
+    private function conversation(PurchaseRequest $request, array $messages): void
+    {
+        foreach ($messages as $index => [$sender, $body, $minutesAgo]) {
+            $sentAt = now()->subMinutes($minutesAgo);
+            $unread = $index === count($messages) - 1 && $sender->email !== 'demo@presto.it';
+
+            $request->messages()->make(['user_id' => $sender->id, 'body' => $body])
+                ->forceFill(['created_at' => $sentAt, 'updated_at' => $sentAt, 'read_at' => $unread ? null : $sentAt->copy()->addMinute()])
+                ->save();
         }
     }
 
