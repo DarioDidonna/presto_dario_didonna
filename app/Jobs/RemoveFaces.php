@@ -11,10 +11,10 @@ use Illuminate\Support\Facades\Storage;
 
 /**
  * Primo anello della catena di elaborazione: raddrizza la foto e ne oscura i volti con il rilevatore locale del
- * servizio Python (YuNet, prima Google Vision). Salva in faces_count quanti volti ha oscurato, per il revisore.
+ * servizio Python (YuNet). Salva in faces_count quanti volti ha oscurato, per il revisore.
  *
- * Se il servizio è spento ritenta più tardi; dopo l'ultimo tentativo la catena prosegue comunque (miniature e
- * analisi), con faces_count vuoto: la foto non è pubblica finché un revisore, avvisato, non l'approva.
+ * Se il servizio è spento ritenta più tardi; dopo l'ultimo tentativo la catena prosegue comunque (miniature),
+ * con faces_count vuoto: la foto non è pubblica finché un revisore, avvisato, non l'approva.
  */
 class RemoveFaces implements ShouldQueue
 {

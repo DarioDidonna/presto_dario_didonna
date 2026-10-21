@@ -2,8 +2,6 @@
 
 namespace App\Models;
 
-use App\Jobs\GoogleVisionLabelImage;
-use App\Jobs\GoogleVisionSafeSearch;
 use App\Jobs\RemoveFaces;
 use App\Jobs\ResizeImage;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -45,22 +43,14 @@ class Image extends Model
         return Storage::url($file);
     }
 
-    // I job Google Vision salvano i rating SafeSearch e le etichette: se mancano entrambi l'analisi non è avvenuta
-    public function hasVisionAnalysis(): bool
-    {
-        return $this->adult !== null || ! empty($this->labels);
-    }
-
     /**
-     * Catena di elaborazione: oscuramento volti, miniature 300/800 con watermark, analisi Google Vision.
+     * Catena di elaborazione: oscuramento dei volti (rilevatore locale), poi miniature 300/800 con watermark.
      */
     public function process(): void
     {
         RemoveFaces::withChain([
             new ResizeImage($this->path, 300, 300),
             new ResizeImage($this->path, self::DISPLAY_SIZE, self::DISPLAY_SIZE),
-            new GoogleVisionSafeSearch($this->id),
-            new GoogleVisionLabelImage($this->id),
         ])->dispatch($this->id);
     }
 
@@ -79,30 +69,6 @@ class Image extends Model
         ]);
 
         $this->delete();
-    }
-
-    // Livello leggibile da una macchina (per l'assistente del revisore) a partire dalla classe CSS salvata
-    public static function likelihoodLevel(?string $cssClass): string
-    {
-        return match (true) {
-            $cssClass === null => 'unknown',
-            str_contains($cssClass, 'text-success') => 'unlikely',
-            str_contains($cssClass, 'text-warning') => 'possible',
-            str_contains($cssClass, 'text-danger') => 'likely',
-            default => 'unknown',
-        };
-    }
-
-    // Il DB salva la classe CSS dell'icona SafeSearch: qui la si traduce in testo leggibile (title e screen reader)
-    public static function likelihoodLabel(?string $cssClass): string
-    {
-        return match (true) {
-            $cssClass === null => __('ui.likelihood_unknown'),
-            str_contains($cssClass, 'text-success') => __('ui.likelihood_unlikely'),
-            str_contains($cssClass, 'text-warning') => __('ui.likelihood_possible'),
-            str_contains($cssClass, 'text-danger') => __('ui.likelihood_likely'),
-            default => __('ui.likelihood_unknown'),
-        };
     }
 
     /**
@@ -146,7 +112,6 @@ class Image extends Model
     protected function casts(): array
     {
         return [
-            'labels' => 'array',
             'faces_count' => 'integer',
         ];
     }

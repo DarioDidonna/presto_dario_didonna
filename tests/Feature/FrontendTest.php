@@ -282,18 +282,14 @@ class FrontendTest extends TestCase
             ->assertSee('MR');
     }
 
-    public function test_revisor_ratings_have_readable_text(): void
+    public function test_revisor_photo_list_has_readable_text(): void
     {
         $article = Article::factory()->create();
-        $article->images()->create(['path' => 'articles/1/a.jpg'])
-            ->forceFill(['adult' => 'text-danger bi bi-dash-circle-fill', 'violence' => 'text-success bi bi-check-circle-fill',
-                'spoof' => 'text-success bi bi-check-circle-fill', 'racy' => 'text-warning bi bi-exclamation-circle-fill',
-                'medical' => 'text-secondary bi bi-circle-fill'])->save();
+        $article->images()->create(['path' => 'articles/1/a.jpg'])->forceFill(['faces_count' => 1])->save();
 
         $this->actingAs(User::factory()->revisor()->create())->get(route('revisor.index'))
-            ->assertSee(__('ui.vision_adult')."\n", false)
-            ->assertSee(': '.__('ui.likelihood_likely'), false)
-            ->assertSee(': '.__('ui.likelihood_possible'), false)
+            ->assertSee(__('ui.image_number', ['n' => 1]))
+            ->assertSee(trans_choice('ui.faces_hidden', 1, ['count' => 1]))
             ->assertDontSee('Imm #', false);
     }
 

@@ -3,7 +3,6 @@
 namespace App\Services;
 
 use App\Models\Article;
-use App\Models\Image;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Http\Client\RequestException;
@@ -67,19 +66,6 @@ class AiAgentClient
     public function review(Article $article, string $lang): array
     {
         $article->loadMissing(['images', 'category']);
-        $levels = ['unknown' => 0, 'unlikely' => 1, 'possible' => 2, 'likely' => 3];
-
-        // Per ogni categoria SafeSearch, la valutazione peggiore tra le foto dell'annuncio
-        $safeSearch = [];
-        foreach (['adult', 'violence', 'racy', 'medical', 'spoof'] as $category) {
-            $worst = $article->images
-                ->map(fn ($image) => Image::likelihoodLevel($image->{$category}))
-                ->sortByDesc(fn ($level) => $levels[$level])
-                ->first();
-            if ($worst !== null) {
-                $safeSearch[$category] = $worst;
-            }
-        }
 
         try {
             $response = $this->http()
@@ -89,8 +75,6 @@ class AiAgentClient
                     'price' => (float) $article->price,
                     'category' => $article->category?->name,
                     'photos' => min($article->images->count(), 20),
-                    'labels' => $article->images->pluck('labels')->flatten()->filter()->unique()->take(60)->values()->all(),
-                    'safe_search' => $safeSearch,
                     'lang' => $lang,
                 ])
                 ->throw()
