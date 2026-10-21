@@ -22,7 +22,8 @@ Progetto finale del corso Hackademy (Aulab), ampliato con refactoring, test auto
 > Every AI feature is measured with repeatable evals and guarded by deterministic checks in code.
 
 <p align="center">
-  <img src="docs/screenshots/assistente.jpg" alt="Assistente acquisti: chat con un modello locale che risponde con annunci veri">
+  <img src="docs/demo.gif" alt="Demo: l'assistente AI trova una bici da corsa sotto i 500 euro e la aggiunge al carrello" width="900"><br>
+  <sub>L'assistente risponde con un annuncio vero (modello locale su Ollama) e dalla scheda si aggiunge al carrello. Video accelerato nelle attese.</sub>
 </p>
 
 <table>
@@ -36,7 +37,6 @@ Progetto finale del corso Hackademy (Aulab), ampliato con refactoring, test auto
   </tr>
 </table>
 
-<!-- DEMO: aggiungi qui una GIF di 10-20 secondi (docs/demo.gif), per esempio la chat dell'assistente o i messaggi in tempo reale. -->
 
 ---
 

@@ -27,3 +27,6 @@ Homestead.json
 Homestead.yaml
 Thumbs.db
 google_credential*.json
+# Registrazioni dello schermo (la GIF della demo invece va committata)
+docs/*.mov
+docs/*.mp4
