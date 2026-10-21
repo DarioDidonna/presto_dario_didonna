@@ -5,6 +5,7 @@ namespace App\Providers;
 use App\Models\Category;
 use App\Models\User;
 use App\View\Composers\ErrorPageLocaleComposer;
+use App\View\Composers\FooterStatusComposer;
 use App\View\Composers\MarketStatsComposer;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Pagination\Paginator;
@@ -38,6 +39,7 @@ class AppServiceProvider extends ServiceProvider
         );
 
         View::composer(['components.header', 'components.live-activity'], MarketStatsComposer::class);
+        View::composer('components.footer', FooterStatusComposer::class);
         View::composer('errors::*', ErrorPageLocaleComposer::class);
 
         // Al login si ripristina la lingua scelta l'ultima volta dall'utente

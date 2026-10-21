@@ -147,6 +147,27 @@ class AiAgentClient
     }
 
     /**
+     * Stato del servizio Python (GET /health, senza token): null se non risponde entro un secondo.
+     * Usato dal footer: non deve mai rallentare la pagina.
+     *
+     * @return array{status: string, model_available: bool}|null
+     */
+    public function health(): ?array
+    {
+        try {
+            $response = Http::baseUrl(config('services.ai_agent.url'))->acceptJson()->timeout(1)->connectTimeout(1)->get('/health');
+        } catch (ConnectionException) {
+            return null;
+        }
+
+        if (! $response->ok() || ! is_string($response->json('status'))) {
+            return null;
+        }
+
+        return ['status' => $response->json('status'), 'model_available' => (bool) $response->json('model_available')];
+    }
+
+    /**
      * Volti da oscurare in una foto (rilevatore locale del servizio Python, non serve Ollama).
      * Riquadri già allargati, in pixel della foto inviata.
      *
