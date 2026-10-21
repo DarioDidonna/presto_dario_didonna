@@ -110,77 +110,24 @@
 
                         <div class="card bg-dark border border-secondary shadow-lg rounded p-3 mt-4">
                             <h5 class="text-neon-cyan font-monospace text-uppercase small mb-3">
-                                <i class="bi bi-cpu me-2"></i>{{ __('ui.vision_title') }}
+                                <i class="bi bi-person-bounding-box me-2"></i>{{ __('ui.vision_title') }}
                             </h5>
 
-                            <div class="row">
+                            {{-- Oscuramento dei volti (rilevatore locale): il revisore controlla che sia giusto --}}
+                            <ul class="list-unstyled mb-0 d-flex flex-column gap-2">
                                 @foreach ($article_to_check->images as $key => $image)
-                                    <div class="col-12 col-md-6 mb-3">
-                                        <div class="p-3 bg-black rounded border border-secondary h-100 d-flex flex-column justify-content-between">
-                                            
-                                            <div>
-                                                <div class="d-flex justify-content-between align-items-center mb-3">
-                                                    <span class="badge bg-secondary font-monospace">{{ __('ui.image_number', ['n' => $key + 1]) }}</span>
-                                                    @if ($image->hasVisionAnalysis())
-                                                        <span class="badge bg-success bg-opacity-25 text-success border border-success font-monospace">
-                                                            <i class="bi bi-check-circle-fill me-1"></i>{{ __('ui.vision_done') }}
-                                                        </span>
-                                                    @else
-                                                        <span class="badge bg-warning bg-opacity-25 text-warning border border-warning font-monospace">
-                                                            <i class="bi bi-exclamation-triangle-fill me-1"></i>{{ __('ui.vision_missing') }}
-                                                        </span>
-                                                    @endif
-                                                </div>
-
-                                                {{-- Oscuramento dei volti (rilevatore locale): il revisore controlla che sia giusto --}}
-                                                <p class="small mb-3 {{ $image->facesChecked() ? 'text-neon-cyan' : 'text-warning' }}">
-                                                    @if ($image->facesChecked())
-                                                        <i class="bi bi-person-bounding-box me-1" aria-hidden="true"></i>{{ trans_choice('ui.faces_hidden', $image->faces_count, ['count' => $image->faces_count]) }}
-                                                    @else
-                                                        <i class="bi bi-exclamation-triangle-fill me-1" aria-hidden="true"></i>{{ __('ui.faces_unchecked') }}
-                                                    @endif
-                                                </p>
-
-                                                @unless ($image->hasVisionAnalysis())
-                                                    <p class="text-warning small fst-italic mb-3">{{ __('ui.vision_missing_help') }}</p>
-                                                @endunless
-
-                                                <div class="mb-3">
-                                                    <label class="text-neon-cyan font-monospace small d-block text-uppercase mb-2">{{ __('ui.vision_labels') }}</label>
-                                                    <div class="d-flex flex-wrap gap-1">
-                                                        @if ($image->labels)
-                                                            @foreach ($image->labels as $label)
-                                                                <span class="badge bg-dark border border-secondary text-light font-monospace small">
-                                                                    #{{ $label }}
-                                                                </span>
-                                                            @endforeach
-                                                        @else
-                                                            <span class="text-muted small fst-italic">{{ __('ui.no_labels') }}</span>
-                                                        @endif
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            @if ($image->adult !== null)
-                                                <div class="mt-2">
-                                                    <label class="text-neon-cyan font-monospace small d-block text-uppercase mb-2">{{ __('ui.vision_ratings') }}</label>
-                                                    <div class="row justify-content-center align-items-center g-1 text-white-50 small font-monospace">
-                                                        @foreach (['adult', 'violence', 'spoof', 'racy', 'medical'] as $rating)
-                                                            <div class="col-2 text-center">
-                                                                <i class="{{ $image->$rating }}" title="{{ \App\Models\Image::likelihoodLabel($image->$rating) }}" aria-hidden="true"></i>
-                                                            </div>
-                                                            <div class="col-10 text-uppercase">
-                                                                {{ __('ui.vision_' . $rating) }}
-                                                                <span class="visually-hidden">: {{ \App\Models\Image::likelihoodLabel($image->$rating) }}</span>
-                                                            </div>
-                                                        @endforeach
-                                                    </div>
-                                                </div>
+                                    <li class="d-flex align-items-start gap-2 p-2 bg-black rounded border border-secondary">
+                                        <span class="badge bg-secondary font-monospace flex-shrink-0">{{ __('ui.image_number', ['n' => $key + 1]) }}</span>
+                                        <span class="small {{ $image->facesChecked() ? 'text-neon-cyan' : 'text-warning' }}">
+                                            @if ($image->facesChecked())
+                                                <i class="bi bi-person-bounding-box me-1" aria-hidden="true"></i>{{ trans_choice('ui.faces_hidden', $image->faces_count, ['count' => $image->faces_count]) }}
+                                            @else
+                                                <i class="bi bi-exclamation-triangle-fill me-1" aria-hidden="true"></i>{{ __('ui.faces_unchecked') }}
                                             @endif
-                                        </div>
-                                    </div>
+                                        </span>
+                                    </li>
                                 @endforeach
-                            </div>
+                            </ul>
                         </div>
                     @else
                         <div class="card bg-dark border border-secondary shadow-lg rounded p-5 text-center d-flex flex-column align-items-center justify-content-center">

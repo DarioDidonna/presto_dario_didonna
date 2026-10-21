@@ -8,7 +8,7 @@
 
 **Marketplace di annunci con moderazione umana e analisi delle immagini tramite intelligenza artificiale.**
 
-Ogni annuncio pubblicato da un utente passa da un revisore prima di diventare visibile. Le foto caricate vengono elaborate in background: un rilevatore **locale** oscura i volti, si generano miniature con watermark e, se configurato, Google Cloud Vision fornisce etichette e una valutazione dei contenuti sensibili per aiutare il revisore a decidere.
+Ogni annuncio pubblicato da un utente passa da un revisore prima di diventare visibile. Le foto caricate vengono elaborate in background: un rilevatore **locale** oscura i volti e si generano miniature con watermark. Il revisore vede per ogni foto quanti volti sono stati oscurati e, se vuole, chiede un parere all'agente AI.
 
 Un **agente AI** scritto in Python (LangChain/LangGraph) con un **modello locale** servito da Ollama aiuta gli utenti a trovare annunci in linguaggio naturale e dà ai revisori un parere motivato su ogni annuncio, senza chiavi API e funzionando anche offline.
 
@@ -18,7 +18,7 @@ Progetto finale del corso Hackademy (Aulab), ampliato con refactoring, test auto
 > **Python AI agent (LangChain/LangGraph + FastAPI)** running a **local model on Ollama** (no API keys, works offline):
 > a shopping assistant that answers with real listings, an AI opinion for human moderators, and a draft listing written
 > from a photo with a vision model, plus local face blurring (OpenCV) on every uploaded photo. It also has a cart with purchase requests, real-time buyer–seller messaging
-> (Laravel Reverb), seller reviews, three UI languages and 253 + 128 automated tests running on GitHub Actions.
+> (Laravel Reverb), seller reviews, three UI languages and 252 + 125 automated tests running on GitHub Actions.
 > Every AI feature is measured with repeatable evals and guarded by deterministic checks in code.
 
 <p align="center">
@@ -86,7 +86,7 @@ sequenceDiagram
 ### Revisori
 - **Dashboard di revisione** con coda in ordine di arrivo e conferma prima di accettare o rifiutare
 - **Annulla l'ultima decisione** entro 5 minuti: l'email all'autore parte solo allo scadere della finestra e solo se la decisione è ancora valida
-- Per ogni foto: **quanti volti sono stati oscurati** (o se non sono ancora stati controllati), **etichette** e **valutazioni SafeSearch** (adulti, violenza, contenuti espliciti…) di Google Vision
+- Per ogni foto: **quanti volti sono stati oscurati** (o se non sono ancora stati controllati)
 - Promozione a revisore tramite **link firmato a tempo** inviato via email all'amministratore
 
 ### Elaborazione delle immagini (code)
@@ -98,13 +98,9 @@ flowchart LR
     A[Upload foto] --> B[RemoveFaces<br/>raddrizza e oscura i volti<br/>rilevatore locale]
     B --> C[ResizeImage 300×300<br/>miniatura + watermark]
     C --> D[ResizeImage 800×800<br/>dettaglio + watermark]
-    D --> E[GoogleVisionSafeSearch<br/>contenuti sensibili]
-    E --> F[GoogleVisionLabelImage<br/>etichette]
 ```
 
 **Oscuramento dei volti in locale.** `RemoveFaces` raddrizza la foto secondo l'EXIF (le foto del telefono sono spesso salvate "di lato") e chiede i volti al servizio Python, che usa **YuNet** di OpenCV: modello da 230 KB incluso nel repository, ~20 ms a foto, senza GPU né rete. Misurato con `ai-agent/evals/faces.py`: **24 volti su 25** (manca un profilo con occhiali da sole) e un falso volto in **2 foto di oggetti su 24** (i bottoncini di un mattoncino). Nessuna soglia separa i due casi, quindi si privilegia la privacy (soglia bassa, riquadri allargati del 25%) e il revisore vede per ogni foto quanti volti sono stati oscurati. Se il servizio è spento il job ritenta più tardi; `php artisan app:analyze-images` rimette in coda le foto rimaste da controllare.
-
-Un errore di Google Vision (credenziali mancanti, servizio non raggiungibile) non blocca la catena: le miniature vengono generate comunque e la dashboard del revisore segnala l'analisi mancante.
 
 ### Assistente AI (Python + Laravel)
 
@@ -139,10 +135,10 @@ flowchart LR
 | Backend | PHP 8.2+, Laravel 13, Laravel Fortify, Laravel Scout + TNTSearch |
 | Frontend | Blade, Livewire 4, Bootstrap 5.3, Bootstrap Icons, Vite (nessuna dipendenza da CDN) |
 | Tempo reale | Laravel Reverb (WebSocket), Laravel Echo |
-| Immagini | Rilevamento volti in locale (OpenCV YuNet), Google Cloud Vision API (facoltativa), Spatie Image (GD) |
+| Immagini | Rilevamento volti in locale (OpenCV YuNet), Spatie Image (GD) |
 | Agente AI | Python 3.12 (uv), FastAPI, LangChain + LangGraph, Ollama con `qwen2.5:3b` (testo) e `qwen2.5vl:3b` (visione, facoltativo) in locale |
 | Dati | MySQL, code e sessioni su database |
-| Test e qualità | PHPUnit (253 test), pytest (128 test), Laravel Pint, ruff, GitHub Actions |
+| Test e qualità | PHPUnit (252 test), pytest (125 test), Laravel Pint, ruff, GitHub Actions |
 
 ---
 
@@ -193,21 +189,13 @@ Per riportare il sito allo stato demo iniziale (database, foto caricate e indice
 composer run demo
 ```
 
-Il sito non usa CDN: icone e stili sono inclusi nel build, quindi la demo funziona anche senza connessione, oscuramento dei volti compreso (manca solo l'analisi di Google Vision).
+Il sito non usa CDN: icone e stili sono inclusi nel build, quindi la demo funziona anche senza connessione, oscuramento dei volti e modelli AI compresi: nessun servizio esterno.
 
 Per usare foto vere al posto delle immagini generate vedi [`database/seeders/demo-images`](database/seeders/demo-images/README.md).
 
-### Google Cloud Vision (facoltativo)
-
-Senza credenziali il sito funziona: mancano solo etichette e valutazioni SafeSearch delle foto. I volti li oscura comunque il rilevatore locale.
-
-1. Crea un service account con la **Cloud Vision API** abilitata e scarica la chiave JSON.
-2. Salvala come `google_credential.json` nella root del progetto (il file è già in `.gitignore`), oppure indica il percorso in `GOOGLE_VISION_CREDENTIALS` nel `.env`.
-3. Analizza le immagini già presenti: `php artisan app:analyze-images`.
-
 ### Assistente AI (facoltativo)
 
-Senza agente il sito funziona normalmente: la chat e il parere del revisore semplicemente non compaiono.
+Senza agente il sito funziona normalmente: la chat e il parere del revisore semplicemente non compaiono, e i volti nelle nuove foto restano segnati come «non controllati» finché non lo si avvia (poi `php artisan app:analyze-images`).
 
 1. Installa [Ollama](https://ollama.com) e scarica il modello: `ollama pull qwen2.5:3b` (~2 GB; scelto perché gira bene anche con 8 GB di RAM).
 2. Installa [uv](https://docs.astral.sh/uv/): `brew install uv` (installa da solo Python 3.12 e le dipendenze).
@@ -245,7 +233,7 @@ In sviluppo le email (reset password, candidature revisore) finiscono nel log (`
 php artisan test
 ```
 
-I 253 test Laravel coprono, tra l'altro:
+I 252 test Laravel coprono, tra l'altro:
 
 - **sicurezza e permessi**: solo i revisori approvano, link di promozione firmati e a scadenza, annunci non pubblicati invisibili agli altri utenti, modifica ed eliminazione riservate all'autore;
 - **flussi completi**: ricerca e filtri, pubblicazione, revisione con email all'autore e annullamento, reset password, profilo e foto profilo, catena di elaborazione delle immagini, oscuramento dei volti (riquadri, tentativi con il servizio spento, tutte le 8 orientazioni EXIF);
@@ -259,7 +247,7 @@ I 253 test Laravel coprono, tra l'altro:
 
 I test usano un database SQLite in memoria e il driver Scout `collection`: non toccano il database né l'indice di ricerca di sviluppo.
 
-L'agente Python ha 128 test propri (`cd ai-agent && uv run pytest`) con un modello e un Laravel finti: tool, difese contro il prompt injection, memoria della conversazione, regole di moderazione, endpoint e autenticazione.
+L'agente Python ha 125 test propri (`cd ai-agent && uv run pytest`) con un modello e un Laravel finti: tool, difese contro il prompt injection, memoria della conversazione, regole di moderazione, endpoint e autenticazione.
 
 A ogni push e pull request **GitHub Actions** esegue le due suite (quella Laravel con il build del front-end) e controlla lo stile del codice con [Laravel Pint](https://laravel.com/docs/pint) e [ruff](https://docs.astral.sh/ruff/): vedi [`.github/workflows/tests.yml`](.github/workflows/tests.yml). Per formattare il codice in locale: `vendor/bin/pint` e `cd ai-agent && uv run ruff format .`.
 
@@ -275,7 +263,7 @@ app/
 │                            Review, Seller
 │                            (+ Api/AgentController per l'agente)
 ├── Http/Requests/           UpdateAvatarRequest, StoreReviewRequest (Form Request)
-├── Jobs/                    RemoveFaces, ResizeImage, GoogleVision* (+ Concerns/CallsGoogleVision)
+├── Jobs/                    RemoveFaces (volti, servizio locale), ResizeImage (miniature con watermark)
 ├── Livewire/                CreateArticleForm, EditArticleForm (+ Forms/ArticleForm, Concerns/HandlesArticleForm),
 │                            ShoppingAssistant (chat), ReviewAssistant (parere AI), Conversation (messaggi)
 ├── Models/                  Article, Category, Image, User, PurchaseRequest, PurchaseRequestItem, Message, Review

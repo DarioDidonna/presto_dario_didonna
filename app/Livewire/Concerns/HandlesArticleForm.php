@@ -101,7 +101,7 @@ trait HandlesArticleForm
         }
     }
 
-    // Salva le nuove foto e avvia la catena di elaborazione (volti, miniature, Google Vision)
+    // Salva le nuove foto e avvia la catena di elaborazione (volti oscurati, miniature con watermark)
     protected function storeNewImages(Article $article): void
     {
         foreach ($this->images as $image) {

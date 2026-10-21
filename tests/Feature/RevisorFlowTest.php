@@ -84,29 +84,14 @@ class RevisorFlowTest extends TestCase
             ->assertFailed();
     }
 
-    public function test_dashboard_shows_whether_vision_analysis_is_available(): void
-    {
-        $article = Article::factory()->create();
-        $article->images()->create(['path' => 'articles/1/senza.jpg']);
-        $analysed = $article->images()->create(['path' => 'articles/1/con.jpg']);
-        $analysed->forceFill(['labels' => ['Bicycle'], 'adult' => 'text-success bi bi-check-circle-fill'])->save();
-
-        $this->actingAs(User::factory()->revisor()->create())
-            ->get(route('revisor.index'))
-            ->assertOk()
-            ->assertSee(__('ui.vision_done'))
-            ->assertSee(__('ui.vision_missing'))
-            ->assertSee('#Bicycle');
-    }
-
     public function test_analyze_images_command_queues_only_missing_analyses(): void
     {
         Queue::fake();
         $article = Article::factory()->create();
         $article->images()->create(['path' => 'articles/1/senza.jpg']);
-        $article->images()->create(['path' => 'articles/1/con.jpg'])->forceFill(['labels' => ['Cat'], 'faces_count' => 0])->save();
-        // Analisi Google presente ma volti non controllati (servizio locale spento al caricamento): da rifare
-        $article->images()->create(['path' => 'articles/1/volti.jpg'])->forceFill(['labels' => ['Cat']])->save();
+        $article->images()->create(['path' => 'articles/1/con.jpg'])->forceFill(['faces_count' => 0])->save();
+        // Volti non controllati (servizio locale spento al caricamento): da rifare
+        $article->images()->create(['path' => 'articles/1/volti.jpg']);
 
         $this->artisan('app:analyze-images')->assertSuccessful();
         Queue::assertPushed(RemoveFaces::class, 2);

@@ -263,7 +263,7 @@ class DemoSeeder extends Seeder
 
         $image = $article->images()->create(['path' => $path]);
 
-        // Solo le miniature con watermark: l'analisi Google Vision si lancia con "php artisan app:analyze-images"
+        // Solo le miniature con watermark: i volti (le foto demo non ne hanno) si controllano con "php artisan app:analyze-images"
         ResizeImage::dispatchSync($image->path, 300, 300);
         ResizeImage::dispatchSync($image->path, Image::DISPLAY_SIZE, Image::DISPLAY_SIZE);
     }

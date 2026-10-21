@@ -44,15 +44,8 @@ class ReviewAssistantTest extends TestCase
             'description' => 'Pagamento con ricarica',
             'price' => 50,
         ]);
-        $article->images()->create(['path' => 'a/1.jpg'])->forceFill([
-            'labels' => ['Mobile phone', 'Gadget'],
-            'adult' => 'text-success bi bi-check-circle-fill',
-            'violence' => 'text-warning bi bi-exclamation-circle-fill',
-        ])->save();
-        $article->images()->create(['path' => 'a/2.jpg'])->forceFill([
-            'labels' => ['Gadget', 'Screen'],
-            'adult' => 'text-danger bi bi-dash-circle-fill',
-        ])->save();
+        $article->images()->create(['path' => 'a/1.jpg']);
+        $article->images()->create(['path' => 'a/2.jpg']);
 
         return $article;
     }
@@ -67,7 +60,7 @@ class ReviewAssistantTest extends TestCase
         $this->actingAs($this->revisor)->get(route('revisor.index'))->assertDontSeeLivewire(ReviewAssistant::class);
     }
 
-    public function test_sends_article_data_with_merged_labels_and_worst_safesearch(): void
+    public function test_sends_article_data_to_the_agent(): void
     {
         $this->fakeReview();
         $article = $this->pendingArticleWithImages();
@@ -81,9 +74,7 @@ class ReviewAssistantTest extends TestCase
             && $request['price'] == 50
             && $request['category'] === 'Elettronica'
             && $request['photos'] === 2
-            && $request['labels'] === ['Mobile phone', 'Gadget', 'Screen']
-            && $request['safe_search']['adult'] === 'likely'      // la peggiore tra le due foto
-            && $request['safe_search']['violence'] === 'possible'
+            && ! isset($request['labels'], $request['safe_search']) // Google Vision rimosso dal progetto
             && $request['lang'] === 'es');
     }
 

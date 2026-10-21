@@ -8,7 +8,7 @@ use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Command;
 
 #[Signature('app:analyze-images {--all : Rianalizza anche le immagini già analizzate}')]
-#[Description('Rimette in coda l\'elaborazione delle immagini: oscuramento dei volti (locale) e analisi Google Vision')]
+#[Description('Rimette in coda l\'elaborazione delle immagini (oscuramento dei volti e miniature)')]
 class AnalyzeImages extends Command
 {
     /**
@@ -17,10 +17,8 @@ class AnalyzeImages extends Command
     public function handle()
     {
         $images = Image::query()
-            // Volti non ancora controllati (servizio spento al caricamento) o analisi Google mancante
-            ->unless($this->option('all'), fn ($query) => $query
-                ->whereNull('faces_count')
-                ->orWhere(fn ($query) => $query->whereNull('adult')->whereNull('labels')))
+            // Volti non ancora controllati (servizio locale spento al caricamento)
+            ->unless($this->option('all'), fn ($query) => $query->whereNull('faces_count'))
             ->get();
 
         if ($images->isEmpty()) {

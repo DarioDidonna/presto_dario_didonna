@@ -2,8 +2,6 @@
 
 namespace Tests\Feature;
 
-use App\Jobs\GoogleVisionLabelImage;
-use App\Jobs\GoogleVisionSafeSearch;
 use App\Jobs\RemoveFaces;
 use App\Jobs\ResizeImage;
 use App\Models\Article;
@@ -51,9 +49,8 @@ class ArticleFlowTest extends TestCase
             ->assertSee('crop_300x300_b.jpg');
     }
 
-    public function test_job_chain_creates_thumbnail_even_without_google_credentials(): void
+    public function test_job_chain_creates_thumbnails_even_without_the_face_service(): void
     {
-        config(['services.google_vision.credentials' => '/percorso/inesistente.json']);
         Storage::fake('public');
 
         $article = Article::factory()->create();
@@ -63,8 +60,6 @@ class ArticleFlowTest extends TestCase
         RemoveFaces::withChain([
             new ResizeImage($image->path, 300, 300),
             new ResizeImage($image->path, Image::DISPLAY_SIZE, Image::DISPLAY_SIZE),
-            new GoogleVisionSafeSearch($image->id),
-            new GoogleVisionLabelImage($image->id),
         ])->dispatch($image->id);
 
         Storage::disk('public')->assertExists(dirname($path).'/crop_300x300_'.basename($path));
