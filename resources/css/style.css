@@ -1017,17 +1017,6 @@ body {
     border: 1px solid var(--border-color-alpha);
 }
 
-.laser-connection-line {
-    position: absolute;
-    top: 61%;
-    left: 15%;
-    right: 15%;
-    height: 1px;
-    background: linear-gradient(90deg, transparent 0%, var(--accent-cyan) 30%, var(--accent-amber) 70%, transparent 100%);
-    opacity: 0.2;
-    z-index: 1;
-}
-
 .step-card {
     background-color: var(--bg-search);
     border: 1px solid var(--border-color-alpha);
@@ -1053,39 +1042,85 @@ body {
     border-radius: 50%;
 }
 
-.step-card:has(.text-neon-amber) .step-icon-wrapper {
-    border-color: rgba(245, 158, 11, 0.2);
-}
-
 .step-card:hover {
-    border-color: var(--accent-cyan);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.25);
+    border-color: var(--step, var(--accent-cyan));
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.25), 0 0 18px -6px var(--step, var(--accent-cyan));
     transform: translateY(-4px);
 }
 
-.step-card:has(.text-neon-amber):hover {
-    border-color: var(--accent-amber);
-    box-shadow: 0 10px 20px rgba(245, 158, 11, 0.15);
-}
-
-.step-card:hover .step-icon-wrapper {
-    border-color: var(--accent-cyan);
-    box-shadow: 0 0 10px var(--accent-glow);
-}
-
-.step-card:has(.text-neon-amber):hover .step-icon-wrapper {
-    border-color: var(--accent-amber);
-    box-shadow: 0 0 10px rgba(245, 158, 11, 0.3);
-}
-
 .step-card:hover .step-number-badge {
-    color: rgba(6, 182, 212, 0.12);
+    color: color-mix(in srgb, var(--step, var(--accent-cyan)) 18%, transparent);
 }
 
-.step-card:has(.text-neon-amber):hover .step-number-badge {
-    color: rgba(245, 158, 11, 0.12);
+/* --- COME FUNZIONA: percorso a 5 passi, ognuno con chi lo compie --- */
+.how-step-cyan { --step: var(--accent-cyan); }
+.how-step-amber { --step: var(--accent-amber); }
+.how-step-blue { --step: #3b82f6; }
+.how-step-green { --step: #22c55e; }
+
+.how-step-icon {
+    position: relative;
+    z-index: 1;
+    color: var(--step);
+    border-color: color-mix(in srgb, var(--step) 45%, transparent);
+    box-shadow: 0 0 18px -6px var(--step);
 }
 
+.how-step-role {
+    color: var(--step);
+}
+
+.step-card:hover .how-step-icon {
+    border-color: var(--step);
+    box-shadow: 0 0 14px var(--step);
+}
+
+/* Linea che unisce le icone: un tratto per passo, sfumato dal colore del passo a quello del successivo */
+.how-step {
+    position: relative;
+}
+
+@media (min-width: 992px) {
+    .how-step:not(:last-child)::after {
+        content: "";
+        position: absolute;
+        z-index: 3;
+        /* dal bordo destro dell'icona fino a quella della scheda successiva (li = mezzo gutter + scheda) */
+        top: calc(1.5rem + 28px);
+        left: calc(var(--bs-gutter-x) * 0.5 + 1.5rem + 62px);
+        right: calc(-1 * (var(--bs-gutter-x) * 0.5 + 1.5rem) + 6px);
+        height: 2px;
+        background: linear-gradient(90deg, var(--step), var(--next-step, var(--step)));
+        opacity: 0.55;
+        pointer-events: none;
+    }
+
+    .how-path > .how-step:nth-child(1) { --next-step: var(--accent-amber); }
+    .how-path > .how-step:nth-child(2) { --next-step: var(--accent-cyan); }
+    .how-path > .how-step:nth-child(3) { --next-step: #3b82f6; }
+    .how-path > .how-step:nth-child(4) { --next-step: #22c55e; }
+}
+
+/* Schermi stretti: percorso verticale a sinistra delle schede */
+@media (max-width: 991.98px) {
+    .how-path {
+        padding-left: 1.25rem !important;
+        border-left: 2px solid transparent;
+        border-image: linear-gradient(180deg, var(--accent-cyan), var(--accent-amber) 30%, var(--accent-cyan) 50%, #3b82f6 72%, #22c55e) 1;
+    }
+
+    .how-step::before {
+        content: "";
+        position: absolute;
+        left: calc(-1.25rem - 7px);
+        top: calc(var(--bs-gutter-y) + 2.6rem);
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: var(--step);
+        box-shadow: 0 0 10px var(--step);
+    }
+}
 
 /* --- REVISOR CTA --- */
 .presto-revisor-cta {

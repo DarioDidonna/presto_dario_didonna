@@ -112,10 +112,11 @@ class FrontendTest extends TestCase
 
     public function test_flash_message_has_generic_title(): void
     {
-        $this->withSession(['message' => 'Operazione riuscita'])->get('/')
-            ->assertSee(__('ui.notice'))
+        // Il titolo dell'avviso è generico (prima era un "Richiesta…" scritto a mano, sbagliato per altri messaggi)
+        $html = $this->withSession(['message' => 'Operazione riuscita'])->get('/')
             ->assertSee('Operazione riuscita')
-            ->assertDontSee('Richiesta');
+            ->getContent();
+        $this->assertMatchesRegularExpression('#<strong[^>]*>\s*'.preg_quote(__('ui.notice'), '#').'\s*</strong>#', $html);
     }
 
     public function test_no_external_placeholder_images(): void
