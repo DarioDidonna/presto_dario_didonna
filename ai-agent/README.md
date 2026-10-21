@@ -119,6 +119,25 @@ già in memoria e il sistema è scarico; in 8 GB Ollama lo alterna con il modell
 Limiti rimasti: a volte un nome in inglese («Couch») e oggetti simili confusi (un bollitore descritto come «tazza»):
 per questo la bozza resta sempre da rileggere.
 
+## Oscuramento dei volti
+
+`POST /faces` riceve una foto e restituisce i riquadri dei volti da oscurare, già allargati, in pixel della foto:
+Laravel (`RemoveFaces`) li riempie di nero e salva quanti sono, per il revisore. **Non usa Ollama**: il modello è
+**YuNet** di OpenCV (`models/face_detection_yunet_2023mar.onnx`, 230 KB, licenza MIT), ~20 ms a foto su CPU.
+
+- Soglia `PRESTO_AI_FACE_THRESHOLD=0.6` e margine `PRESTO_AI_FACE_MARGIN=0.25`: un volto scoperto è peggio di un
+  oggetto oscurato per errore.
+- La foto si legge **senza applicare la rotazione EXIF**, come fa GD in Laravel: le coordinate devono riferirsi agli
+  stessi pixel (Laravel raddrizza comunque la foto prima di inviarla).
+
+```bash
+uv run python evals/faces.py    # 6 foto di persone (Wikimedia, 25 volti contati a mano) + 24 foto di oggetti
+```
+
+Risultato: **24/25 volti** (mancato: profilo con occhiali da sole e testa all'insù), falsi volti in **2 foto di
+oggetti su 24** (i bottoncini di un mattoncino, una scarpa). I due casi si sovrappongono nei punteggi (il mattoncino
+ottiene 0,86, alcuni volti veri in una folla 0,56): per questo il numero di volti oscurati è mostrato al revisore.
+
 ## Test e stile
 
 ```bash
