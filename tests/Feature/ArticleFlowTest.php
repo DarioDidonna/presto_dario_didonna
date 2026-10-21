@@ -27,7 +27,9 @@ class ArticleFlowTest extends TestCase
         Article::factory()->rejected()->for($category)->create();
         Article::factory()->accepted()->create(); // altra categoria
 
-        $response = $this->get(route('byCategory', $category))->assertOk();
+        $response = $this->get(route('byCategory', $category))->assertOk()
+            ->assertSee('Mostrati da') // paginazione tradotta (prima: "Showing 1 to 12 of 13 results")
+            ->assertDontSee('Showing');
         $this->assertCount(12, $response->viewData('articles'));
         $this->assertSame(13, $response->viewData('articles')->total());
     }
