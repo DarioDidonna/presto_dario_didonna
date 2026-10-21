@@ -17,6 +17,11 @@ class Settings(BaseSettings):
     # Ollama deve alternarlo con il modello della chat: in 8 GB non stanno insieme)
     vision_model: str = "qwen2.5vl:3b"
 
+    # Oscuramento dei volti (YuNet, locale): soglia bassa e riquadri allargati del 25% per lato, perché un volto
+    # scoperto è peggio di un oggetto oscurato per errore (misurato su foto di persone e di oggetti)
+    face_threshold: float = 0.6
+    face_margin: float = 0.25
+
     # API interne di Laravel (sola lettura) usate dai tool dell'agente
     laravel_url: str = "http://localhost:8000"
     api_token: str = ""
