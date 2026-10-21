@@ -162,7 +162,7 @@ class FrontendTest extends TestCase
         $this->get('/')
             ->assertDontSee('newsletterForm', false)
             ->assertDontSee('Core v10.4', false)
-            ->assertSee(__('ui.footer_start_now'));
+            ->assertSee(__('ui.footer_status_title'));
     }
 
     public function test_search_results_page_uses_dark_theme_and_shared_grid(): void

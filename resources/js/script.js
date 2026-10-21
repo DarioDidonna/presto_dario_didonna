@@ -43,6 +43,17 @@ document.addEventListener('DOMContentLoaded', () => {
         badge.textContent = event.detail.count;
     });
 
+    // Footer: alone leggero che segue il cursore
+    const footer = document.querySelector('[data-footer-glow]');
+    if (footer && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        footer.addEventListener('pointermove', (event) => {
+            const box = footer.getBoundingClientRect();
+            footer.style.setProperty('--fx', `${event.clientX - box.left}px`);
+            footer.style.setProperty('--fy', `${event.clientY - box.top}px`);
+        });
+        footer.addEventListener('pointerleave', () => footer.style.setProperty('--fx', '-999px'));
+    }
+
     // I dropdown (anche su mobile) sono gestiti da Bootstrap tramite data-bs-toggle="dropdown":
     // un secondo gestore qui li apriva e richiudeva subito.
 
