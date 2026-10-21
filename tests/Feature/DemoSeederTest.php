@@ -12,6 +12,7 @@ use App\Models\User;
 use Database\Seeders\DemoSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Tests\TestCase;
 
 class DemoSeederTest extends TestCase
@@ -40,14 +41,22 @@ class DemoSeederTest extends TestCase
         $this->assertGreaterThan(0, Article::where('created_at', '>=', now()->subWeek())->count());
 
         // Ogni immagine ha l'originale e le due versioni con watermark
-        $this->assertGreaterThanOrEqual(24, Image::count());
+        $this->assertSame(24, Image::count());
         foreach (Image::all() as $image) {
             $dir = dirname($image->path);
             $name = basename($image->path);
             Storage::disk('public')->assertExists([$image->path, "$dir/crop_300x300_$name", "$dir/crop_800x800_$name"]);
         }
-        [$w, $h] = getimagesize(Storage::disk('public')->path(Image::first()->path));
-        $this->assertSame([1200, 900], [$w, $h]);
+        // Ogni annuncio ha la sua foto vera (database/seeders/demo-images/{slug}.jpg), non una a caso della categoria
+        $bike = Article::where('title', 'Bicicletta da corsa in alluminio')->first();
+        $this->assertCount(1, $bike->images);
+        $this->assertFileEquals(
+            database_path('seeders/demo-images/bicicletta-da-corsa-in-alluminio.jpg'),
+            Storage::disk('public')->path($bike->images->first()->path),
+        );
+        foreach (Article::all() as $article) {
+            $this->assertFileExists(database_path('seeders/demo-images/'.Str::slug($article->title).'.jpg'), 'foto mancante per '.$article->title);
+        }
 
         // Le pagine del sito popolato funzionano e la ricerca trova gli annunci demo
         $article = Article::accepted()->first();
