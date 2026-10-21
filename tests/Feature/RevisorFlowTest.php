@@ -104,13 +104,15 @@ class RevisorFlowTest extends TestCase
         Queue::fake();
         $article = Article::factory()->create();
         $article->images()->create(['path' => 'articles/1/senza.jpg']);
-        $article->images()->create(['path' => 'articles/1/con.jpg'])->forceFill(['labels' => ['Cat']])->save();
+        $article->images()->create(['path' => 'articles/1/con.jpg'])->forceFill(['labels' => ['Cat'], 'faces_count' => 0])->save();
+        // Analisi Google presente ma volti non controllati (servizio locale spento al caricamento): da rifare
+        $article->images()->create(['path' => 'articles/1/volti.jpg'])->forceFill(['labels' => ['Cat']])->save();
 
         $this->artisan('app:analyze-images')->assertSuccessful();
-        Queue::assertPushed(RemoveFaces::class, 1);
+        Queue::assertPushed(RemoveFaces::class, 2);
 
         $this->artisan('app:analyze-images', ['--all' => true])->assertSuccessful();
-        Queue::assertPushed(RemoveFaces::class, 3);
+        Queue::assertPushed(RemoveFaces::class, 5); // 2 di prima + tutte e 3
     }
 
     public function test_accept_and_reject_require_confirmation_in_a_modal(): void

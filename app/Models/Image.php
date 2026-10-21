@@ -22,6 +22,12 @@ class Image extends Model
         'path',
     ];
 
+    // Volti controllati dal rilevatore locale (anche se non ne ha trovati)
+    public function facesChecked(): bool
+    {
+        return $this->faces_count !== null;
+    }
+
     public function article(): BelongsTo
     {
         return $this->belongsTo(Article::class);
@@ -141,6 +147,7 @@ class Image extends Model
     {
         return [
             'labels' => 'array',
+            'faces_count' => 'integer',
         ];
     }
 }

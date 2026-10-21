@@ -162,6 +162,38 @@ class AiAgentClient
         ];
     }
 
+    /**
+     * Volti da oscurare in una foto (rilevatore locale del servizio Python, non serve Ollama).
+     * Riquadri già allargati, in pixel della foto inviata.
+     *
+     * @return array{width: int, height: int, faces: list<array{x: int, y: int, width: int, height: int}>}
+     *
+     * @throws AgentUnavailableException
+     */
+    public function faces(string $imagePath): array
+    {
+        try {
+            $response = $this->http()
+                ->timeout(30)
+                ->post('/faces', ['image' => base64_encode((string) file_get_contents($imagePath))])
+                ->throw()
+                ->json();
+        } catch (ConnectionException|RequestException $error) {
+            throw new AgentUnavailableException('Rilevatore dei volti non disponibile: '.$error->getMessage(), previous: $error);
+        }
+
+        if (! is_array($response) || ! is_int($response['width'] ?? null) || ! is_int($response['height'] ?? null) || ! is_array($response['faces'] ?? null)) {
+            throw new AgentUnavailableException('Risposta non valida dal rilevatore dei volti.');
+        }
+
+        $faces = array_values(array_filter(
+            $response['faces'],
+            fn ($face) => is_array($face) && collect(['x', 'y', 'width', 'height'])->every(fn ($key) => is_int($face[$key] ?? null)),
+        ));
+
+        return ['width' => $response['width'], 'height' => $response['height'], 'faces' => $faces];
+    }
+
     private function http(): PendingRequest
     {
         return Http::baseUrl(config('services.ai_agent.url'))

@@ -8,7 +8,7 @@
 
 **Marketplace di annunci con moderazione umana e analisi delle immagini tramite intelligenza artificiale.**
 
-Ogni annuncio pubblicato da un utente passa da un revisore prima di diventare visibile. Le foto caricate vengono elaborate in background: i volti vengono oscurati, si generano miniature con watermark e Google Cloud Vision fornisce etichette e una valutazione dei contenuti sensibili per aiutare il revisore a decidere.
+Ogni annuncio pubblicato da un utente passa da un revisore prima di diventare visibile. Le foto caricate vengono elaborate in background: un rilevatore **locale** oscura i volti, si generano miniature con watermark e, se configurato, Google Cloud Vision fornisce etichette e una valutazione dei contenuti sensibili per aiutare il revisore a decidere.
 
 Un **agente AI** scritto in Python (LangChain/LangGraph) con un **modello locale** servito da Ollama aiuta gli utenti a trovare annunci in linguaggio naturale e dà ai revisori un parere motivato su ogni annuncio, senza chiavi API e funzionando anche offline.
 
@@ -17,8 +17,8 @@ Progetto finale del corso Hackademy (Aulab), ampliato con refactoring, test auto
 > **In English** — Presto.it is a classifieds marketplace built with **Laravel 13 + Livewire 4**, extended with a
 > **Python AI agent (LangChain/LangGraph + FastAPI)** running a **local model on Ollama** (no API keys, works offline):
 > a shopping assistant that answers with real listings, an AI opinion for human moderators, and a draft listing written
-> from a photo with a vision model. It also has a cart with purchase requests, real-time buyer–seller messaging
-> (Laravel Reverb), seller reviews, three UI languages and 239 + 121 automated tests running on GitHub Actions.
+> from a photo with a vision model, plus local face blurring (OpenCV) on every uploaded photo. It also has a cart with purchase requests, real-time buyer–seller messaging
+> (Laravel Reverb), seller reviews, three UI languages and 253 + 128 automated tests running on GitHub Actions.
 > Every AI feature is measured with repeatable evals and guarded by deterministic checks in code.
 
 <p align="center">
@@ -86,7 +86,7 @@ sequenceDiagram
 ### Revisori
 - **Dashboard di revisione** con coda in ordine di arrivo e conferma prima di accettare o rifiutare
 - **Annulla l'ultima decisione** entro 5 minuti: l'email all'autore parte solo allo scadere della finestra e solo se la decisione è ancora valida
-- Per ogni foto: **etichette** e **valutazioni SafeSearch** (adulti, violenza, contenuti espliciti…) di Google Vision
+- Per ogni foto: **quanti volti sono stati oscurati** (o se non sono ancora stati controllati), **etichette** e **valutazioni SafeSearch** (adulti, violenza, contenuti espliciti…) di Google Vision
 - Promozione a revisore tramite **link firmato a tempo** inviato via email all'amministratore
 
 ### Elaborazione delle immagini (code)
@@ -95,12 +95,14 @@ Ogni foto caricata avvia una catena di job in coda:
 
 ```mermaid
 flowchart LR
-    A[Upload foto] --> B[RemoveFaces<br/>oscura i volti]
+    A[Upload foto] --> B[RemoveFaces<br/>raddrizza e oscura i volti<br/>rilevatore locale]
     B --> C[ResizeImage 300×300<br/>miniatura + watermark]
     C --> D[ResizeImage 800×800<br/>dettaglio + watermark]
     D --> E[GoogleVisionSafeSearch<br/>contenuti sensibili]
     E --> F[GoogleVisionLabelImage<br/>etichette]
 ```
+
+**Oscuramento dei volti in locale.** `RemoveFaces` raddrizza la foto secondo l'EXIF (le foto del telefono sono spesso salvate "di lato") e chiede i volti al servizio Python, che usa **YuNet** di OpenCV: modello da 230 KB incluso nel repository, ~20 ms a foto, senza GPU né rete. Misurato con `ai-agent/evals/faces.py`: **24 volti su 25** (manca un profilo con occhiali da sole) e un falso volto in **2 foto di oggetti su 24** (i bottoncini di un mattoncino). Nessuna soglia separa i due casi, quindi si privilegia la privacy (soglia bassa, riquadri allargati del 25%) e il revisore vede per ogni foto quanti volti sono stati oscurati. Se il servizio è spento il job ritenta più tardi; `php artisan app:analyze-images` rimette in coda le foto rimaste da controllare.
 
 Un errore di Google Vision (credenziali mancanti, servizio non raggiungibile) non blocca la catena: le miniature vengono generate comunque e la dashboard del revisore segnala l'analisi mancante.
 
@@ -137,10 +139,10 @@ flowchart LR
 | Backend | PHP 8.2+, Laravel 13, Laravel Fortify, Laravel Scout + TNTSearch |
 | Frontend | Blade, Livewire 4, Bootstrap 5.3, Bootstrap Icons, Vite (nessuna dipendenza da CDN) |
 | Tempo reale | Laravel Reverb (WebSocket), Laravel Echo |
-| Immagini | Google Cloud Vision API, Spatie Image (GD) |
+| Immagini | Rilevamento volti in locale (OpenCV YuNet), Google Cloud Vision API (facoltativa), Spatie Image (GD) |
 | Agente AI | Python 3.12 (uv), FastAPI, LangChain + LangGraph, Ollama con `qwen2.5:3b` (testo) e `qwen2.5vl:3b` (visione, facoltativo) in locale |
 | Dati | MySQL, code e sessioni su database |
-| Test e qualità | PHPUnit (239 test), pytest (121 test), Laravel Pint, ruff, GitHub Actions |
+| Test e qualità | PHPUnit (253 test), pytest (128 test), Laravel Pint, ruff, GitHub Actions |
 
 ---
 
@@ -191,13 +193,13 @@ Per riportare il sito allo stato demo iniziale (database, foto caricate e indice
 composer run demo
 ```
 
-Il sito non usa CDN: icone e stili sono inclusi nel build, quindi la demo funziona anche senza connessione (tranne l'analisi di Google Vision).
+Il sito non usa CDN: icone e stili sono inclusi nel build, quindi la demo funziona anche senza connessione, oscuramento dei volti compreso (manca solo l'analisi di Google Vision).
 
 Per usare foto vere al posto delle immagini generate vedi [`database/seeders/demo-images`](database/seeders/demo-images/README.md).
 
 ### Google Cloud Vision (facoltativo)
 
-Senza credenziali il sito funziona: solo l'oscuramento dei volti e l'analisi delle foto vengono saltati.
+Senza credenziali il sito funziona: mancano solo etichette e valutazioni SafeSearch delle foto. I volti li oscura comunque il rilevatore locale.
 
 1. Crea un service account con la **Cloud Vision API** abilitata e scarica la chiave JSON.
 2. Salvala come `google_credential.json` nella root del progetto (il file è già in `.gitignore`), oppure indica il percorso in `GOOGLE_VISION_CREDENTIALS` nel `.env`.
@@ -243,10 +245,10 @@ In sviluppo le email (reset password, candidature revisore) finiscono nel log (`
 php artisan test
 ```
 
-I 239 test Laravel coprono, tra l'altro:
+I 253 test Laravel coprono, tra l'altro:
 
 - **sicurezza e permessi**: solo i revisori approvano, link di promozione firmati e a scadenza, annunci non pubblicati invisibili agli altri utenti, modifica ed eliminazione riservate all'autore;
-- **flussi completi**: ricerca e filtri, pubblicazione, revisione con email all'autore e annullamento, reset password, profilo e foto profilo, catena di elaborazione delle immagini;
+- **flussi completi**: ricerca e filtri, pubblicazione, revisione con email all'autore e annullamento, reset password, profilo e foto profilo, catena di elaborazione delle immagini, oscuramento dei volti (riquadri, tentativi con il servizio spento, tutte le 8 orientazioni EXIF);
 - **recensioni**: solo l'acquirente di una vendita accettata e una sola volta, errori di validazione sotto il modulo giusto, media calcolata correttamente, pagina pubblica senza dati privati;
 - **messaggi**: solo acquirente e venditore leggono e scrivono, conversazione chiusa dopo rifiuto o annullamento, evento trasmesso sui canali giusti senza il testo, contatori dei non letti, email ritardata e saltata se il messaggio è stato letto;
 - **carrello e richieste d'acquisto**: niente annunci propri, riservati o venduti nel carrello, una richiesta per venditore, accetta/rifiuta/annulla solo da chi ne ha diritto e solo se ancora in attesa, email alle due parti;
@@ -257,7 +259,7 @@ I 239 test Laravel coprono, tra l'altro:
 
 I test usano un database SQLite in memoria e il driver Scout `collection`: non toccano il database né l'indice di ricerca di sviluppo.
 
-L'agente Python ha 121 test propri (`cd ai-agent && uv run pytest`) con un modello e un Laravel finti: tool, difese contro il prompt injection, memoria della conversazione, regole di moderazione, endpoint e autenticazione.
+L'agente Python ha 128 test propri (`cd ai-agent && uv run pytest`) con un modello e un Laravel finti: tool, difese contro il prompt injection, memoria della conversazione, regole di moderazione, endpoint e autenticazione.
 
 A ogni push e pull request **GitHub Actions** esegue le due suite (quella Laravel con il build del front-end) e controlla lo stile del codice con [Laravel Pint](https://laravel.com/docs/pint) e [ruff](https://docs.astral.sh/ruff/): vedi [`.github/workflows/tests.yml`](.github/workflows/tests.yml). Per formattare il codice in locale: `vendor/bin/pint` e `cd ai-agent && uv run ruff format .`.
 

@@ -132,6 +132,15 @@
                                                     @endif
                                                 </div>
 
+                                                {{-- Oscuramento dei volti (rilevatore locale): il revisore controlla che sia giusto --}}
+                                                <p class="small mb-3 {{ $image->facesChecked() ? 'text-neon-cyan' : 'text-warning' }}">
+                                                    @if ($image->facesChecked())
+                                                        <i class="bi bi-person-bounding-box me-1" aria-hidden="true"></i>{{ trans_choice('ui.faces_hidden', $image->faces_count, ['count' => $image->faces_count]) }}
+                                                    @else
+                                                        <i class="bi bi-exclamation-triangle-fill me-1" aria-hidden="true"></i>{{ __('ui.faces_unchecked') }}
+                                                    @endif
+                                                </p>
+
                                                 @unless ($image->hasVisionAnalysis())
                                                     <p class="text-warning small fst-italic mb-3">{{ __('ui.vision_missing_help') }}</p>
                                                 @endunless

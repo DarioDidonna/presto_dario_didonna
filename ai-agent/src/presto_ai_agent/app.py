@@ -12,6 +12,7 @@ from pydantic import BaseModel, Field
 from .agent import ChatResult, ShoppingAgent
 from .config import Settings, get_settings
 from .describe import Describer, DescribeRequest, DraftAd, InvalidImageError, describe_photo, ollama_describer
+from .faces import Detector, FacesRequest, FacesResult, find_faces, yunet_detector
 from .review import ArticleForReview, Judge, ReviewSuggestion, ollama_judge, review
 
 app = FastAPI(title="Presto.it AI agent", version="0.1.0")
@@ -33,6 +34,10 @@ def get_judge() -> Judge:
 def get_describer() -> Describer:
     settings = get_settings()
     return ollama_describer(ChatOllama(model=settings.vision_model, base_url=settings.ollama_base_url, temperature=0))
+
+
+def get_face_detector() -> Detector:
+    return yunet_detector
 
 
 def require_token(
@@ -115,3 +120,16 @@ def describe(request: DescribeRequest, describer: Annotated[Describer, Depends(g
         raise HTTPException(503, "Il modello di visione non è raggiungibile (Ollama è acceso?).") from error
     except Exception as error:  # noqa: BLE001 — modello mancante o output non valido: nessuna bozza
         raise HTTPException(503, "Il modello di visione non ha prodotto una risposta valida.") from error
+
+
+@app.post("/faces", dependencies=[Depends(require_token)])
+def faces(
+    request: FacesRequest,
+    settings: Annotated[Settings, Depends(get_settings)],
+    detector: Annotated[Detector, Depends(get_face_detector)],
+) -> FacesResult:
+    """Riquadri dei volti da oscurare (già allargati), in pixel della foto ricevuta. Non serve Ollama."""
+    try:
+        return find_faces(request, detector, settings.face_threshold, settings.face_margin)
+    except InvalidImageError as error:
+        raise HTTPException(422, str(error)) from error
