@@ -19,16 +19,19 @@ class Review extends Model
         return ['rating' => 'integer'];
     }
 
+    /** @return BelongsTo<PurchaseRequest, $this> */
     public function purchaseRequest(): BelongsTo
     {
         return $this->belongsTo(PurchaseRequest::class);
     }
 
+    /** @return BelongsTo<User, $this> */
     public function reviewer(): BelongsTo
     {
         return $this->belongsTo(User::class, 'reviewer_id');
     }
 
+    /** @return BelongsTo<User, $this> */
     public function seller(): BelongsTo
     {
         return $this->belongsTo(User::class, 'seller_id');

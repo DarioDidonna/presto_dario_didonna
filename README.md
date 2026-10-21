@@ -18,7 +18,7 @@ Progetto finale del corso Hackademy (Aulab), ampliato con refactoring, test auto
 > **Python AI agent (LangChain/LangGraph + FastAPI)** running a **local model on Ollama** (no API keys, works offline):
 > a shopping assistant that answers with real listings, an AI opinion for human moderators, and a draft listing written
 > from a photo with a vision model, plus local face blurring (OpenCV) on every uploaded photo. It also has a cart with purchase requests, real-time buyer–seller messaging
-> (Laravel Reverb), seller reviews, three UI languages and 252 + 125 automated tests running on GitHub Actions.
+> (Laravel Reverb), seller reviews, three UI languages and 253 + 125 automated tests, static analysis with Larastan running on GitHub Actions.
 > Every AI feature is measured with repeatable evals and guarded by deterministic checks in code.
 
 <p align="center">
@@ -138,7 +138,7 @@ flowchart LR
 | Immagini | Rilevamento volti in locale (OpenCV YuNet), Spatie Image (GD) |
 | Agente AI | Python 3.12 (uv), FastAPI, LangChain + LangGraph, Ollama con `qwen2.5:3b` (testo) e `qwen2.5vl:3b` (visione, facoltativo) in locale |
 | Dati | MySQL, code e sessioni su database |
-| Test e qualità | PHPUnit (252 test), pytest (125 test), Laravel Pint, ruff, GitHub Actions |
+| Test e qualità | PHPUnit (253 test), pytest (125 test), Larastan (PHPStan livello 5), Laravel Pint, ruff, GitHub Actions |
 
 ---
 
@@ -233,7 +233,7 @@ In sviluppo le email (reset password, candidature revisore) finiscono nel log (`
 php artisan test
 ```
 
-I 252 test Laravel coprono, tra l'altro:
+I 253 test Laravel coprono, tra l'altro:
 
 - **sicurezza e permessi**: solo i revisori approvano, link di promozione firmati e a scadenza, annunci non pubblicati invisibili agli altri utenti, modifica ed eliminazione riservate all'autore;
 - **flussi completi**: ricerca e filtri, pubblicazione, revisione con email all'autore e annullamento, reset password, profilo e foto profilo, catena di elaborazione delle immagini, oscuramento dei volti (riquadri, tentativi con il servizio spento, tutte le 8 orientazioni EXIF);
@@ -249,7 +249,9 @@ I test usano un database SQLite in memoria e il driver Scout `collection`: non t
 
 L'agente Python ha 125 test propri (`cd ai-agent && uv run pytest`) con un modello e un Laravel finti: tool, difese contro il prompt injection, memoria della conversazione, regole di moderazione, endpoint e autenticazione.
 
-A ogni push e pull request **GitHub Actions** esegue le due suite (quella Laravel con il build del front-end) e controlla lo stile del codice con [Laravel Pint](https://laravel.com/docs/pint) e [ruff](https://docs.astral.sh/ruff/): vedi [`.github/workflows/tests.yml`](.github/workflows/tests.yml). Per formattare il codice in locale: `vendor/bin/pint` e `cd ai-agent && uv run ruff format .`.
+A ogni push e pull request **GitHub Actions** esegue le due suite (quella Laravel con il build del front-end), l'**analisi statica** con [Larastan](https://github.com/larastan/larastan) e controlla lo stile del codice con [Laravel Pint](https://laravel.com/docs/pint) e [ruff](https://docs.astral.sh/ruff/): vedi [`.github/workflows/tests.yml`](.github/workflows/tests.yml). In locale: `composer analyse`, `vendor/bin/pint` e `cd ai-agent && uv run ruff format .`.
+
+**Analisi statica.** Larastan (PHPStan per Laravel) al livello 5, configurato in [`phpstan.neon`](phpstan.neon), su `app`, `routes` e `database`: zero errori, senza baseline né soppressioni. Introdurlo ha richiesto di dichiarare i tipi delle relazioni Eloquent (`BelongsTo<User, $this>`) e ha trovato un bug vero: il prezzo era un `float` a **precisione singola** (`float('price', 8, 2)`, dove dal Laravel 11 il terzo argomento è ignorato), quindi 999.999,99 €, il massimo ammesso dal modulo, veniva salvato come 1.000.000 €. Ora è `decimal(10,2)`, con un test.
 
 ---
 
@@ -289,3 +291,10 @@ ai-agent/                    Servizio Python dell'agente AI
 ## Autore
 
 **Dario Didonna** — [GitHub](https://github.com/DarioDidonna)
+
+## Licenza
+
+Codice rilasciato con licenza [MIT](LICENSE). Fanno eccezione, con le rispettive licenze:
+- le foto demo in `database/seeders/demo-images/` (Wikimedia Commons: autori e licenze in [`CREDITS.md`](database/seeders/demo-images/CREDITS.md));
+- il modello YuNet in `ai-agent/src/presto_ai_agent/models/` (MIT, [`LICENSE-yunet`](ai-agent/src/presto_ai_agent/models/LICENSE-yunet)).
+

@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\Agent;
 
+use App\Models\Article;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Str;
@@ -9,6 +10,8 @@ use Illuminate\Support\Str;
 /**
  * Annuncio come lo vede l'agente: solo dati pubblici (niente email né altri dati personali del venditore).
  * Titolo e descrizione sono scritti dagli utenti: l'agente li tratta come dati, non come istruzioni.
+ *
+ * @mixin Article
  */
 class ArticleResource extends JsonResource
 {

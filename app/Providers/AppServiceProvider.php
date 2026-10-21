@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Models\Category;
+use App\Models\User;
 use App\View\Composers\ErrorPageLocaleComposer;
 use App\View\Composers\MarketStatsComposer;
 use Illuminate\Auth\Events\Login;
@@ -41,7 +42,7 @@ class AppServiceProvider extends ServiceProvider
 
         // Al login si ripristina la lingua scelta l'ultima volta dall'utente
         Event::listen(Login::class, function (Login $event) {
-            if ($event->user->locale && request()->hasSession()) {
+            if ($event->user instanceof User && $event->user->locale && request()->hasSession()) {
                 request()->session()->put('locale', $event->user->locale);
             }
         });

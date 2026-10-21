@@ -66,4 +66,13 @@ class ArticleFlowTest extends TestCase
         Storage::disk('public')->assertExists(dirname($path).'/crop_800x800_'.basename($path));
         $this->assertStringEndsWith('crop_800x800_'.basename($path), $image->getDisplayUrl());
     }
+
+    public function test_prices_are_stored_exactly_up_to_the_maximum_allowed(): void
+    {
+        // Con il vecchio float a precisione singola 999999.99 diventava 1000000 (trovato con Larastan)
+        foreach (['999999.99', '123456.78', '0.01'] as $price) {
+            $article = Article::factory()->create(['price' => $price]);
+            $this->assertSame($price, $article->fresh()->price);
+        }
+    }
 }

@@ -73,6 +73,32 @@ jobs:
       - name: Pint
         run: vendor/bin/pint --test
 
+  larastan:
+    name: Analisi statica (Larastan)
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: PHP 8.4
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          coverage: none
+
+      - name: Cache Composer
+        uses: actions/cache@v4
+        with:
+          path: ~/.composer/cache/files
+          key: composer-${{ hashFiles('composer.lock') }}
+
+      - name: Dipendenze PHP
+        run: composer install --no-interaction --prefer-dist --no-progress
+
+      # Livello e cartelle in phpstan.neon; Larastan legge le migrazioni per conoscere le colonne dei modelli
+      - name: PHPStan
+        run: vendor/bin/phpstan analyse --no-progress --memory-limit=1G
+
   agent:
     name: Agente AI (Python)
     runs-on: ubuntu-latest

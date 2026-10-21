@@ -15,7 +15,9 @@ return new class extends Migration
             $table->id();
             $table->string('title');
             $table->text('description');
-            $table->float('price', 8, 2);
+            // Era float('price', 8, 2): in Laravel 11+ float() accetta solo la precisione, quindi la colonna è un float a
+            // precisione singola. Corretto in decimal dalla migrazione 2026_10_23 (questa resta com'era per la cronologia)
+            $table->float('price', 8);
             // relazione con Category
             $table->unsignedBigInteger('category_id')->nullable();
             $table->foreign('category_id')->references('id')->on('categories');

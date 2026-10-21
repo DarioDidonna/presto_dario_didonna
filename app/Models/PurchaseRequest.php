@@ -28,26 +28,31 @@ class PurchaseRequest extends Model
         return ['total' => 'decimal:2'];
     }
 
+    /** @return BelongsTo<User, $this> */
     public function buyer(): BelongsTo
     {
         return $this->belongsTo(User::class, 'buyer_id');
     }
 
+    /** @return BelongsTo<User, $this> */
     public function seller(): BelongsTo
     {
         return $this->belongsTo(User::class, 'seller_id');
     }
 
+    /** @return HasMany<PurchaseRequestItem, $this> */
     public function items(): HasMany
     {
         return $this->hasMany(PurchaseRequestItem::class);
     }
 
+    /** @return HasMany<Message, $this> */
     public function messages(): HasMany
     {
         return $this->hasMany(Message::class)->oldest()->orderBy('id');
     }
 
+    /** @return HasOne<Review, $this> */
     public function review(): HasOne
     {
         return $this->hasOne(Review::class);

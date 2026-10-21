@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Database\Factories\ArticleFactory;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -22,11 +23,13 @@ class Article extends Model
         'user_id',
     ];
 
+    /** @return BelongsTo<User, $this> */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
+    /** @return BelongsTo<Category, $this> */
     public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class);
@@ -68,12 +71,20 @@ class Article extends Model
 
     // Elenchi pubblici (ricerca, categorie, homepage, statistiche, agente AI): pubblicati e non ancora venduti.
     // La pagina di un annuncio venduto resta raggiungibile (ArticlePolicy::view), con l'etichetta "Venduto".
-    public function scopeAccepted($query)
+    /**
+     * @param  Builder<Article>  $query
+     * @return Builder<Article>
+     */
+    public function scopeAccepted(Builder $query): Builder
     {
         return $query->where('is_accepted', true)->whereNull('sold_at');
     }
 
-    public function scopeWithCardRelations($query)
+    /**
+     * @param  Builder<Article>  $query
+     * @return Builder<Article>
+     */
+    public function scopeWithCardRelations(Builder $query): Builder
     {
         return $query->with(['images', 'category']);
     }
@@ -100,6 +111,7 @@ class Article extends Model
         ];
     }
 
+    /** @return HasMany<Image, $this> */
     public function images(): HasMany
     {
         return $this->hasMany(Image::class);

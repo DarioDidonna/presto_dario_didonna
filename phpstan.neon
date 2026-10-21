@@ -1,0 +1,11 @@
+includes:
+    - vendor/larastan/larastan/extension.neon
+
+parameters:
+    # Livello 5: tipi di argomenti e valori di ritorno controllati. Larastan legge le migrazioni per conoscere
+    # le colonne dei modelli e i tipi generici delle relazioni Eloquent per seguire $a->b->c.
+    level: 5
+    paths:
+        - app
+        - routes
+        - database

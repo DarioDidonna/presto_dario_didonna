@@ -6,6 +6,7 @@ use App\Models\Article;
 use App\Models\PurchaseRequest;
 use App\Models\User;
 use App\Notifications\PurchaseRequested;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
@@ -21,7 +22,7 @@ class Checkout
      */
     public function submit(User $buyer, ?string $message): Collection
     {
-        $unavailable = collect();
+        $unavailable = new EloquentCollection;
 
         $requests = DB::transaction(function () use ($buyer, $message, &$unavailable) {
             $ids = $buyer->cart()->pluck('articles.id');

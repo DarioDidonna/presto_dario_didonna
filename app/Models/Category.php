@@ -8,6 +8,10 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Str;
 
+/**
+ * @property-read int|null $published_count conteggio con withCount() nelle API dell'agente
+ * @property-read int|null $accepted_articles_count conteggio con withCount() nel menu e nella homepage
+ */
 class Category extends Model
 {
     /** @use HasFactory<CategoryFactory> */
@@ -25,6 +29,7 @@ class Category extends Model
         return trans()->has($key) ? __($key) : $this->name;
     }
 
+    /** @return HasMany<Article, $this> */
     public function articles(): HasMany
     {
         return $this->hasMany(Article::class);

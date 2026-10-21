@@ -26,6 +26,7 @@ class Image extends Model
         return $this->faces_count !== null;
     }
 
+    /** @return BelongsTo<Article, $this> */
     public function article(): BelongsTo
     {
         return $this->belongsTo(Article::class);
