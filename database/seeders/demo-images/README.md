@@ -1,21 +1,14 @@
-# Foto per i dati demo (facoltative)
+# Foto per i dati demo
 
-Il `DemoSeeder` usa le foto di questa cartella se esistono; altrimenti genera immagini astratte nei colori del sito.
+Il `DemoSeeder` sceglie la foto di ogni annuncio in quest'ordine:
 
-Crea una sottocartella per categoria e mettici file `.jpg`, `.png` o `.webp` (meglio se orizzontali, almeno 1200×900):
+1. **`{slug-del-titolo}.jpg`** (più `-2.jpg`, `-3.jpg` per altre foto dello stesso annuncio): per esempio
+   `bicicletta-da-corsa-in-alluminio.jpg`. Le 24 foto presenti vengono da Wikimedia Commons con licenze libere:
+   autori e licenze in [`CREDITS.md`](CREDITS.md).
+2. **Una sottocartella per categoria** (`elettronica/`, `sport/`, …) con file `.jpg`, `.png` o `.webp`: le foto
+   vengono assegnate a rotazione agli annunci di quella categoria.
+3. Se non trova nulla, **genera un'immagine astratta** nei colori del sito.
 
-- `abbigliamento/` → Abbigliamento
-- `accessori/` → Accessori
-- `animali-domestici/` → Animali domestici
-- `casa-e-giardinaggio/` → Casa e Giardinaggio
-- `elettronica/` → Elettronica
-- `giocattoli/` → Giocattoli
-- `libri-e-riviste/` → Libri e Riviste
-- `motori/` → Motori
-- `salute-e-bellezza/` → Salute e Bellezza
-- `sport/` → Sport
+Tutte passano dal normale ridimensionamento con watermark. Usa solo immagini di cui hai i diritti.
 
-Le foto vengono assegnate a rotazione agli annunci di quella categoria e passano dal normale ridimensionamento con watermark.
-Usa solo immagini di cui hai i diritti (ad esempio scatti tuoi o foto con licenza libera come Unsplash/Pexels).
-
-Poi rigenera i dati: `php artisan migrate:fresh --seed` (cancella il database!) oppure, su un database con le sole categorie, `php artisan db:seed --class=DemoSeeder`.
+Per rigenerare i dati demo: `composer run demo` (cancella il database e le foto caricate).

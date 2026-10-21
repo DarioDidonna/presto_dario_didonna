@@ -1,5 +1,11 @@
 # Presto.it
 
+![PHP](https://img.shields.io/badge/PHP-8.2%2B-777BB4?logo=php&logoColor=white)
+![Laravel](https://img.shields.io/badge/Laravel-13-FF2D20?logo=laravel&logoColor=white)
+![Livewire](https://img.shields.io/badge/Livewire-4-FB70A9?logo=livewire&logoColor=white)
+![Bootstrap](https://img.shields.io/badge/Bootstrap-5.3-7952B3?logo=bootstrap&logoColor=white)
+[![Test](https://github.com/DarioDidonna/presto_dario_didonna/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/DarioDidonna/presto_dario_didonna/actions/workflows/tests.yml)
+
 **Marketplace di annunci con moderazione umana e analisi delle immagini tramite intelligenza artificiale.**
 
 Ogni annuncio pubblicato da un utente passa da un revisore prima di diventare visibile. Le foto caricate vengono elaborate in background: i volti vengono oscurati, si generano miniature con watermark e Google Cloud Vision fornisce etichette e una valutazione dei contenuti sensibili per aiutare il revisore a decidere.
@@ -8,20 +14,29 @@ Un **agente AI** scritto in Python (LangChain/LangGraph) con un **modello locale
 
 Progetto finale del corso Hackademy (Aulab), ampliato con refactoring, test automatici e nuove funzionalità.
 
-<!--
-  SCREENSHOT: aggiungi le immagini in docs/screenshots/ e togli questo commento.
+> **In English** — Presto.it is a classifieds marketplace built with **Laravel 13 + Livewire 4**, extended with a
+> **Python AI agent (LangChain/LangGraph + FastAPI)** running a **local model on Ollama** (no API keys, works offline):
+> a shopping assistant that answers with real listings, an AI opinion for human moderators, and a draft listing written
+> from a photo with a vision model. It also has a cart with purchase requests, real-time buyer–seller messaging
+> (Laravel Reverb), seller reviews, three UI languages and 239 + 121 automated tests running on GitHub Actions.
+> Every AI feature is measured with repeatable evals and guarded by deterministic checks in code.
 
-  <p align="center">
-    <img src="docs/screenshots/homepage.png" width="49%" alt="Homepage">
-    <img src="docs/screenshots/revisor.png" width="49%" alt="Dashboard del revisore">
-  </p>
--->
+<p align="center">
+  <img src="docs/screenshots/assistente.jpg" alt="Assistente acquisti: chat con un modello locale che risponde con annunci veri">
+</p>
 
-![PHP](https://img.shields.io/badge/PHP-8.2%2B-777BB4?logo=php&logoColor=white)
-![Laravel](https://img.shields.io/badge/Laravel-13-FF2D20?logo=laravel&logoColor=white)
-![Livewire](https://img.shields.io/badge/Livewire-4-FB70A9?logo=livewire&logoColor=white)
-![Bootstrap](https://img.shields.io/badge/Bootstrap-5.3-7952B3?logo=bootstrap&logoColor=white)
-[![Test](https://github.com/DarioDidonna/presto_dario_didonna/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/DarioDidonna/presto_dario_didonna/actions/workflows/tests.yml)
+<table>
+  <tr>
+    <td width="50%"><img src="docs/screenshots/compila-ai.jpg" alt="Compila con l'AI: bozza dell'annuncio dalla foto"><br><sub><b>Compila con l'AI</b>: bozza dell'annuncio dalla foto, con un modello di visione locale</sub></td>
+    <td width="50%"><img src="docs/screenshots/messaggi.jpg" alt="Messaggi in tempo reale tra acquirente e venditore"><br><sub><b>Messaggi in tempo reale</b> (Reverb) e recensione del venditore dopo l'acquisto</sub></td>
+  </tr>
+  <tr>
+    <td width="50%"><img src="docs/screenshots/revisore.jpg" alt="Dashboard del revisore con il parere dell'AI"><br><sub><b>Dashboard del revisore</b>: parere dell'AI, decide sempre una persona</sub></td>
+    <td width="50%"><img src="docs/screenshots/elenco.jpg" alt="Elenco annunci con ricerca e filtri"><br><sub><b>Ricerca e filtri</b>, annunci riservati e carrello</sub></td>
+  </tr>
+</table>
+
+<!-- DEMO: aggiungi qui una GIF di 10-20 secondi (docs/demo.gif), per esempio la chat dell'assistente o i messaggi in tempo reale. -->
 
 ---
 

@@ -19,8 +19,10 @@ use Illuminate\Support\Str;
  *
  *   php artisan db:seed --class=DemoSeeder
  *
- * Foto: se esiste database/seeders/demo-images/{slug-categoria}/ con file jpg/png/webp vengono usati quelli,
- * altrimenti si generano immagini astratte nei colori del sito (nessuna connessione richiesta).
+ * Foto, in ordine di preferenza (nessuna connessione richiesta):
+ * 1. database/seeders/demo-images/{slug-del-titolo}.jpg (e -2.jpg, -3.jpg…): foto libere di Wikimedia, vedi CREDITS.md;
+ * 2. database/seeders/demo-images/{slug-categoria}/: foto qualsiasi della categoria, a rotazione;
+ * 3. immagini astratte generate nei colori del sito.
  */
 class DemoSeeder extends Seeder
 {
@@ -105,8 +107,15 @@ class DemoSeeder extends Seeder
             $article->updated_at = $createdAt;
             $article->save();
 
-            foreach (range(1, $photos) as $n) {
-                $this->addImage($article, $category, $n);
+            $ownPhotos = $this->articlePhotos($title);
+            if ($ownPhotos !== []) {
+                foreach ($ownPhotos as $n => $photo) {
+                    $this->storeImage($article, $photo, $n + 1);
+                }
+            } else {
+                foreach (range(1, $photos) as $n) {
+                    $this->addImage($article, $category, $n);
+                }
             }
         }
 
@@ -224,13 +233,30 @@ class DemoSeeder extends Seeder
         return $user;
     }
 
+    // Foto proprie dell'annuncio: {slug-del-titolo}.jpg, {slug-del-titolo}-2.jpg, …
+    private function articlePhotos(string $title): array
+    {
+        $base = database_path('seeders/demo-images/'.Str::slug($title));
+
+        return collect(['.jpg', '-2.jpg', '-3.jpg'])
+            ->map(fn ($suffix) => $base.$suffix)
+            ->filter(fn ($path) => is_file($path))
+            ->values()
+            ->all();
+    }
+
     private function addImage(Article $article, string $category, int $n): void
+    {
+        $this->storeImage($article, $this->realPhoto($category, $article->id + $n), $n, $category);
+    }
+
+    // Copia la foto (o ne genera una astratta se $photo è null) e crea le miniature con watermark
+    private function storeImage(Article $article, ?string $photo, int $n, ?string $category = null): void
     {
         $disk = Storage::disk('public');
         $path = "articles/{$article->id}/demo-{$n}-".Str::random(8).'.jpg';
         $disk->makeDirectory(dirname($path));
 
-        $photo = $this->realPhoto($category, $article->id + $n);
         $photo
             ? File::copy($photo, $disk->path($path))
             : $this->generateImage($disk->path($path), self::COLORS[$category] ?? [6, 182, 212], $article->id * 10 + $n);
