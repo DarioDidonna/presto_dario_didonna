@@ -188,7 +188,7 @@ return [
     'validation_images_max_count' => 'Puedes subir como máximo :max imágenes.',
     'vision_done' => 'Análisis completado',
     'vision_missing' => 'Análisis no disponible',
-    'vision_missing_help' => 'Google Vision no analizó esta imagen (credenciales no válidas o servicio no disponible). Revisa los rostros y el contenido manualmente.',
+    'vision_missing_help' => 'Google Vision no ha analizado esta imagen (credenciales no válidas o servicio no disponible): no hay etiquetas ni valoraciones. Revisa el contenido a mano.',
     'show_password' => 'Mostrar u ocultar la contraseña',
     'articles_last_week' => 'Anuncios en los últimos 7 días',
     'articles_in_review' => 'Anuncios en revisión',
@@ -503,4 +503,6 @@ return [
     'ai_draft_unavailable' => 'El asistente no está disponible ahora: rellena los campos a mano.',
     'ai_draft_too_many' => 'Demasiadas solicitudes: inténtalo de nuevo en :seconds segundos.',
     'ai_draft_category_check' => 'Categoría propuesta por la IA: comprueba que sea la correcta.',
+    'faces_hidden' => '{0} No se ha encontrado ningún rostro: si en la foto hay personas, rechaza el anuncio|{1} 1 rostro ocultado: comprueba que sea correcto|[2,*] :count rostros ocultados: comprueba que sean correctos',
+    'faces_unchecked' => 'Rostros aún no revisados (servicio local apagado): comprueba que nadie sea reconocible',
 ];

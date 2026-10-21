@@ -188,7 +188,7 @@ return [
     'validation_images_max_count' => 'You can upload at most :max images.',
     'vision_done' => 'Analysis completed',
     'vision_missing' => 'Analysis unavailable',
-    'vision_missing_help' => 'Google Vision did not analyse this image (invalid credentials or service unreachable). Check faces and content manually.',
+    'vision_missing_help' => 'Google Vision did not analyse this image (invalid credentials or service unreachable): labels and ratings are not available. Check the content yourself.',
     'show_password' => 'Show or hide password',
     'articles_last_week' => 'Ads in the last 7 days',
     'articles_in_review' => 'Ads under review',
@@ -503,4 +503,6 @@ return [
     'ai_draft_unavailable' => 'The assistant is not available right now: fill in the fields yourself.',
     'ai_draft_too_many' => 'Too many requests: try again in :seconds seconds.',
     'ai_draft_category_check' => 'Category suggested by AI: check that it is right.',
+    'faces_hidden' => '{0} No face found: if there are people in the photo, reject the ad|{1} 1 face hidden: check it is correct|[2,*] :count faces hidden: check they are correct',
+    'faces_unchecked' => 'Faces not checked yet (local service off): make sure no one is recognisable',
 ];
