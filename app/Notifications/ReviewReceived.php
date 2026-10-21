@@ -32,7 +32,8 @@ class ReviewReceived extends Notification implements ShouldQueue
 
     public function toMail(object $notifiable): MailMessage
     {
-        $reviewer = $this->review->reviewer?->name ?? __('ui.anonymous_user');
+        // La recensione viene cancellata insieme al suo autore (chiave esterna): l'autore c'è sempre
+        $reviewer = $this->review->reviewer->name;
         $mail = (new MailMessage)
             ->subject(__('ui.reviews_mail_subject', ['name' => $reviewer]))
             ->greeting(__('ui.review_mail_greeting', ['name' => $notifiable->name]))

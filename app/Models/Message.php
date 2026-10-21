@@ -17,11 +17,13 @@ class Message extends Model
         return ['read_at' => 'datetime'];
     }
 
+    /** @return BelongsTo<PurchaseRequest, $this> */
     public function purchaseRequest(): BelongsTo
     {
         return $this->belongsTo(PurchaseRequest::class);
     }
 
+    /** @return BelongsTo<User, $this> */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);

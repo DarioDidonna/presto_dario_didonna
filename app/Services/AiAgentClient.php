@@ -120,7 +120,7 @@ class AiAgentClient
             $response = $this->http()
                 ->post('/describe', [
                     'image' => base64_encode((string) file_get_contents($resized)),
-                    'categories' => array_values($categories),
+                    'categories' => $categories,
                     'lang' => $lang,
                 ])
                 ->throw()

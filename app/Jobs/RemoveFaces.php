@@ -112,7 +112,7 @@ class RemoveFaces implements ShouldQueue
             return 0;
         }
 
-        $type = @getimagesize($path)[2] ?? null;
+        $type = (@getimagesize($path) ?: [])[2] ?? null;
         $gd = @imagecreatefromstring((string) file_get_contents($path));
         if (! $gd) {
             return 0;

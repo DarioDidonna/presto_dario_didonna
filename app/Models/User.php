@@ -15,6 +15,10 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
+/**
+ * @property-read float|null $reviews_received_avg_rating con withAvg() (pagina dell'annuncio)
+ * @property-read int|null $reviews_received_count con withCount()
+ */
 #[Fillable(['name', 'email', 'password'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable implements HasLocalePreference
@@ -35,12 +39,14 @@ class User extends Authenticatable implements HasLocalePreference
         ];
     }
 
+    /** @return HasMany<Article, $this> */
     public function articles(): HasMany
     {
         return $this->hasMany(Article::class);
     }
 
     // Annunci nel carrello (tabella cart_items), dal più recente
+    /** @return BelongsToMany<Article, $this> */
     public function cart(): BelongsToMany
     {
         return $this->belongsToMany(Article::class, 'cart_items')->withTimestamps()->latest('cart_items.created_at');
@@ -52,17 +58,20 @@ class User extends Authenticatable implements HasLocalePreference
         return in_array($this->locale, config('app.available_locales'), true) ? $this->locale : 'it';
     }
 
+    /** @return HasMany<PurchaseRequest, $this> */
     public function purchaseRequests(): HasMany
     {
         return $this->hasMany(PurchaseRequest::class, 'buyer_id');
     }
 
+    /** @return HasMany<PurchaseRequest, $this> */
     public function receivedPurchaseRequests(): HasMany
     {
         return $this->hasMany(PurchaseRequest::class, 'seller_id');
     }
 
     // Recensioni ricevute come venditore
+    /** @return HasMany<Review, $this> */
     public function reviewsReceived(): HasMany
     {
         return $this->hasMany(Review::class, 'seller_id');
