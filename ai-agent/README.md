@@ -65,17 +65,18 @@ Con `qwen2.5:3b` su Mac M3 / 8 GB: **6/10** prima delle difese, **29/30** su tre
 
 ## Assistente del revisore
 
-`POST /review` riceve da Laravel i dati di un annuncio in revisione (titolo, descrizione, prezzo, categoria,
-numero di foto, etichette e valutazioni SafeSearch di Google Vision) e restituisce un **suggerimento**:
+`POST /review` riceve da Laravel i dati di un annuncio in revisione (titolo, descrizione, prezzo, categoria e
+numero di foto) e restituisce un **suggerimento**:
 
 ```json
 {"recommendation": "reject", "confidence": 0.9, "reasons": ["Pagamento fuori dal sito"], "flags": [], "model_used": true}
 ```
 
 - **Regole deterministiche** (`review.py`): contenuti vietati (armi, droghe, farmaci, contraffazioni, animali),
-  SafeSearch "probabile", tentativi di manipolazione, contatti personali, prezzi sospetti, descrizioni povere.
+  tentativi di manipolazione, contatti personali, prezzi sospetti, descrizioni povere.
 - **Giudizio del modello** con output strutturato (Pydantic) per i casi che le regole non vedono: truffe,
-  annunci incoerenti con foto e categoria, contenuti vietati descritti in modo velato.
+  annunci incoerenti con la categoria, contenuti vietati descritti in modo velato. Il modello non vede le foto:
+  il loro contenuto lo controlla il revisore.
 - **Le regole bloccanti vincono sempre**: un annuncio scritto per manipolare il modello non può ottenere "accept".
   Se il modello non risponde, il suggerimento si basa sulle sole regole (`model_used: false`).
 - È solo un suggerimento: nella dashboard la decisione resta al revisore.
