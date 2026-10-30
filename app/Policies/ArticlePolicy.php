@@ -16,6 +16,12 @@ class ArticlePolicy
             || ($user && ($user->is_revisor || $user->id === $article->user_id));
     }
 
+    // Nessuno approva i propri annunci: la moderazione non si può aggirare diventando revisore
+    public function review(User $user, Article $article): bool
+    {
+        return $user->is_revisor && $user->id !== $article->user_id;
+    }
+
     // Carrello: solo annunci pubblicati, non riservati e non propri
     public function addToCart(User $user, Article $article): bool
     {

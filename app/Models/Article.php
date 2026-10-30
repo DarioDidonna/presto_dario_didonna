@@ -89,6 +89,17 @@ class Article extends Model
         return $query->with(['images', 'category']);
     }
 
+    // Annunci in attesa che questo revisore può giudicare (non i propri: ArticlePolicy::review)
+    /**
+     * @param  Builder<Article>  $query
+     * @return Builder<Article>
+     */
+    public function scopeToReviewBy(Builder $query, User $reviewer): Builder
+    {
+        return $query->whereNull('is_accepted')
+            ->where(fn ($owner) => $owner->whereNull('user_id')->orWhere('user_id', '!=', $reviewer->id));
+    }
+
     public static function toBeRevisedCount()
     {
         // once(): la navbar può chiamarlo più volte nella stessa richiesta

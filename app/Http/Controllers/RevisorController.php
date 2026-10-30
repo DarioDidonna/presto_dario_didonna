@@ -18,7 +18,7 @@ class RevisorController extends Controller
 
     public function index()
     {
-        $article_to_check = Article::with(['images', 'category', 'user'])->whereNull('is_accepted')->oldest()->first();
+        $article_to_check = Article::with(['images', 'category', 'user'])->toReviewBy(Auth::user())->oldest()->first();
 
         return view('revisor.index', compact('article_to_check'));
     }

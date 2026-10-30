@@ -35,10 +35,10 @@ Route::get('/venditore/{user}', [SellerController::class, 'show'])->name('seller
 Route::get('/revisor/index', [RevisorController::class, 'index'])->middleware('isRevisor')->name('revisor.index');
 
 // ACCEPT
-Route::patch('/accept/{article}', [RevisorController::class, 'accept'])->middleware('isRevisor')->name('accept');
+Route::patch('/accept/{article}', [RevisorController::class, 'accept'])->middleware(['isRevisor', 'can:review,article'])->name('accept');
 
 // REJECT
-Route::patch('/reject/{article}', [RevisorController::class, 'reject'])->middleware('isRevisor')->name('reject');
+Route::patch('/reject/{article}', [RevisorController::class, 'reject'])->middleware(['isRevisor', 'can:review,article'])->name('reject');
 
 // UNDO (ultima decisione del revisore)
 Route::patch('/revisor/undo', [RevisorController::class, 'undo'])->middleware('isRevisor')->name('revisor.undo');

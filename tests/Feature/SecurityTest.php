@@ -156,4 +156,21 @@ class SecurityTest extends TestCase
             Request::setTrustedHosts([]);
         }
     }
+
+    public function test_revisor_cannot_judge_their_own_article(): void
+    {
+        $revisor = User::factory()->revisor()->create();
+        $own = Article::factory()->create(['user_id' => $revisor->id]);
+
+        $this->actingAs($revisor)->patch(route('accept', $own))->assertForbidden();
+        $this->actingAs($revisor)->patch(route('reject', $own))->assertForbidden();
+        $this->assertNull($own->fresh()->is_accepted);
+
+        $this->actingAs($revisor)->get(route('revisor.index'))->assertDontSee($own->title);
+
+        $other = Article::factory()->create();
+        $this->actingAs($revisor)->get(route('revisor.index'))->assertSee($other->title);
+        $this->actingAs($revisor)->patch(route('accept', $other))->assertRedirect();
+        $this->assertTrue($other->fresh()->is_accepted);
+    }
 }
