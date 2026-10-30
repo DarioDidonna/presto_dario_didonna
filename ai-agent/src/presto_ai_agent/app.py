@@ -15,7 +15,8 @@ from .describe import Describer, DescribeRequest, DraftAd, InvalidImageError, de
 from .faces import Detector, FacesRequest, FacesResult, find_faces, yunet_detector
 from .review import ArticleForReview, Judge, ReviewSuggestion, ollama_judge, review
 
-app = FastAPI(title="Presto.it AI agent", version="0.1.0")
+# Niente /docs e /openapi.json: sono API interne, non serve descriverle a chi le raggiunge
+app = FastAPI(title="Presto.it AI agent", version="0.1.0", docs_url=None, redoc_url=None, openapi_url=None)
 
 
 @lru_cache
