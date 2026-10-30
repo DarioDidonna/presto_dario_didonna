@@ -230,4 +230,13 @@ class SecurityTest extends TestCase
         $this->assertFalse($check('Corta123'));
         $this->assertTrue($check('UnaPasswordLunga123'));
     }
+
+    public function test_reverb_defaults_are_closed(): void
+    {
+        $app = config('reverb.apps.apps.0');
+
+        $this->assertNotContains('*', $app['allowed_origins']);
+        $this->assertTrue($app['rate_limiting']['enabled']);
+        $this->assertSame('127.0.0.1', config('reverb.servers.reverb.host'));
+    }
 }
