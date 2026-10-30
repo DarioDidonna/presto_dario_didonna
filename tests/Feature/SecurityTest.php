@@ -4,7 +4,9 @@ namespace Tests\Feature;
 
 use App\Mail\BecomeRevisor;
 use App\Models\Article;
+use App\Models\PurchaseRequest;
 use App\Models\User;
+use App\Notifications\NewMessage;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Request;
@@ -172,5 +174,21 @@ class SecurityTest extends TestCase
         $this->actingAs($revisor)->get(route('revisor.index'))->assertSee($other->title);
         $this->actingAs($revisor)->patch(route('accept', $other))->assertRedirect();
         $this->assertTrue($other->fresh()->is_accepted);
+    }
+
+    public function test_markdown_written_by_users_does_not_become_a_link_in_emails(): void
+    {
+        $trap = '[Conferma il pagamento](https://evil.example/x)';
+        $sender = User::factory()->create(['name' => $trap]);
+        $request = PurchaseRequest::factory()->create(['buyer_id' => $sender->id]);
+        $message = $request->messages()->create(['user_id' => $sender->id, 'body' => "Ciao {$trap} **urgente** <b>x</b>"]);
+
+        $html = (string) (new NewMessage($message))->toMail($request->seller)->render();
+
+        $this->assertStringNotContainsString('href="https://evil.example', $html);
+        $this->assertStringNotContainsString('<strong>urgente', $html);
+        $this->assertStringNotContainsString('<b>x</b>', $html);
+        $this->assertStringContainsString('[Conferma il pagamento](https://evil.example/x)', $html);
+        $this->assertStringContainsString('**urgente**', $html);
     }
 }

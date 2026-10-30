@@ -3,6 +3,7 @@
 namespace App\Notifications;
 
 use App\Models\PurchaseRequest;
+use App\Support\MailText;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -37,15 +38,15 @@ class PurchaseRequestAnswered extends Notification implements ShouldQueue
         $mail = (new MailMessage)
             ->subject(__("ui.answer_mail_{$status}_subject", ['name' => $request->seller->name]))
             ->greeting(__('ui.review_mail_greeting', ['name' => $notifiable->name]))
-            ->line(__("ui.answer_mail_{$status}_line", ['name' => $request->seller->name]));
+            ->line(__("ui.answer_mail_{$status}_line", ['name' => MailText::plain($request->seller->name)]));
 
         foreach ($request->items as $item) {
-            $mail->line('• '.$item->title.' — '.number_format((float) $item->price, 2, ',', '.').' €');
+            $mail->line('• '.MailText::plain($item->title).' — '.number_format((float) $item->price, 2, ',', '.').' €');
         }
 
         if ($this->accepted) {
             // Ora che ha accettato, il contatto del venditore serve per accordarsi su pagamento e consegna
-            $mail->line(__('ui.answer_mail_contact', ['email' => $request->seller->email]));
+            $mail->line(__('ui.answer_mail_contact', ['email' => MailText::plain($request->seller->email)]));
         }
 
         return $mail->action(__('ui.orders_title'), route('orders.index'));

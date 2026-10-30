@@ -3,6 +3,7 @@
 namespace App\Notifications;
 
 use App\Models\Review;
+use App\Support\MailText;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -37,10 +38,10 @@ class ReviewReceived extends Notification implements ShouldQueue
         $mail = (new MailMessage)
             ->subject(__('ui.reviews_mail_subject', ['name' => $reviewer]))
             ->greeting(__('ui.review_mail_greeting', ['name' => $notifiable->name]))
-            ->line(__('ui.reviews_mail_line', ['name' => $reviewer, 'rating' => $this->review->rating]));
+            ->line(__('ui.reviews_mail_line', ['name' => MailText::plain($reviewer), 'rating' => $this->review->rating]));
 
         if ($this->review->comment) {
-            $mail->line('«'.Str::limit($this->review->comment, 300).'»');
+            $mail->line('«'.MailText::plain(Str::limit($this->review->comment, 300)).'»');
         }
 
         return $mail->action(__('ui.sales_title'), route('sales.index'));
