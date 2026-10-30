@@ -11,9 +11,12 @@ use App\Notifications\NewMessage;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rules\Password;
 use Tests\TestCase;
 
 class SecurityTest extends TestCase
@@ -214,5 +217,17 @@ class SecurityTest extends TestCase
         } finally {
             Request::setTrustedHosts([]);
         }
+    }
+
+    public function test_passwords_are_stricter_in_production(): void
+    {
+        Http::fake(['api.pwnedpasswords.com/*' => Http::response('')]);
+        $check = fn (string $password) => Validator::make(['password' => $password], ['password' => Password::default()])->passes();
+
+        $this->assertTrue($check('Corta123'));
+
+        $this->app['env'] = 'production';
+        $this->assertFalse($check('Corta123'));
+        $this->assertTrue($check('UnaPasswordLunga123'));
     }
 }

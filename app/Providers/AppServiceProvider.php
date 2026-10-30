@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Validation\Rules\Password;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -30,6 +31,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // In produzione anche il controllo sulle password già finite in un furto di dati (Have I Been Pwned riceve
+        // solo i primi 5 caratteri dell'hash, mai la password)
+        Password::defaults(fn () => $this->app->isProduction() ? Password::min(12)->uncompromised() : Password::min(8));
+
         // In produzione tutti i link generati sono HTTPS
         URL::forceHttps($this->app->isProduction());
 
