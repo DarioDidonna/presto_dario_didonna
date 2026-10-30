@@ -50,8 +50,15 @@ class FortifyServiceProvider extends ServiceProvider
         RateLimiter::for('login', function (Request $request) {
             $throttleKey = Str::transliterate(Str::lower($request->input(Fortify::username())).'|'.$request->ip());
 
-            return Limit::perMinute(5)->by($throttleKey);
+            // Il secondo limite ferma chi prova la stessa password su tante email diverse
+            return [Limit::perMinute(5)->by($throttleKey), Limit::perMinute(30)->by($request->ip())];
         });
+
+        // Registrazione e reset non hanno un limite in Fortify: invio di email e creazione di account a raffica.
+        // Applicato a tutte le sue rotte (config/fortify.php) perché funzioni anche con la cache delle rotte
+        RateLimiter::for('auth-forms', fn (Request $request) => in_array($request->route()?->getName(), ['register.store', 'password.email', 'password.update'], true)
+            ? Limit::perMinute(10)->by($request->ip())
+            : Limit::none());
 
         RateLimiter::for('two-factor', function (Request $request) {
             return Limit::perMinute(5)->by($request->session()->get('login.id'));

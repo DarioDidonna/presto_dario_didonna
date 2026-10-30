@@ -197,4 +197,13 @@ class AuthTest extends TestCase
         $this->withSession(['password_hash_web' => 'impronta-vecchia'])->get(route('profile.show'))->assertRedirect(route('login'));
         $this->assertGuest();
     }
+
+    public function test_register_and_reset_forms_are_rate_limited_by_ip(): void
+    {
+        foreach (range(1, 10) as $n) {
+            $this->post('/forgot-password', ['email' => "utente{$n}@example.com"])->assertRedirect();
+        }
+
+        $this->post('/forgot-password', ['email' => 'altro@example.com'])->assertStatus(429);
+    }
 }
