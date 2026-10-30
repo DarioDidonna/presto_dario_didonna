@@ -8,6 +8,7 @@ use App\Services\AiAgentClient;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
+use Livewire\Attributes\Locked;
 use Livewire\Component;
 
 /**
@@ -27,8 +28,10 @@ class ShoppingAssistant extends Component
     public string $input = '';
 
     /** @var list<array{role: string, text: string, articles?: list<array<string, mixed>>}> */
+    #[Locked]
     public array $messages = [];
 
+    #[Locked]
     public ?string $conversationId = null;
 
     public function mount(): void

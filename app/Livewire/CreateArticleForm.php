@@ -9,6 +9,7 @@ use App\Services\AgentUnavailableException;
 use App\Services\AiAgentClient;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\RateLimiter;
+use Livewire\Attributes\Locked;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 
@@ -18,12 +19,15 @@ class CreateArticleForm extends Component
 
     public const MAX_SUGGESTIONS_PER_MINUTE = 5;
 
+    #[Locked]
     public $article;
 
     // Categoria proposta dall'AI e non ancora confermata: il modello piccolo sbaglia circa 3 volte su 8
+    #[Locked]
     public bool $categoryToCheck = false;
 
     // Esito dell'ultima richiesta di bozza: 'filled', 'kept' (campi già scritti, lasciati com'erano) o null
+    #[Locked]
     public ?string $suggestion = null;
 
     /**

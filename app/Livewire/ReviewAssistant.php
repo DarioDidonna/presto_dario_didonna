@@ -17,8 +17,10 @@ class ReviewAssistant extends Component
     #[Locked]
     public int $articleId;
 
+    #[Locked]
     public ?array $suggestion = null;
 
+    #[Locked]
     public bool $unavailable = false;
 
     public function mount(int $articleId): void
