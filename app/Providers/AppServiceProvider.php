@@ -11,6 +11,7 @@ use Illuminate\Auth\Events\Login;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
@@ -29,6 +30,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // In produzione tutti i link generati sono HTTPS
+        URL::forceHttps($this->app->isProduction());
+
         View::composer(
             ['components.navbar', 'components.categories', 'livewire.article-form', 'article.index'],
             fn ($view) => $view->with('categories', once(

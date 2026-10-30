@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Http\Middleware\SecurityHeaders;
 use App\Mail\BecomeRevisor;
 use App\Models\Article;
 use App\Models\PurchaseRequest;
@@ -190,5 +191,28 @@ class SecurityTest extends TestCase
         $this->assertStringNotContainsString('<b>x</b>', $html);
         $this->assertStringContainsString('[Conferma il pagamento](https://evil.example/x)', $html);
         $this->assertStringContainsString('**urgente**', $html);
+    }
+
+    public function test_security_headers_are_on_every_response(): void
+    {
+        foreach (['/', '/up', '/api/agent/categories'] as $url) {
+            $this->get($url)
+                ->assertHeader('X-Frame-Options', 'SAMEORIGIN')
+                ->assertHeader('X-Content-Type-Options', 'nosniff')
+                ->assertHeader('Content-Security-Policy', SecurityHeaders::CSP)
+                ->assertHeaderMissing('Strict-Transport-Security');
+        }
+    }
+
+    public function test_hsts_is_sent_only_in_production_over_https(): void
+    {
+        config(['app.url' => 'https://presto.test']);
+        $this->app['env'] = 'production';
+
+        try {
+            $this->get('https://presto.test/up')->assertHeader('Strict-Transport-Security');
+        } finally {
+            Request::setTrustedHosts([]);
+        }
     }
 }

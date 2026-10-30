@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Middleware\IsRevisor;
+use App\Http\Middleware\SecurityHeaders;
 use App\Http\Middleware\SetLocaleMiddleware;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -21,6 +22,7 @@ return Application::configure(basePath: dirname(__DIR__))
             at: fn () => ['^'.preg_quote((string) parse_url((string) config('app.url'), PHP_URL_HOST), '/').'$'],
             subdomains: false,
         );
+        $middleware->append(SecurityHeaders::class);
         $middleware->web(append: [
             SetLocaleMiddleware::class,
         ]);
