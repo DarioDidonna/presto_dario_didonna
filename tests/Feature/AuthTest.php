@@ -177,4 +177,24 @@ class AuthTest extends TestCase
         $this->assertFalse($user->fresh()->hasVerifiedEmail());
         Notification::assertSentTo($user, VerifyEmail::class);
     }
+
+    public function test_changing_password_closes_other_sessions_but_not_this_one(): void
+    {
+        $user = User::factory()->create(['password' => 'Password123!']);
+
+        $this->actingAs($user)->get(route('profile.show'))->assertOk();
+
+        $this->put(route('user-password.update'), [
+            'current_password' => 'Password123!',
+            'password' => 'NuovaPassword456!',
+            'password_confirmation' => 'NuovaPassword456!',
+        ])->assertSessionHasNoErrors();
+
+        // Questa sessione resta aperta
+        $this->get(route('profile.show'))->assertOk();
+
+        // Un altro dispositivo ha ancora l'impronta della vecchia password
+        $this->withSession(['password_hash_web' => 'impronta-vecchia'])->get(route('profile.show'))->assertRedirect(route('login'));
+        $this->assertGuest();
+    }
 }

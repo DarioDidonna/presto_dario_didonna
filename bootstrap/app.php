@@ -7,6 +7,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
+use Illuminate\Session\Middleware\AuthenticateSession;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -24,6 +25,8 @@ return Application::configure(basePath: dirname(__DIR__))
         );
         $middleware->append(SecurityHeaders::class);
         $middleware->web(append: [
+            // Se la password cambia, le sessioni aperte sugli altri dispositivi vengono chiuse
+            AuthenticateSession::class,
             SetLocaleMiddleware::class,
         ]);
         $middleware->alias([
