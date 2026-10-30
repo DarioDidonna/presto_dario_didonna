@@ -16,6 +16,11 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        // Solo il dominio di APP_URL: un header Host falso viene rifiutato (Laravel non lo applica in locale e nei test)
+        $middleware->trustHosts(
+            at: fn () => ['^'.preg_quote((string) parse_url((string) config('app.url'), PHP_URL_HOST), '/').'$'],
+            subdomains: false,
+        );
         $middleware->web(append: [
             SetLocaleMiddleware::class,
         ]);

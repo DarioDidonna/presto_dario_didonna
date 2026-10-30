@@ -8,6 +8,7 @@ use App\View\Composers\ErrorPageLocaleComposer;
 use App\View\Composers\FooterStatusComposer;
 use App\View\Composers\MarketStatsComposer;
 use Illuminate\Auth\Events\Login;
+use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\View;
@@ -41,6 +42,12 @@ class AppServiceProvider extends ServiceProvider
         View::composer(['components.header', 'components.live-activity'], MarketStatsComposer::class);
         View::composer('components.footer', FooterStatusComposer::class);
         View::composer('errors::*', ErrorPageLocaleComposer::class);
+
+        // Link di reset sempre su APP_URL, mai sull'host della richiesta: un Host falso porterebbe il token a un altro sito
+        ResetPassword::createUrlUsing(fn (User $user, string $token) => rtrim((string) config('app.url'), '/').route('password.reset', [
+            'token' => $token,
+            'email' => $user->getEmailForPasswordReset(),
+        ], false));
 
         // Al login si ripristina la lingua scelta l'ultima volta dall'utente
         Event::listen(Login::class, function (Login $event) {

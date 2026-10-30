@@ -5,8 +5,11 @@ namespace Tests\Feature;
 use App\Mail\BecomeRevisor;
 use App\Models\Article;
 use App\Models\User;
+use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\URL;
 use Tests\TestCase;
 
@@ -97,5 +100,32 @@ class SecurityTest extends TestCase
     public function test_tampered_session_locale_falls_back_to_italian(): void
     {
         $this->withSession(['locale' => 'xx'])->get('/')->assertOk()->assertSee('lang="it"', false);
+    }
+
+    public function test_reset_link_ignores_a_forged_host_header(): void
+    {
+        Notification::fake();
+        config(['app.url' => 'https://presto.test']);
+        $user = User::factory()->create();
+
+        $this->post('http://evil.example/forgot-password', ['email' => $user->email]);
+
+        Notification::assertSentTo($user, ResetPassword::class, function (ResetPassword $notification) use ($user) {
+            return str_starts_with($notification->toMail($user)->actionUrl, 'https://presto.test/reset-password/');
+        });
+    }
+
+    public function test_forged_host_is_rejected_in_production(): void
+    {
+        config(['app.url' => 'https://presto.test']);
+        $this->app['env'] = 'production';
+
+        try {
+            $this->get('https://presto.test/up')->assertOk();
+            $this->get('http://evil.example/up')->assertStatus(400);
+        } finally {
+            // Regola statica di Symfony: non deve restare attiva per i test successivi
+            Request::setTrustedHosts([]);
+        }
     }
 }
