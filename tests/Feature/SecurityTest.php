@@ -8,6 +8,7 @@ use App\Models\Article;
 use App\Models\PurchaseRequest;
 use App\Models\User;
 use App\Notifications\NewMessage;
+use Database\Seeders\DemoSeeder;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Request;
@@ -238,5 +239,13 @@ class SecurityTest extends TestCase
         $this->assertNotContains('*', $app['allowed_origins']);
         $this->assertTrue($app['rate_limiting']['enabled']);
         $this->assertSame('127.0.0.1', config('reverb.servers.reverb.host'));
+    }
+
+    public function test_demo_accounts_cannot_be_created_in_production(): void
+    {
+        $this->app['env'] = 'production';
+
+        $this->expectException(\RuntimeException::class);
+        (new DemoSeeder)->run();
     }
 }
