@@ -120,4 +120,64 @@ class CreateArticleFormTest extends TestCase
 
         $this->assertSame(0, Article::count());
     }
+
+    // JPEG 40x20 con un blocco EXIF minimo: l'orientazione scelta e, come dato da non pubblicare, un testo riconoscibile
+    private function jpegWithExif(int $orientation): string
+    {
+        $gd = imagecreatetruecolor(40, 20);
+        ob_start();
+        imagejpeg($gd);
+        $jpeg = ob_get_clean();
+
+        $tiff = "MM\x00\x2a\x00\x00\x00\x08".pack('n', 1).pack('nnNnn', 0x0112, 3, 1, $orientation, 0)."\x00\x00\x00\x00POSIZIONE-GPS";
+        $payload = "Exif\x00\x00".$tiff;
+
+        return substr($jpeg, 0, 2)."\xFF\xE1".pack('n', strlen($payload) + 2).$payload.substr($jpeg, 2);
+    }
+
+    private function storeArticleWith(UploadedFile $photo): string
+    {
+        Queue::fake();
+        Storage::fake('public');
+
+        Livewire::actingAs(User::factory()->create())
+            ->test(CreateArticleForm::class)
+            ->set('form.title', 'Bicicletta')
+            ->set('form.price', 100)
+            ->set('form.description', 'Bicicletta da corsa in ottimo stato')
+            ->set('form.category', Category::factory()->create()->id)
+            ->set('temporary_images', [$photo])
+            ->call('store')
+            ->assertHasNoErrors();
+
+        return Article::sole()->images()->sole()->path;
+    }
+
+    public function test_photo_metadata_is_removed_before_the_file_becomes_public(): void
+    {
+        $path = $this->storeArticleWith(UploadedFile::fake()->createWithContent('foto.jpg', $this->jpegWithExif(1)));
+
+        $stored = Storage::disk('public')->get($path);
+        $this->assertStringNotContainsString('POSIZIONE-GPS', $stored);
+        $this->assertStringNotContainsString("Exif\x00\x00", $stored);
+    }
+
+    public function test_removing_metadata_keeps_the_photo_upright(): void
+    {
+        $path = $this->storeArticleWith(UploadedFile::fake()->createWithContent('foto.jpg', $this->jpegWithExif(6)));
+
+        // Orientazione 6: la foto 40x20 va girata di 90°, quindi diventa verticale
+        $this->assertSame([20, 40], array_slice(getimagesize(Storage::disk('public')->path($path)), 0, 2));
+    }
+
+    public function test_command_cleans_photos_uploaded_before(): void
+    {
+        Storage::fake('public');
+        Storage::disk('public')->put('articles/1/vecchia.jpg', $this->jpegWithExif(1));
+        Article::factory()->create()->images()->create(['path' => 'articles/1/vecchia.jpg']);
+
+        $this->artisan('app:strip-image-metadata')->assertSuccessful();
+
+        $this->assertStringNotContainsString('POSIZIONE-GPS', Storage::disk('public')->get('articles/1/vecchia.jpg'));
+    }
 }

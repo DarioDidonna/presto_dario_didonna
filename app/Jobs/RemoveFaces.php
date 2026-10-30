@@ -5,6 +5,7 @@ namespace App\Jobs;
 use App\Models\Image;
 use App\Services\AgentUnavailableException;
 use App\Services\AiAgentClient;
+use App\Support\PhotoMetadata;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\Storage;
@@ -68,37 +69,19 @@ class RemoveFaces implements ShouldQueue
     }
 
     /**
-     * Applica la rotazione EXIF ai pixel e salva la foto dritta, senza metadati: il rilevatore e GD lavorano così
-     * sulla stessa immagine (prima le foto del telefono "di lato" avevano i riquadri nel punto sbagliato).
+     * Applica la rotazione EXIF ai pixel e salva la foto dritta: il rilevatore e GD lavorano così sulla stessa
+     * immagine (prima le foto del telefono "di lato" avevano i riquadri nel punto sbagliato). Le foto nuove arrivano
+     * già dritte (HandlesArticleForm), questo resta per quelle caricate prima.
      */
     private function straighten(string $path): void
     {
         $orientation = function_exists('exif_read_data') && @getimagesize($path)[2] === IMAGETYPE_JPEG
             ? (int) (@exif_read_data($path)['Orientation'] ?? 1)
             : 1;
-        if ($orientation <= 1 || $orientation > 8) {
-            return;
-        }
 
-        $gd = @imagecreatefromstring((string) file_get_contents($path));
-        if (! $gd) {
-            return;
+        if ($orientation > 1 && $orientation <= 8) {
+            PhotoMetadata::strip($path);
         }
-        // Le orientazioni specchiate (2, 4, 5, 7) = specchio orizzontale + la rotazione qui sotto (4: 180° = verticale)
-        if (in_array($orientation, [2, 4, 5, 7], true)) {
-            imageflip($gd, IMG_FLIP_HORIZONTAL);
-        }
-        // imagerotate gira in senso antiorario: 270 = 90° in senso orario. 5 e 7 sono specchiate e poi ruotate
-        $angle = match ($orientation) {
-            3, 4 => 180,
-            6, 7 => 270,
-            5, 8 => 90,
-            default => 0,
-        };
-        if ($angle) {
-            $gd = imagerotate($gd, $angle, 0);
-        }
-        imagejpeg($gd, $path, 92);
     }
 
     /**
