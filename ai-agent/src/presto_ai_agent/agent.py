@@ -1,5 +1,7 @@
 """Agente per l'acquisto: LangChain create_agent (grafo LangGraph) + modello locale Ollama + tool sul catalogo."""
 
+import threading
+import time
 from dataclasses import dataclass, field
 from typing import Any, Literal
 from uuid import uuid4
@@ -67,6 +69,8 @@ class ChatResult:
 
 class ShoppingAgent:
     MAX_ARTICLES = 5
+    # Le chat contengono testo scritto dagli utenti: non si conservano oltre questo tempo dall'ultimo messaggio
+    CONVERSATION_TTL_SECONDS = 24 * 60 * 60
 
     def __init__(self, settings: Settings, model: BaseChatModel | None = None, client: LaravelClient | None = None):
         self._model = model or ChatOllama(
@@ -78,6 +82,8 @@ class ShoppingAgent:
         # Memoria delle conversazioni (per conversation_id), condivisa tra le lingue; persa al riavvio del servizio
         self._checkpointer = InMemorySaver()
         self._graphs: dict[str, Any] = {}
+        self._last_used: dict[str, float] = {}
+        self._last_used_lock = threading.Lock()
 
     def _graph(self, lang: Lang):
         if lang not in self._graphs:
@@ -91,6 +97,7 @@ class ShoppingAgent:
 
     def chat(self, message: str, conversation_id: str | None = None, lang: Lang = "it") -> ChatResult:
         conversation_id = conversation_id or str(uuid4())
+        self._forget_old_conversations(current=conversation_id)
 
         # Tentativo di manipolazione nel messaggio: rifiuto standard senza interpellare il modello
         if is_injection_attempt(message):
@@ -121,6 +128,16 @@ class ShoppingAgent:
             conversation_id=conversation_id,
             articles=found[: self.MAX_ARTICLES],
         )
+
+    def _forget_old_conversations(self, current: str) -> None:
+        now = time.monotonic()
+        with self._last_used_lock:
+            self._last_used[current] = now
+            expired = [key for key, used in self._last_used.items() if now - used > self.CONVERSATION_TTL_SECONDS]
+            for key in expired:
+                del self._last_used[key]
+        for key in expired:
+            self._checkpointer.delete_thread(key)
 
     @staticmethod
     def _current_turn(messages: list) -> list:
