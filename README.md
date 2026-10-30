@@ -211,6 +211,15 @@ In sviluppo le email (reset password, candidature revisore) finiscono nel log (`
 
 ---
 
+### Messa in produzione
+
+Parti da `.env.production.example` (copialo in `.env` sul server e compila i valori vuoti):
+
+- `APP_URL` deve essere il dominio vero con `https://`: le richieste con un altro host vengono rifiutate e i link delle email usano questo indirizzo;
+- `ADMIN_EMAIL` riceve le richieste per diventare revisore: il link va confermato con un clic, dura 3 giorni e vale una volta;
+- la registrazione invia un'email di conferma: senza un `MAIL_MAILER` funzionante nessuno può pubblicare o acquistare. In locale, con `MAIL_MAILER=log`, il link si trova in `storage/logs/laravel.log`;
+- dopo l'aggiornamento: `php artisan migrate` e `php artisan app:strip-image-metadata`, che toglie i metadati (GPS compreso) dalle foto caricate in precedenza.
+
 ## Comandi utili
 
 | Comando | Descrizione |
