@@ -207,10 +207,6 @@
                                             </form>
                                         @endif
                                     @endcan
-                                    <a href="mailto:{{ $article->user->email }}?subject={{ rawurlencode(__('ui.contact_subject', ['title' => $article->title])) }}"
-                                        class="btn btn-cyber-gradient w-100 text-uppercase text-light tracking-wider fs-7 fw-bold">
-                                        <i class="bi bi-envelope-fill me-2"></i> {{ __('ui.contact_seller') }}
-                                    </a>
                                 @endif
                             @endguest
                         </div>
