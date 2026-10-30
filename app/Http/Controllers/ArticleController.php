@@ -9,7 +9,6 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Facades\Storage;
 
 class ArticleController extends Controller implements HasMiddleware
 {
@@ -56,9 +55,7 @@ class ArticleController extends Controller implements HasMiddleware
     // Permesso verificato sulla rotta: ->can('delete', 'article')
     public function destroy(Article $article)
     {
-        // Le righe di "images" spariscono per il cascade del DB; i file vanno rimossi a mano
-        Storage::disk('public')->deleteDirectory("articles/{$article->id}");
-        $article->delete();
+        $article->deleteWithFiles();
 
         return redirect()->route('profile.show')->with('message', __('ui.article_deleted', ['title' => $article->title]));
     }

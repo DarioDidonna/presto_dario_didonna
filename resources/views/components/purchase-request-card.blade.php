@@ -54,7 +54,7 @@
     @endif
 
     {{-- Contatto: il venditore vede sempre l'acquirente; l'acquirente vede il venditore dopo l'accettazione --}}
-    @if ($other && ($perspective === 'seller' || $request->status === 'accepted'))
+    @if ($other && ! $other->anonymized_at && ($perspective === 'seller' || $request->status === 'accepted'))
         <p class="fs-7 mt-3 mb-0">
             <i class="bi bi-envelope me-1 text-neon-cyan" aria-hidden="true"></i>
             <a href="mailto:{{ $other->email }}" class="text-neon-cyan">{{ $other->email }}</a>

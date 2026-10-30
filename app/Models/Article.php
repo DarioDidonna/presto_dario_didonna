@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Storage;
 use Laravel\Scout\Searchable;
 
 class Article extends Model
@@ -59,6 +60,13 @@ class Article extends Model
     public function isReserved(): bool
     {
         return $this->reserved_at !== null;
+    }
+
+    // Le righe di "images" spariscono per il cascade del DB; i file vanno rimossi a mano
+    public function deleteWithFiles(): void
+    {
+        Storage::disk('public')->deleteDirectory("articles/{$this->id}");
+        $this->delete();
     }
 
     public function setAccepted($value)

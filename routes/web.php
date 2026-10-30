@@ -60,6 +60,8 @@ Route::post('/lingua/{lang}', [PublicController::class, 'setLanguage'])->whereIn
 Route::get('/profilo', [ProfileController::class, 'show'])->name('profile.show');
 Route::post('/profilo/avatar', [ProfileController::class, 'updateAvatar'])->middleware('throttle:10,1')->name('profile.avatar.update');
 Route::delete('/profilo/avatar', [ProfileController::class, 'destroyAvatar'])->name('profile.avatar.destroy');
+Route::get('/profilo/dati', [ProfileController::class, 'export'])->middleware('throttle:5,1')->name('profile.export');
+Route::delete('/profilo', [ProfileController::class, 'destroy'])->middleware('throttle:5,1')->name('profile.destroy');
 
 // CARRELLO (solo utenti con l'email verificata)
 Route::middleware(['auth', 'verified'])->prefix('carrello')->name('cart.')->group(function () {
