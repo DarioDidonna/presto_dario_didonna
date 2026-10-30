@@ -206,4 +206,16 @@ class AuthTest extends TestCase
 
         $this->post('/forgot-password', ['email' => 'altro@example.com'])->assertStatus(429);
     }
+
+    public function test_reset_form_does_not_reveal_which_emails_exist(): void
+    {
+        Notification::fake();
+        $user = User::factory()->create();
+
+        $known = $this->from('/forgot-password')->post('/forgot-password', ['email' => $user->email]);
+        $unknown = $this->from('/forgot-password')->post('/forgot-password', ['email' => 'nessuno@example.com']);
+
+        $unknown->assertRedirect('/forgot-password')->assertSessionHasNoErrors();
+        $this->assertSame($known->getSession()->get('status'), $unknown->getSession()->get('status'));
+    }
 }
