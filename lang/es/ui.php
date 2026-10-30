@@ -143,6 +143,8 @@ return [
     'revisor_mail_action' => 'Para revisar el perfil, habilitar la cuenta y acceder al panel de control al instante, haz clic en el enlace de activación:',
     'revisor_mail_button' => 'Activar posición',
     'revisor_mail_footer' => 'NOTIFICACIÓN AUTOMÁTICA DE SEGURIDAD GENERADA POR PRESTO.IT',
+    'revisor_confirm_title' => 'Confirma el nuevo revisor',
+    'revisor_confirm_body' => '¿Quieres que :name sea revisor? Podrá aprobar y rechazar anuncios.',
 
     // Parte 3: testi prima scritti direttamente nelle viste
     'images_label' => 'Imágenes del anuncio',

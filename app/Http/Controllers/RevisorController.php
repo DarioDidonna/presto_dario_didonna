@@ -6,7 +6,9 @@ use App\Mail\BecomeRevisor;
 use App\Models\Article;
 use App\Models\User;
 use App\Notifications\ArticleReviewed;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Mail;
 
 class RevisorController extends Controller
@@ -82,14 +84,22 @@ class RevisorController extends Controller
 
     public function becomeRevisor()
     {
-        Mail::to('admin@presto.it')->send(new BecomeRevisor(Auth::user()));
+        Mail::to(config('app.admin_email'))->send(new BecomeRevisor(Auth::user()));
 
         return redirect()->route('homepage')->with('message', __('ui.revisor_request_success'));
     }
 
-    public function makeRevisor(User $user)
+    // Solo una pagina di conferma: gli antivirus di posta aprono i link da soli, una GET non deve promuovere nessuno
+    public function confirmRevisor(User $user)
     {
-        // La rotta è protetta dal middleware 'signed': il link è valido solo se generato dalla mail
+        return view('revisor.confirm', compact('user'));
+    }
+
+    public function makeRevisor(Request $request, User $user)
+    {
+        // La rotta è protetta dal middleware 'signed': il link è valido solo se generato dalla mail. Ed è monouso
+        abort_unless(Cache::add('revisor-link:'.$request->query('signature'), true, now()->addDays(BecomeRevisor::LINK_DAYS)), 403);
+
         $user->is_revisor = true;
         $user->save();
 

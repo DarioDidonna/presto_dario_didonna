@@ -41,24 +41,52 @@ class SecurityTest extends TestCase
         $user = User::factory()->create();
 
         $this->get(route('make.revisor', $user))->assertForbidden();
+        $this->post(route('make.revisor.store', $user))->assertForbidden();
         $this->assertFalse((bool) $user->fresh()->is_revisor);
 
-        $expired = URL::temporarySignedRoute('make.revisor', now()->subMinute(), ['user' => $user]);
+        $expired = URL::temporarySignedRoute('make.revisor', now()->subMinute(), ['user' => $user], absolute: false);
         $this->get($expired)->assertForbidden();
+        $this->post($expired)->assertForbidden();
+        $this->assertFalse((bool) $user->fresh()->is_revisor);
+    }
 
-        $valid = URL::temporarySignedRoute('make.revisor', now()->addDay(), ['user' => $user]);
-        $this->get($valid)->assertRedirect(route('homepage'));
+    public function test_opening_the_link_does_not_promote_and_confirming_works_once(): void
+    {
+        $user = User::factory()->create();
+        $url = URL::temporarySignedRoute('make.revisor', now()->addDay(), ['user' => $user], absolute: false);
+
+        // Un antivirus di posta che apre il link non deve promuovere nessuno
+        $this->get($url)->assertOk()->assertSee($user->name)->assertSee('action="'.e($url).'"', false);
+        $this->assertFalse((bool) $user->fresh()->is_revisor);
+
+        $this->post($url)->assertRedirect(route('homepage'));
         $this->assertTrue((bool) $user->fresh()->is_revisor);
+
+        // Monouso: se il revisore viene poi revocato, lo stesso link non lo riattiva
+        $user->forceFill(['is_revisor' => false])->save();
+        $this->post($url)->assertForbidden();
+        $this->assertFalse((bool) $user->fresh()->is_revisor);
     }
 
     public function test_signed_link_cannot_be_reused_for_another_user(): void
     {
         $victim = User::factory()->create();
         $attacker = User::factory()->create();
-        $url = URL::temporarySignedRoute('make.revisor', now()->addDay(), ['user' => $victim]);
+        $url = URL::temporarySignedRoute('make.revisor', now()->addDay(), ['user' => $victim], absolute: false);
 
-        $this->get(str_replace("/{$victim->id}?", "/{$attacker->id}?", $url))->assertForbidden();
+        $this->post(str_replace("/{$victim->id}?", "/{$attacker->id}?", $url))->assertForbidden();
         $this->assertFalse((bool) $attacker->fresh()->is_revisor);
+    }
+
+    public function test_revisor_link_ignores_a_forged_host_header(): void
+    {
+        Mail::fake();
+        config(['app.url' => 'https://presto.test']);
+        $user = User::factory()->create();
+
+        $this->actingAs($user)->post('http://evil.example/revisor/request');
+
+        Mail::assertSent(BecomeRevisor::class, fn (BecomeRevisor $mail) => str_starts_with($mail->approvalUrl, 'https://presto.test/make/revisor/'));
     }
 
     public function test_become_revisor_requires_post_auth_and_is_throttled(): void

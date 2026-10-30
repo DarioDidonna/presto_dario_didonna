@@ -143,6 +143,8 @@ return [
     'revisor_mail_action' => 'Per esaminare il profilo, abilitare l\'account ed effettuare l\'accesso istantaneo alla dashboard di controllo, clicca sul link di attivazione:',
     'revisor_mail_button' => 'Attiva Posizione',
     'revisor_mail_footer' => 'NOTIFICA DI SICUREZZA AUTOMATICA GENERATA DA PRESTO.IT',
+    'revisor_confirm_title' => 'Conferma il nuovo revisore',
+    'revisor_confirm_body' => 'Vuoi rendere revisore :name? Potrà approvare e rifiutare gli annunci.',
 
     // Parte 3: testi prima scritti direttamente nelle viste
     'images_label' => 'Immagini dell\'annuncio',

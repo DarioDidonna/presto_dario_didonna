@@ -83,6 +83,9 @@ return [
     'fallback_locale' => env('APP_FALLBACK_LOCALE', 'en'),
 
     // Lingue selezionabili dall'utente (whitelist usata da rotta e middleware)
+    // Destinatario delle richieste per diventare revisore
+    'admin_email' => env('ADMIN_EMAIL') ?: env('MAIL_FROM_ADDRESS'),
+
     'available_locales' => ['it', 'en', 'es'],
 
     'faker_locale' => env('APP_FAKER_LOCALE', 'en_US'),

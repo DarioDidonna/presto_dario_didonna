@@ -47,7 +47,8 @@ Route::patch('/revisor/undo', [RevisorController::class, 'undo'])->middleware('i
 Route::post('/revisor/request', [RevisorController::class, 'becomeRevisor'])->middleware(['auth', 'throttle:3,60'])->name('become.revisor');
 
 // MAKE REVISOR
-Route::get('/make/revisor/{user}', [RevisorController::class, 'makeRevisor'])->middleware('signed')->name('make.revisor');
+Route::get('/make/revisor/{user}', [RevisorController::class, 'confirmRevisor'])->middleware('signed:relative')->name('make.revisor');
+Route::post('/make/revisor/{user}', [RevisorController::class, 'makeRevisor'])->middleware(['signed:relative', 'throttle:10,1'])->name('make.revisor.store');
 
 // SEARCH
 Route::get('/search/article', [PublicController::class, 'searchArticles'])->name('article.search');
