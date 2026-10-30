@@ -32,6 +32,7 @@ class CreateArticleForm extends Component
      */
     public function suggestFromPhoto(AiAgentClient $agent): void
     {
+        $this->authorizeSeller();
         $this->resetErrorBag('ai');
         $this->suggestion = null;
         if (! $agent->isEnabled() || empty($this->images)) {
@@ -86,6 +87,7 @@ class CreateArticleForm extends Component
 
     public function store()
     {
+        $this->authorizeSeller();
         $this->validateArticle();
 
         $this->article = Article::create([...$this->form->attributes(), 'user_id' => Auth::id()]);
@@ -95,6 +97,12 @@ class CreateArticleForm extends Component
         session()->flash('message', __('ui.article_published'));
         $this->form->reset();
         $this->reset(['images', 'temporary_images', 'categoryToCheck', 'suggestion']);
+    }
+
+    // Le azioni Livewire arrivano sul suo endpoint: il controllo della rotta da solo non basta
+    private function authorizeSeller(): void
+    {
+        abort_unless(Auth::user()?->hasVerifiedEmail(), 403);
     }
 
     public function render()

@@ -2,12 +2,17 @@
 
 namespace Tests\Feature;
 
+use App\Livewire\CreateArticleForm;
+use App\Models\Article;
 use App\Models\User;
 use Illuminate\Auth\Notifications\ResetPassword;
+use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Facades\URL;
+use Livewire\Livewire;
 use Tests\TestCase;
 
 class AuthTest extends TestCase
@@ -122,5 +127,54 @@ class AuthTest extends TestCase
     public function test_unused_two_factor_routes_are_disabled(): void
     {
         $this->get('/two-factor-challenge')->assertNotFound();
+    }
+
+    public function test_new_users_must_verify_their_email_before_selling_or_buying(): void
+    {
+        Notification::fake();
+
+        $this->post('/register', [
+            'name' => 'Mario Rossi',
+            'email' => 'mario@example.com',
+            'password' => 'Password123!',
+            'password_confirmation' => 'Password123!',
+        ]);
+
+        $user = User::where('email', 'mario@example.com')->first();
+        Notification::assertSentTo($user, VerifyEmail::class);
+
+        $this->get(route('create.article'))->assertRedirect(route('verification.notice'));
+        $this->get(route('verification.notice'))->assertOk()->assertSee(__('ui.verify_email_title'));
+        $this->post(route('become.revisor'))->assertRedirect(route('verification.notice'));
+
+        $article = Article::factory()->accepted()->create();
+        $this->post(route('cart.add', $article))->assertRedirect(route('verification.notice'));
+
+        Livewire::actingAs($user)->test(CreateArticleForm::class)->call('store')->assertForbidden();
+
+        $link = URL::temporarySignedRoute('verification.verify', now()->addHour(), ['id' => $user->id, 'hash' => sha1($user->email)]);
+        $this->get($link);
+
+        $this->assertTrue($user->fresh()->hasVerifiedEmail());
+        $this->get(route('create.article'))->assertOk();
+    }
+
+    public function test_changing_email_needs_the_password_and_a_new_verification(): void
+    {
+        Notification::fake();
+        $user = User::factory()->create(['email' => 'prima@example.com', 'password' => 'Password123!']);
+
+        $this->actingAs($user)->put(route('user-profile-information.update'), ['name' => $user->name, 'email' => 'dopo@example.com'])
+            ->assertSessionHasErrorsIn('updateProfileInformation', 'current_password');
+        $this->actingAs($user)->put(route('user-profile-information.update'), ['name' => $user->name, 'email' => 'dopo@example.com', 'current_password' => 'sbagliata'])
+            ->assertSessionHasErrorsIn('updateProfileInformation', 'current_password');
+        $this->assertSame('prima@example.com', $user->fresh()->email);
+
+        $this->actingAs($user)->put(route('user-profile-information.update'), ['name' => $user->name, 'email' => 'dopo@example.com', 'current_password' => 'Password123!'])
+            ->assertSessionHasNoErrors();
+
+        $this->assertSame('dopo@example.com', $user->fresh()->email);
+        $this->assertFalse($user->fresh()->hasVerifiedEmail());
+        Notification::assertSentTo($user, VerifyEmail::class);
     }
 }

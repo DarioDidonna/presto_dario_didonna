@@ -243,6 +243,10 @@ return [
     // Reset password
     'forgot_password_title' => 'Forgot password',
     'forgot_password_subtitle' => 'Enter your email and we will send you a link to choose a new one.',
+    'verify_email_title' => 'Verify your email',
+    'verify_email_body' => 'We sent you a confirmation link: open it to publish ads and buy.',
+    'verify_email_sent' => 'New link sent: check your inbox.',
+    'verify_email_resend' => 'Send the link again',
     'send_reset_link' => 'Send link',
     'back_to_login' => 'Back to login',
     'reset_password_title' => 'New password',

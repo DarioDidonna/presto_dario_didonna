@@ -44,7 +44,7 @@ Route::patch('/reject/{article}', [RevisorController::class, 'reject'])->middlew
 Route::patch('/revisor/undo', [RevisorController::class, 'undo'])->middleware('isRevisor')->name('revisor.undo');
 
 // BECOME REVISOR
-Route::post('/revisor/request', [RevisorController::class, 'becomeRevisor'])->middleware(['auth', 'throttle:3,60'])->name('become.revisor');
+Route::post('/revisor/request', [RevisorController::class, 'becomeRevisor'])->middleware(['auth', 'verified', 'throttle:3,60'])->name('become.revisor');
 
 // MAKE REVISOR
 Route::get('/make/revisor/{user}', [RevisorController::class, 'confirmRevisor'])->middleware('signed:relative')->name('make.revisor');
@@ -61,8 +61,8 @@ Route::get('/profilo', [ProfileController::class, 'show'])->name('profile.show')
 Route::post('/profilo/avatar', [ProfileController::class, 'updateAvatar'])->middleware('throttle:10,1')->name('profile.avatar.update');
 Route::delete('/profilo/avatar', [ProfileController::class, 'destroyAvatar'])->name('profile.avatar.destroy');
 
-// CARRELLO (solo utenti registrati)
-Route::middleware('auth')->prefix('carrello')->name('cart.')->group(function () {
+// CARRELLO (solo utenti con l'email verificata)
+Route::middleware(['auth', 'verified'])->prefix('carrello')->name('cart.')->group(function () {
     Route::get('/', [CartController::class, 'index'])->name('index');
     Route::delete('/', [CartController::class, 'clear'])->name('clear');
     // Prima di {article}: "invia" non è l'id di un annuncio

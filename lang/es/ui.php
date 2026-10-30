@@ -243,6 +243,10 @@ return [
     // Reset password
     'forgot_password_title' => 'Contraseña olvidada',
     'forgot_password_subtitle' => 'Introduce tu correo y te enviaremos un enlace para elegir una nueva.',
+    'verify_email_title' => 'Verifica tu email',
+    'verify_email_body' => 'Te hemos enviado un enlace de confirmación: ábrelo para publicar anuncios y comprar.',
+    'verify_email_sent' => 'Nuevo enlace enviado: revisa tu correo.',
+    'verify_email_resend' => 'Enviar el enlace de nuevo',
     'send_reset_link' => 'Enviar enlace',
     'back_to_login' => 'Volver al inicio de sesión',
     'reset_password_title' => 'Nueva contraseña',
