@@ -3,6 +3,7 @@
 namespace App\Notifications;
 
 use App\Models\Article;
+use App\Notifications\Concerns\RetriesDelivery;
 use App\Support\MailText;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -16,7 +17,7 @@ use Illuminate\Queue\SerializesModels;
  */
 class ArticleReviewed extends Notification implements ShouldQueue
 {
-    use Queueable, SerializesModels;
+    use Queueable, RetriesDelivery, SerializesModels;
 
     // Annuncio eliminato prima dell'invio: il job viene scartato invece di finire tra i falliti
     public bool $deleteWhenMissingModels = true;

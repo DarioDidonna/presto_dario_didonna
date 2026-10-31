@@ -3,7 +3,9 @@
 namespace App\Mail;
 
 use App\Models\User;
+use App\Notifications\Concerns\RetriesDelivery;
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Attachment;
 use Illuminate\Mail\Mailables\Content;
@@ -11,9 +13,9 @@ use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\URL;
 
-class BecomeRevisor extends Mailable
+class BecomeRevisor extends Mailable implements ShouldQueue
 {
-    use Queueable, SerializesModels;
+    use Queueable, RetriesDelivery, SerializesModels;
 
     public const LINK_DAYS = 3;
 

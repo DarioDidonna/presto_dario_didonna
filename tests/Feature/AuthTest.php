@@ -5,12 +5,15 @@ namespace Tests\Feature;
 use App\Livewire\CreateArticleForm;
 use App\Models\Article;
 use App\Models\User;
-use Illuminate\Auth\Notifications\ResetPassword;
-use Illuminate\Auth\Notifications\VerifyEmail;
+use App\Notifications\QueuedResetPassword;
+use App\Notifications\QueuedVerifyEmail;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Mail\SendQueuedMailable;
+use Illuminate\Notifications\SendQueuedNotifications;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\URL;
 use Livewire\Livewire;
 use Tests\TestCase;
@@ -87,7 +90,7 @@ class AuthTest extends TestCase
             ->assertRedirect('/forgot-password')
             ->assertSessionHas('status', 'Ti abbiamo inviato via email il link per reimpostare la password.');
 
-        Notification::assertSentTo($user, ResetPassword::class,
+        Notification::assertSentTo($user, QueuedResetPassword::class,
             function ($notification) use ($user) {
                 $mail = $notification->toMail($user);
 
@@ -141,7 +144,7 @@ class AuthTest extends TestCase
         ]);
 
         $user = User::where('email', 'mario@example.com')->first();
-        Notification::assertSentTo($user, VerifyEmail::class);
+        Notification::assertSentTo($user, QueuedVerifyEmail::class);
 
         $this->get(route('create.article'))->assertRedirect(route('verification.notice'));
         $this->get(route('verification.notice'))->assertOk()->assertSee(__('ui.verify_email_title'));
@@ -175,7 +178,7 @@ class AuthTest extends TestCase
 
         $this->assertSame('dopo@example.com', $user->fresh()->email);
         $this->assertFalse($user->fresh()->hasVerifiedEmail());
-        Notification::assertSentTo($user, VerifyEmail::class);
+        Notification::assertSentTo($user, QueuedVerifyEmail::class);
     }
 
     public function test_changing_password_closes_other_sessions_but_not_this_one(): void
@@ -217,5 +220,37 @@ class AuthTest extends TestCase
 
         $unknown->assertRedirect('/forgot-password')->assertSessionHasNoErrors();
         $this->assertSame($known->getSession()->get('status'), $unknown->getSession()->get('status'));
+    }
+
+    public function test_a_mail_server_failure_does_not_become_an_error_page(): void
+    {
+        Queue::fake();
+        // Porta chiusa: se un'email partisse durante la richiesta, la risposta sarebbe un errore 500
+        config(['mail.default' => 'smtp', 'mail.mailers.smtp.host' => '127.0.0.1', 'mail.mailers.smtp.port' => 1]);
+
+        $this->post('/register', [
+            'name' => 'Mario Rossi',
+            'email' => 'mario@example.com',
+            'password' => 'Password123!',
+            'password_confirmation' => 'Password123!',
+        ])->assertRedirect('/create/article');
+
+        $user = User::where('email', 'mario@example.com')->first();
+        $this->post(route('verification.send'))->assertRedirect();
+        $user->markEmailAsVerified();
+        $this->actingAs($user)->post(route('become.revisor'))->assertRedirect(route('homepage'));
+        auth()->logout();
+        $this->from('/forgot-password')->post('/forgot-password', ['email' => $user->email])->assertRedirect('/forgot-password');
+
+        Queue::assertPushed(SendQueuedNotifications::class, 3);
+        Queue::assertPushed(SendQueuedMailable::class, 1);
+    }
+
+    public function test_every_queued_email_is_retried(): void
+    {
+        $job = new SendQueuedNotifications(collect([User::factory()->create()]), new QueuedVerifyEmail, ['mail']);
+
+        $this->assertSame(4, $job->tries);
+        $this->assertSame([15, 60, 300], $job->backoff());
     }
 }

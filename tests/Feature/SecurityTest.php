@@ -8,8 +8,8 @@ use App\Models\Article;
 use App\Models\PurchaseRequest;
 use App\Models\User;
 use App\Notifications\NewMessage;
+use App\Notifications\QueuedResetPassword;
 use Database\Seeders\DemoSeeder;
-use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
@@ -93,7 +93,7 @@ class SecurityTest extends TestCase
 
         $this->actingAs($user)->post('http://evil.example/revisor/request');
 
-        Mail::assertSent(BecomeRevisor::class, fn (BecomeRevisor $mail) => str_starts_with($mail->approvalUrl, 'https://presto.test/make/revisor/'));
+        Mail::assertQueued(BecomeRevisor::class, fn (BecomeRevisor $mail) => str_starts_with($mail->approvalUrl, 'https://presto.test/make/revisor/'));
     }
 
     public function test_become_revisor_requires_post_auth_and_is_throttled(): void
@@ -109,7 +109,7 @@ class SecurityTest extends TestCase
         }
         $this->actingAs($user)->post(route('become.revisor'))->assertStatus(429);
 
-        Mail::assertSent(BecomeRevisor::class, 3);
+        Mail::assertQueued(BecomeRevisor::class, 3);
     }
 
     public function test_unapproved_article_is_visible_only_to_author_and_revisors(): void
@@ -145,7 +145,7 @@ class SecurityTest extends TestCase
 
         $this->post('http://evil.example/forgot-password', ['email' => $user->email]);
 
-        Notification::assertSentTo($user, ResetPassword::class, function (ResetPassword $notification) use ($user) {
+        Notification::assertSentTo($user, QueuedResetPassword::class, function (QueuedResetPassword $notification) use ($user) {
             return str_starts_with($notification->toMail($user)->actionUrl, 'https://presto.test/reset-password/');
         });
     }

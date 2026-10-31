@@ -61,7 +61,7 @@ class RevisorFlowTest extends TestCase
 
         $this->actingAs($candidate)->post(route('become.revisor'));
 
-        Mail::assertSent(BecomeRevisor::class, function (BecomeRevisor $mail) use ($candidate) {
+        Mail::assertQueued(BecomeRevisor::class, function (BecomeRevisor $mail) use ($candidate) {
             $html = $mail->render();
             preg_match('#href="([^"]*/make/revisor/[^"]+)"#', $html, $match);
             $this->assertNotEmpty($match, 'Link di attivazione non trovato nella mail');

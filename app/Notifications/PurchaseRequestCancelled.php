@@ -3,6 +3,7 @@
 namespace App\Notifications;
 
 use App\Models\PurchaseRequest;
+use App\Notifications\Concerns\RetriesDelivery;
 use App\Support\MailText;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -15,7 +16,7 @@ use Illuminate\Queue\SerializesModels;
  */
 class PurchaseRequestCancelled extends Notification implements ShouldQueue
 {
-    use Queueable, SerializesModels;
+    use Queueable, RetriesDelivery, SerializesModels;
 
     public function __construct(public PurchaseRequest $purchaseRequest)
     {

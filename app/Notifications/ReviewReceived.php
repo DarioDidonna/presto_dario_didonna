@@ -3,6 +3,7 @@
 namespace App\Notifications;
 
 use App\Models\Review;
+use App\Notifications\Concerns\RetriesDelivery;
 use App\Support\MailText;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -14,7 +15,7 @@ use Illuminate\Support\Str;
 // Email al venditore quando un acquirente lo recensisce
 class ReviewReceived extends Notification implements ShouldQueue
 {
-    use Queueable, SerializesModels;
+    use Queueable, RetriesDelivery, SerializesModels;
 
     public bool $deleteWhenMissingModels = true;
 
