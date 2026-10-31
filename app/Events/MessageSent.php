@@ -7,6 +7,7 @@ use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Foundation\Events\Dispatchable;
+use Illuminate\Support\Facades\Broadcast;
 
 /**
  * Nuovo messaggio in una conversazione, inviato subito (non in coda) tramite Reverb su due canali privati:
@@ -18,6 +19,18 @@ class MessageSent implements ShouldBroadcastNow
     use Dispatchable, InteractsWithSockets;
 
     public function __construct(public Message $message) {}
+
+    /**
+     * Esclude la connessione di chi scrive, se ne ha una. Se non è connesso a Reverb Livewire manda "undefined":
+     * passato a Reverb farebbe fallire l'invio, e il messaggio non arriverebbe nemmeno all'altra persona.
+     */
+    public function dontBroadcastToCurrentUser(): static
+    {
+        $socket = Broadcast::socket();
+        $this->socket = is_string($socket) && preg_match('/^\d+\.\d+$/', $socket) ? $socket : null;
+
+        return $this;
+    }
 
     /**
      * @return array<int, PrivateChannel>
