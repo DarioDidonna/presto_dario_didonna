@@ -1,5 +1,5 @@
 <x-layout :title="__('ui.revisor_confirm_title')">
-    <div class="container py-5">
+    <div class="container pt-custom-navbar pb-5">
         <div class="row justify-content-center">
             <div class="col-12 col-md-8 col-lg-6">
                 <div class="p-4 rounded-3 border border-secondary-subtle bg-navbar-card shadow-lg text-center">
