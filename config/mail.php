@@ -110,6 +110,18 @@ return [
     |
     */
 
+    /*
+    |--------------------------------------------------------------------------
+    | Sending Pace
+    |--------------------------------------------------------------------------
+    |
+    | Secondi di attesa tra un'email e l'altra spedite dalla coda: i server di
+    | posta hanno un limite e rifiutano gli invii troppo ravvicinati.
+    |
+    */
+
+    'seconds_between_sends' => (int) env('MAIL_SECONDS_BETWEEN_SENDS', 1),
+
     'from' => [
         'address' => env('MAIL_FROM_ADDRESS', 'hello@example.com'),
         'name' => env('MAIL_FROM_NAME', env('APP_NAME', 'Laravel')),

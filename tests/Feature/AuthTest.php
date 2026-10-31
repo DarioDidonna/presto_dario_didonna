@@ -10,10 +10,12 @@ use App\Notifications\QueuedVerifyEmail;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Mail\SendQueuedMailable;
 use Illuminate\Notifications\SendQueuedNotifications;
+use Illuminate\Queue\Middleware\RateLimited;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Queue;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\URL;
 use Livewire\Livewire;
 use Tests\TestCase;
@@ -246,11 +248,41 @@ class AuthTest extends TestCase
         Queue::assertPushed(SendQueuedMailable::class, 1);
     }
 
-    public function test_every_queued_email_is_retried(): void
+    public function test_queued_emails_are_paced_and_limited_by_errors_not_by_attempts(): void
     {
         $job = new SendQueuedNotifications(collect([User::factory()->create()]), new QueuedVerifyEmail, ['mail']);
 
-        $this->assertSame(4, $job->tries);
-        $this->assertSame([15, 60, 300], $job->backoff());
+        // Nessun numero di tentativi: le attese dovute al limite non devono consumarli
+        $this->assertNull($job->tries);
+        $this->assertSame(4, $job->maxExceptions);
+        $this->assertTrue($job->retryUntil()->isFuture());
+        $this->assertCount(3, $job->backoff());
+    }
+
+    public function test_every_kind_of_email_goes_through_the_sending_limit(): void
+    {
+        Queue::fake();
+        config(['queue.default' => 'database']);
+        $user = User::factory()->create();
+        $limited = fn ($job) => collect($job->middleware)->contains(fn ($middleware) => $middleware instanceof RateLimited);
+
+        $user->sendEmailVerificationNotification();
+        $user->sendPasswordResetNotification('token');
+        $this->actingAs($user)->post(route('become.revisor'));
+
+        Queue::assertPushed(SendQueuedNotifications::class, 2);
+        Queue::assertPushed(SendQueuedNotifications::class, $limited);
+        Queue::assertNotPushed(SendQueuedNotifications::class, fn ($job) => ! $limited($job));
+        Queue::assertPushed(SendQueuedMailable::class, $limited);
+    }
+
+    public function test_sending_limit_lets_one_email_through_per_interval(): void
+    {
+        config(['mail.seconds_between_sends' => 10]);
+
+        $limit = RateLimiter::limiter('mail-delivery')();
+
+        $this->assertSame(1, $limit->maxAttempts);
+        $this->assertSame(10, $limit->decaySeconds);
     }
 }

@@ -50,6 +50,9 @@ class AppServiceProvider extends ServiceProvider
             RateLimiter::for($name, fn (Request $request) => (clone $limit)->by($request->user()?->id ?: $request->ip()));
         }
 
+        // Un'email alla volta, qualunque sia il worker che la spedisce (App\Notifications\Concerns\RetriesDelivery)
+        RateLimiter::for('mail-delivery', fn () => Limit::perSecond(1, max(1, (int) config('mail.seconds_between_sends')))->by('mail'));
+
         // In produzione anche il controllo sulle password già finite in un furto di dati (Have I Been Pwned riceve
         // solo i primi 5 caratteri dell'hash, mai la password)
         Password::defaults(fn () => $this->app->isProduction() ? Password::min(12)->uncompromised() : Password::min(8));
