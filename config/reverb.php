@@ -82,8 +82,12 @@ return [
                     'scheme' => env('REVERB_SCHEME', 'https'),
                     'useTLS' => env('REVERB_SCHEME', 'https') === 'https',
                 ],
-                // Solo le pagine del sito possono aprire una connessione
-                'allowed_origins' => [parse_url((string) env('APP_URL', 'http://localhost'), PHP_URL_HOST)],
+                // Solo le pagine del sito possono aprire una connessione. In locale "php artisan serve" stampa 127.0.0.1,
+                // quindi valgono entrambi gli indirizzi
+                'allowed_origins' => array_values(array_unique(array_filter([
+                    parse_url((string) env('APP_URL', 'http://localhost'), PHP_URL_HOST),
+                    ...(env('APP_ENV') === 'local' ? ['localhost', '127.0.0.1'] : []),
+                ]))),
                 'ping_interval' => env('REVERB_APP_PING_INTERVAL', 60),
                 'activity_timeout' => env('REVERB_APP_ACTIVITY_TIMEOUT', 30),
                 'max_connections' => env('REVERB_APP_MAX_CONNECTIONS'),

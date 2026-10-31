@@ -241,6 +241,28 @@ class SecurityTest extends TestCase
         $this->assertSame('127.0.0.1', config('reverb.servers.reverb.host'));
     }
 
+    public function test_reverb_accepts_only_the_site_and_in_local_also_127_0_0_1(): void
+    {
+        $origins = function (string $env, string $url) {
+            [$_ENV['APP_ENV'], $_ENV['APP_URL'], $_SERVER['APP_ENV'], $_SERVER['APP_URL']] = [$env, $url, $env, $url];
+
+            return (require config_path('reverb.php'))['apps']['apps'][0]['allowed_origins'];
+        };
+        [$env, $url] = [$_ENV['APP_ENV'] ?? 'testing', $_ENV['APP_URL'] ?? null];
+
+        try {
+            $this->assertSame(['localhost', '127.0.0.1'], $origins('local', 'http://localhost:8000'));
+            $this->assertSame(['presto.test'], $origins('production', 'https://presto.test'));
+        } finally {
+            [$_ENV['APP_ENV'], $_SERVER['APP_ENV']] = [$env, $env];
+            if ($url === null) {
+                unset($_ENV['APP_URL'], $_SERVER['APP_URL']);
+            } else {
+                [$_ENV['APP_URL'], $_SERVER['APP_URL']] = [$url, $url];
+            }
+        }
+    }
+
     public function test_demo_accounts_cannot_be_created_in_production(): void
     {
         $this->app['env'] = 'production';
