@@ -66,3 +66,10 @@ def test_health_degraded_when_ollama_is_down(client, monkeypatch):
         "vision_model": "qwen2.5vl:3b",
         "vision_model_available": False,
     }
+
+
+def test_api_documentation_is_not_exposed():
+    client = TestClient(app)
+
+    for path in ("/docs", "/redoc", "/openapi.json"):
+        assert client.get(path).status_code == 404

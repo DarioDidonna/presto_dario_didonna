@@ -3,6 +3,8 @@
 namespace App\Notifications;
 
 use App\Models\PurchaseRequest;
+use App\Notifications\Concerns\RetriesDelivery;
+use App\Support\MailText;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -14,7 +16,7 @@ use Illuminate\Queue\SerializesModels;
  */
 class PurchaseRequestCancelled extends Notification implements ShouldQueue
 {
-    use Queueable, SerializesModels;
+    use Queueable, RetriesDelivery, SerializesModels;
 
     public function __construct(public PurchaseRequest $purchaseRequest)
     {
@@ -36,7 +38,7 @@ class PurchaseRequestCancelled extends Notification implements ShouldQueue
         return (new MailMessage)
             ->subject(__('ui.cancel_mail_subject', ['name' => $request->buyer->name]))
             ->greeting(__('ui.review_mail_greeting', ['name' => $notifiable->name]))
-            ->line(__('ui.cancel_mail_line', ['name' => $request->buyer->name, 'items' => $request->items->pluck('title')->join(', ')]))
+            ->line(__('ui.cancel_mail_line', ['name' => MailText::plain($request->buyer->name), 'items' => MailText::plain($request->items->pluck('title')->join(', '))]))
             ->action(__('ui.sales_title'), route('sales.index'));
     }
 }

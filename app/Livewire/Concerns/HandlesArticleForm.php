@@ -4,6 +4,8 @@ namespace App\Livewire\Concerns;
 
 use App\Livewire\Forms\ArticleForm;
 use App\Models\Article;
+use App\Support\PhotoMetadata;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 
 /**
@@ -35,7 +37,7 @@ trait HandlesArticleForm
     {
         return [
             'images' => 'array|max:'.$this->maxNewImages(),
-            'images.*' => 'image|max:5120',
+            'images.*' => 'image|mimes:jpg,jpeg,png,gif,webp|max:5120',
         ];
     }
 
@@ -46,8 +48,10 @@ trait HandlesArticleForm
         return [
             'images.max' => $maxImages,
             'images.*.image' => __('ui.validation_image_image'),
+            'images.*.mimes' => __('ui.validation_image_image'),
             'images.*.max' => __('ui.validation_image_max'),
             'temporary_images.*.image' => __('ui.validation_image_image'),
+            'temporary_images.*.mimes' => __('ui.validation_image_image'),
             'temporary_images.*.max' => __('ui.validation_image_max'),
             'temporary_images.max' => $maxImages,
         ];
@@ -78,7 +82,7 @@ trait HandlesArticleForm
         try {
             $this->validate([
                 'temporary_images' => 'array|max:'.($this->maxNewImages() - count($this->images)),
-                'temporary_images.*' => 'image|max:5120',
+                'temporary_images.*' => 'image|mimes:jpg,jpeg,png,gif,webp|max:5120',
             ]);
         } catch (ValidationException $e) {
             // I file scartati non devono restare in coda: si sommerebbero al caricamento successivo
@@ -101,13 +105,23 @@ trait HandlesArticleForm
         }
     }
 
-    // Salva le nuove foto e avvia la catena di elaborazione (volti oscurati, miniature con watermark)
+    // Salva le nuove foto senza metadati (il GPS rivelerebbe dove abita chi vende) e avvia la catena di elaborazione
+    // (volti oscurati, miniature con watermark)
     protected function storeNewImages(Article $article): void
     {
+        $disk = Storage::disk('public');
+
         foreach ($this->images as $image) {
-            $article->images()
-                ->create(['path' => $image->store("articles/{$article->id}", 'public')])
-                ->process();
+            $path = $image->store("articles/{$article->id}", 'public');
+
+            if (! PhotoMetadata::strip($disk->path($path))) {
+                logger()->warning("Foto scartata per l'annuncio {$article->id}: file non leggibile");
+                $disk->delete($path);
+
+                continue;
+            }
+
+            $article->images()->create(['path' => $path])->process();
         }
     }
 }

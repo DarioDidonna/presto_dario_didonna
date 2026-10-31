@@ -9,6 +9,7 @@ use App\Services\AgentUnavailableException;
 use App\Services\AiAgentClient;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\RateLimiter;
+use Livewire\Attributes\Locked;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 
@@ -18,12 +19,15 @@ class CreateArticleForm extends Component
 
     public const MAX_SUGGESTIONS_PER_MINUTE = 5;
 
+    #[Locked]
     public $article;
 
     // Categoria proposta dall'AI e non ancora confermata: il modello piccolo sbaglia circa 3 volte su 8
+    #[Locked]
     public bool $categoryToCheck = false;
 
     // Esito dell'ultima richiesta di bozza: 'filled', 'kept' (campi già scritti, lasciati com'erano) o null
+    #[Locked]
     public ?string $suggestion = null;
 
     /**
@@ -32,6 +36,7 @@ class CreateArticleForm extends Component
      */
     public function suggestFromPhoto(AiAgentClient $agent): void
     {
+        $this->authorizeSeller();
         $this->resetErrorBag('ai');
         $this->suggestion = null;
         if (! $agent->isEnabled() || empty($this->images)) {
@@ -86,6 +91,7 @@ class CreateArticleForm extends Component
 
     public function store()
     {
+        $this->authorizeSeller();
         $this->validateArticle();
 
         $this->article = Article::create([...$this->form->attributes(), 'user_id' => Auth::id()]);
@@ -95,6 +101,12 @@ class CreateArticleForm extends Component
         session()->flash('message', __('ui.article_published'));
         $this->form->reset();
         $this->reset(['images', 'temporary_images', 'categoryToCheck', 'suggestion']);
+    }
+
+    // Le azioni Livewire arrivano sul suo endpoint: il controllo della rotta da solo non basta
+    private function authorizeSeller(): void
+    {
+        abort_unless(Auth::user()?->hasVerifiedEmail(), 403);
     }
 
     public function render()

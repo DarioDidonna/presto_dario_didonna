@@ -1,11 +1,13 @@
 <?php
 
 use App\Http\Middleware\IsRevisor;
+use App\Http\Middleware\SecurityHeaders;
 use App\Http\Middleware\SetLocaleMiddleware;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
+use Illuminate\Session\Middleware\AuthenticateSession;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -16,7 +18,15 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        // Solo il dominio di APP_URL: un header Host falso viene rifiutato (Laravel non lo applica in locale e nei test)
+        $middleware->trustHosts(
+            at: fn () => ['^'.preg_quote((string) parse_url((string) config('app.url'), PHP_URL_HOST), '/').'$'],
+            subdomains: false,
+        );
+        $middleware->append(SecurityHeaders::class);
         $middleware->web(append: [
+            // Se la password cambia, le sessioni aperte sugli altri dispositivi vengono chiuse
+            AuthenticateSession::class,
             SetLocaleMiddleware::class,
         ]);
         $middleware->alias([

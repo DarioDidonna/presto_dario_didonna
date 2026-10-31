@@ -136,8 +136,10 @@ class FrontendTest extends TestCase
             ->assertSee(__('ui.login_to_contact'))
             ->assertDontSee('mailto:', false);
 
+        // L'email del venditore si vede solo dopo una vendita accettata, mai sulla pagina pubblica dell'annuncio
         $this->actingAs(User::factory()->create())->get(route('article.show', $article))
-            ->assertSee('mailto:'.$article->user->email, false);
+            ->assertDontSee($article->user->email)
+            ->assertDontSee('mailto:', false);
 
         $this->actingAs($article->user)->get(route('article.show', $article))
             ->assertSee(__('ui.your_own_ad'))

@@ -52,7 +52,7 @@ class FooterStatusTest extends TestCase
         $this->enableAgent();
         Http::fake(['agent.test/health' => Http::response(['status' => 'ok', 'model_available' => true])]);
 
-        $this->get('/')->assertSee('qwen2.5:3b')->assertSee(__('ui.footer_value_on'));
+        $this->get('/')->assertDontSee('qwen')->assertSee(__('ui.footer_value_on'));
     }
 
     public function test_agent_running_without_the_chat_model_still_hides_faces(): void

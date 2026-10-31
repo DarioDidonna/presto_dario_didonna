@@ -9,6 +9,8 @@ class SellerController extends Controller
     // Profilo pubblico del venditore: niente email né dati personali, solo annunci pubblicati e recensioni
     public function show(User $user)
     {
+        abort_if($user->anonymized_at !== null, 404);
+
         $articles = $user->articles()->accepted()->withCardRelations()->latest()
             ->paginate(6, pageName: 'annunci')->withQueryString();
         $reviews = $user->reviewsReceived()->with('reviewer')->latest()

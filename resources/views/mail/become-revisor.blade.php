@@ -52,7 +52,7 @@
                             {{ __('ui.revisor_mail_action') }}
                         </p>
 
-                        <a href="{{ URL::temporarySignedRoute('make.revisor', now()->addDays(7), ['user' => $user]) }}" style="display: inline-block; background-color: #06b6d4; color: #060a14; font-weight: 800; text-transform: uppercase; font-size: 13px; letter-spacing: 1.5px; text-decoration: none; padding: 14px 35px; border-radius: 4px; outline: 2px solid #06b6d4; outline-offset: 3px; box-shadow: 0 4px 14px rgba(6, 182, 212, 0.3);">
+                        <a href="{{ $approvalUrl }}" style="display: inline-block; background-color: #06b6d4; color: #060a14; font-weight: 800; text-transform: uppercase; font-size: 13px; letter-spacing: 1.5px; text-decoration: none; padding: 14px 35px; border-radius: 4px; outline: 2px solid #06b6d4; outline-offset: 3px; box-shadow: 0 4px 14px rgba(6, 182, 212, 0.3);">
                             {{ __('ui.revisor_mail_button') }} &raquo;
                         </a>
                     </div>

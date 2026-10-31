@@ -3,10 +3,12 @@
 namespace Tests\Feature;
 
 use App\Models\Article;
+use App\Models\PurchaseRequest;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
@@ -243,5 +245,85 @@ class ProfileTest extends TestCase
     public function test_guest_cannot_change_name(): void
     {
         $this->put(route('user-profile-information.update'), ['name' => 'Hacker'])->assertRedirect(route('login'));
+    }
+
+    public function test_export_contains_own_data_only(): void
+    {
+        $user = User::factory()->create(['email' => 'mia@example.com']);
+        $article = Article::factory()->create(['user_id' => $user->id, 'title' => 'Annuncio mio']);
+        Article::factory()->create(['title' => 'Annuncio altrui']);
+        $buyer = User::factory()->create(['email' => 'acquirente@example.com']);
+        PurchaseRequest::factory()->create(['buyer_id' => $buyer->id, 'seller_id' => $user->id]);
+
+        $this->get(route('profile.export'))->assertRedirect(route('login'));
+
+        $response = $this->actingAs($user)->get(route('profile.export'))
+            ->assertOk()
+            ->assertHeader('Content-Disposition', 'attachment; filename="presto-i-miei-dati.json"')
+            ->assertJsonPath('profile.email', 'mia@example.com')
+            ->assertJsonPath('articles.0.title', $article->title)
+            ->assertJsonCount(1, 'articles')
+            ->assertJsonCount(1, 'sales');
+
+        $this->assertStringNotContainsString('acquirente@example.com', $response->getContent());
+        $this->assertStringNotContainsString($user->password, $response->getContent());
+    }
+
+    public function test_account_deletion_needs_the_password(): void
+    {
+        $user = User::factory()->create(['password' => 'Password123!']);
+
+        $this->delete(route('profile.destroy'))->assertRedirect(route('login'));
+        $this->actingAs($user)->delete(route('profile.destroy'), ['password' => 'sbagliata'])
+            ->assertSessionHasErrorsIn('deleteAccount', 'password');
+
+        $this->assertNull($user->fresh()->anonymized_at);
+    }
+
+    public function test_account_deletion_erases_personal_data_and_keeps_the_other_side_working(): void
+    {
+        Storage::fake('public');
+        Notification::fake();
+        $user = User::factory()->create(['name' => 'Giulia Bianchi', 'email' => 'giulia@example.com', 'password' => 'Password123!', 'avatar' => 'avatars/1/a.jpg']);
+        $other = User::factory()->create();
+
+        $mine = Article::factory()->accepted()->create(['user_id' => $user->id]);
+        Storage::disk('public')->put("articles/{$mine->id}/foto.jpg", 'x');
+        Storage::disk('public')->put("avatars/{$user->id}/a.jpg", 'x');
+
+        // Sta acquistando un annuncio altrui: deve tornare disponibile
+        $reserved = Article::factory()->accepted()->create(['user_id' => $other->id, 'reserved_at' => now()]);
+        $pending = PurchaseRequest::factory()->create(['buyer_id' => $user->id, 'seller_id' => $other->id, 'status' => PurchaseRequest::PENDING, 'message' => 'Chiamami al 333']);
+        $pending->items()->create(['article_id' => $reserved->id, 'title' => $reserved->title, 'price' => $reserved->price]);
+
+        // Vendita già conclusa: resta nello storico dell'altra persona
+        $sold = PurchaseRequest::factory()->create(['buyer_id' => $other->id, 'seller_id' => $user->id, 'status' => PurchaseRequest::ACCEPTED]);
+        $sold->messages()->create(['user_id' => $user->id, 'body' => 'Il mio indirizzo è via Roma 1']);
+
+        $this->actingAs($user)->delete(route('profile.destroy'), ['password' => 'Password123!'])
+            ->assertRedirect(route('homepage'))
+            ->assertSessionHas('message');
+
+        $this->assertGuest();
+        $fresh = $user->fresh();
+        $this->assertNotNull($fresh->anonymized_at);
+        $this->assertSame('Utente eliminato', $fresh->name);
+        $this->assertStringEndsWith('@deleted.invalid', $fresh->email);
+        $this->assertNull($fresh->avatar);
+        $this->assertFalse(Hash::check('Password123!', $fresh->password));
+
+        $this->assertModelMissing($mine);
+        Storage::disk('public')->assertMissing("articles/{$mine->id}/foto.jpg");
+        Storage::disk('public')->assertMissing("avatars/{$user->id}/a.jpg");
+
+        $this->assertSame(PurchaseRequest::CANCELLED, $pending->fresh()->status);
+        $this->assertNull($pending->fresh()->message);
+        $this->assertTrue($reserved->fresh()->isAvailable());
+
+        $this->assertModelExists($sold);
+        $this->assertSame(0, $sold->messages()->count());
+        $this->post('/login', ['email' => 'giulia@example.com', 'password' => 'Password123!'])->assertSessionHasErrors('email');
+        $this->get(route('sellers.show', $user))->assertNotFound();
+        $this->actingAs($other)->get(route('orders.index'))->assertOk()->assertDontSee('deleted.invalid');
     }
 }

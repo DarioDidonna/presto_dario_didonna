@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Storage;
 use Laravel\Scout\Searchable;
 
 class Article extends Model
@@ -61,6 +62,13 @@ class Article extends Model
         return $this->reserved_at !== null;
     }
 
+    // Le righe di "images" spariscono per il cascade del DB; i file vanno rimossi a mano
+    public function deleteWithFiles(): void
+    {
+        Storage::disk('public')->deleteDirectory("articles/{$this->id}");
+        $this->delete();
+    }
+
     public function setAccepted($value)
     {
         $this->is_accepted = $value;
@@ -87,6 +95,17 @@ class Article extends Model
     public function scopeWithCardRelations(Builder $query): Builder
     {
         return $query->with(['images', 'category']);
+    }
+
+    // Annunci in attesa che questo revisore può giudicare (non i propri: ArticlePolicy::review)
+    /**
+     * @param  Builder<Article>  $query
+     * @return Builder<Article>
+     */
+    public function scopeToReviewBy(Builder $query, User $reviewer): Builder
+    {
+        return $query->whereNull('is_accepted')
+            ->where(fn ($owner) => $owner->whereNull('user_id')->orWhere('user_id', '!=', $reviewer->id));
     }
 
     public static function toBeRevisedCount()

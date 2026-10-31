@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\Article;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 class CartTest extends TestCase
@@ -104,6 +105,8 @@ class CartTest extends TestCase
 
     public function test_deleted_articles_disappear_from_carts(): void
     {
+        // Senza il disco finto l'eliminazione cancellava davvero storage/app/public/articles/{id}
+        Storage::fake('public');
         $article = Article::factory()->accepted()->create();
         $this->buyer->cart()->attach($article->id);
 

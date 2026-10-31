@@ -35,19 +35,20 @@ Route::get('/venditore/{user}', [SellerController::class, 'show'])->name('seller
 Route::get('/revisor/index', [RevisorController::class, 'index'])->middleware('isRevisor')->name('revisor.index');
 
 // ACCEPT
-Route::patch('/accept/{article}', [RevisorController::class, 'accept'])->middleware('isRevisor')->name('accept');
+Route::patch('/accept/{article}', [RevisorController::class, 'accept'])->middleware(['isRevisor', 'can:review,article'])->name('accept');
 
 // REJECT
-Route::patch('/reject/{article}', [RevisorController::class, 'reject'])->middleware('isRevisor')->name('reject');
+Route::patch('/reject/{article}', [RevisorController::class, 'reject'])->middleware(['isRevisor', 'can:review,article'])->name('reject');
 
 // UNDO (ultima decisione del revisore)
 Route::patch('/revisor/undo', [RevisorController::class, 'undo'])->middleware('isRevisor')->name('revisor.undo');
 
 // BECOME REVISOR
-Route::post('/revisor/request', [RevisorController::class, 'becomeRevisor'])->middleware(['auth', 'throttle:3,60'])->name('become.revisor');
+Route::post('/revisor/request', [RevisorController::class, 'becomeRevisor'])->middleware(['auth', 'verified', 'throttle:revisor-request'])->name('become.revisor');
 
 // MAKE REVISOR
-Route::get('/make/revisor/{user}', [RevisorController::class, 'makeRevisor'])->middleware('signed')->name('make.revisor');
+Route::get('/make/revisor/{user}', [RevisorController::class, 'confirmRevisor'])->middleware('signed:relative')->name('make.revisor');
+Route::post('/make/revisor/{user}', [RevisorController::class, 'makeRevisor'])->middleware(['signed:relative', 'throttle:revisor-confirm'])->name('make.revisor.store');
 
 // SEARCH
 Route::get('/search/article', [PublicController::class, 'searchArticles'])->name('article.search');
@@ -57,15 +58,17 @@ Route::post('/lingua/{lang}', [PublicController::class, 'setLanguage'])->whereIn
 
 // PROFILO
 Route::get('/profilo', [ProfileController::class, 'show'])->name('profile.show');
-Route::post('/profilo/avatar', [ProfileController::class, 'updateAvatar'])->middleware('throttle:10,1')->name('profile.avatar.update');
+Route::post('/profilo/avatar', [ProfileController::class, 'updateAvatar'])->middleware('throttle:avatar')->name('profile.avatar.update');
 Route::delete('/profilo/avatar', [ProfileController::class, 'destroyAvatar'])->name('profile.avatar.destroy');
+Route::get('/profilo/dati', [ProfileController::class, 'export'])->middleware('throttle:profile-export')->name('profile.export');
+Route::delete('/profilo', [ProfileController::class, 'destroy'])->middleware('throttle:profile-destroy')->name('profile.destroy');
 
-// CARRELLO (solo utenti registrati)
-Route::middleware('auth')->prefix('carrello')->name('cart.')->group(function () {
+// CARRELLO (solo utenti con l'email verificata)
+Route::middleware(['auth', 'verified'])->prefix('carrello')->name('cart.')->group(function () {
     Route::get('/', [CartController::class, 'index'])->name('index');
     Route::delete('/', [CartController::class, 'clear'])->name('clear');
     // Prima di {article}: "invia" non è l'id di un annuncio
-    Route::post('/invia', [PurchaseRequestController::class, 'store'])->middleware('throttle:5,1')->name('checkout');
+    Route::post('/invia', [PurchaseRequestController::class, 'store'])->middleware('throttle:checkout')->name('checkout');
     Route::post('/{article}', [CartController::class, 'add'])->middleware('can:addToCart,article')->name('add');
     Route::delete('/{article}', [CartController::class, 'remove'])->name('remove');
 });
@@ -76,7 +79,7 @@ Route::patch('/ordini/{purchaseRequest}/annulla', [PurchaseRequestController::cl
     ->middleware(['auth', 'can:cancel,purchaseRequest'])->name('orders.cancel');
 
 Route::post('/ordini/{purchaseRequest}/recensione', [ReviewController::class, 'store'])
-    ->middleware(['auth', 'can:review,purchaseRequest', 'throttle:10,1'])->name('reviews.store');
+    ->middleware(['auth', 'can:review,purchaseRequest', 'throttle:review'])->name('reviews.store');
 
 // MESSAGGI tra acquirente e venditore di una richiesta d'acquisto
 Route::get('/richieste/{purchaseRequest}/messaggi', [ConversationController::class, 'show'])

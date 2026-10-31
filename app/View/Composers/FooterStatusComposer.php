@@ -47,7 +47,7 @@ class FooterStatusComposer
             [
                 'key' => 'assistant', // Servizio acceso ma modello della chat non scaricato: l'assistente non può rispondere
                 'state' => $agent === 'on' && ! $modelReady ? 'off' : $agent,
-                'value' => $modelReady ? 'qwen2.5:3b' : __('ui.footer_value_'.($agent === 'on' ? 'off' : $agent)),
+                'value' => __('ui.footer_value_'.($modelReady ? 'on' : ($agent === 'on' ? 'off' : $agent))),
             ],
             ['key' => 'realtime', 'state' => $realtime, 'value' => $realtime === 'on' ? 'Reverb' : __('ui.footer_value_'.$realtime)],
         ];

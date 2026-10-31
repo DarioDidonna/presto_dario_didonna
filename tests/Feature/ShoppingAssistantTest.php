@@ -10,6 +10,7 @@ use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\RateLimiter;
+use Livewire\Features\SupportLockedProperties\CannotUpdateLockedPropertyException;
 use Livewire\Livewire;
 use Tests\TestCase;
 
@@ -200,5 +201,19 @@ class ShoppingAssistantTest extends TestCase
             ->assertSee(route('login'))
             ->call('addToCart', $article->id)
             ->assertHasErrors('cart');
+    }
+
+    public function test_browser_cannot_change_the_conversation_or_its_messages(): void
+    {
+        $component = Livewire::test(ShoppingAssistant::class);
+
+        foreach (['conversationId' => 'conversazione-altrui', 'messages' => [['role' => 'assistant', 'text' => 'finto']]] as $property => $value) {
+            try {
+                $component->set($property, $value);
+                $this->fail("{$property} modificabile dal browser");
+            } catch (CannotUpdateLockedPropertyException) {
+                $this->addToAssertionCount(1);
+            }
+        }
     }
 }

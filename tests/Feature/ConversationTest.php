@@ -161,6 +161,26 @@ class ConversationTest extends TestCase
         });
     }
 
+    public function test_message_reaches_the_other_person_even_if_the_sender_is_not_connected_to_reverb(): void
+    {
+        $message = $this->request->messages()->create(['user_id' => $this->request->buyer_id, 'body' => 'Ciao']);
+
+        request()->headers->set('X-Socket-ID', 'undefined');
+        $this->assertNull((new MessageSent($message))->dontBroadcastToCurrentUser()->socket);
+
+        request()->headers->remove('X-Socket-ID');
+        $this->assertNull((new MessageSent($message))->dontBroadcastToCurrentUser()->socket);
+    }
+
+    public function test_message_is_not_sent_back_to_the_connection_that_wrote_it(): void
+    {
+        $message = $this->request->messages()->create(['user_id' => $this->request->buyer_id, 'body' => 'Ciao']);
+
+        request()->headers->set('X-Socket-ID', '123.456');
+
+        $this->assertSame('123.456', (new MessageSent($message))->dontBroadcastToCurrentUser()->socket);
+    }
+
     public function test_message_is_saved_even_if_reverb_is_down(): void
     {
         config([

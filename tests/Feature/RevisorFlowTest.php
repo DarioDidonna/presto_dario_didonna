@@ -56,19 +56,23 @@ class RevisorFlowTest extends TestCase
     public function test_revisor_request_mail_contains_working_signed_link(): void
     {
         Mail::fake();
+        config(['app.admin_email' => 'responsabile@example.com']);
         $candidate = User::factory()->create();
 
         $this->actingAs($candidate)->post(route('become.revisor'));
 
-        Mail::assertSent(BecomeRevisor::class, function (BecomeRevisor $mail) use ($candidate) {
+        Mail::assertQueued(BecomeRevisor::class, function (BecomeRevisor $mail) use ($candidate) {
             $html = $mail->render();
             preg_match('#href="([^"]*/make/revisor/[^"]+)"#', $html, $match);
             $this->assertNotEmpty($match, 'Link di attivazione non trovato nella mail');
 
             auth()->logout();
-            $this->get(html_entity_decode($match[1]))->assertRedirect(route('homepage'));
+            $link = html_entity_decode($match[1]);
+            $this->get($link)->assertOk();
+            $this->assertFalse((bool) $candidate->fresh()->is_revisor);
+            $this->post($link)->assertRedirect(route('homepage'));
 
-            return $mail->hasTo('admin@presto.it') && $candidate->fresh()->is_revisor;
+            return $mail->hasTo('responsabile@example.com') && $candidate->fresh()->is_revisor;
         });
     }
 

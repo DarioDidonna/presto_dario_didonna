@@ -3,6 +3,8 @@
 namespace App\Notifications;
 
 use App\Models\Article;
+use App\Notifications\Concerns\RetriesDelivery;
+use App\Support\MailText;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -15,7 +17,7 @@ use Illuminate\Queue\SerializesModels;
  */
 class ArticleReviewed extends Notification implements ShouldQueue
 {
-    use Queueable, SerializesModels;
+    use Queueable, RetriesDelivery, SerializesModels;
 
     // Annuncio eliminato prima dell'invio: il job viene scartato invece di finire tra i falliti
     public bool $deleteWhenMissingModels = true;
@@ -57,7 +59,7 @@ class ArticleReviewed extends Notification implements ShouldQueue
         $mail = (new MailMessage)
             ->subject(__("ui.review_mail_{$status}_subject", ['title' => $this->article->title]))
             ->greeting(__('ui.review_mail_greeting', ['name' => $notifiable->name]))
-            ->line(__("ui.review_mail_{$status}_line", ['title' => $this->article->title]));
+            ->line(__("ui.review_mail_{$status}_line", ['title' => MailText::plain($this->article->title)]));
 
         if ($this->accepted) {
             return $mail->action(__('ui.review_mail_view_ad'), route('article.show', $this->article));

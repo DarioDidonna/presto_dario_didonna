@@ -4,6 +4,10 @@ on:
   push:
   pull_request:
 
+# Il token del workflow può solo leggere il repository
+permissions:
+  contents: read
+
 # Un nuovo push sullo stesso ramo annulla l'esecuzione precedente ancora in corso
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -15,23 +19,23 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 
       - name: PHP 8.4
-        uses: shivammathur/setup-php@v2
+        uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # v2
         with:
           php-version: '8.4'
           extensions: gd, exif, fileinfo, mbstring, pdo_sqlite
           coverage: none
 
       - name: Node.js 22
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: '22'
           cache: npm
 
       - name: Cache Composer
-        uses: actions/cache@v4
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
         with:
           path: ~/.composer/cache/files
           key: composer-${{ hashFiles('composer.lock') }}
@@ -59,10 +63,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 
       - name: PHP 8.4
-        uses: shivammathur/setup-php@v2
+        uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # v2
         with:
           php-version: '8.4'
           coverage: none
@@ -78,16 +82,16 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 
       - name: PHP 8.4
-        uses: shivammathur/setup-php@v2
+        uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # v2
         with:
           php-version: '8.4'
           coverage: none
 
       - name: Cache Composer
-        uses: actions/cache@v4
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
         with:
           path: ~/.composer/cache/files
           key: composer-${{ hashFiles('composer.lock') }}
@@ -107,11 +111,11 @@ jobs:
         working-directory: ai-agent
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 
       # uv installa da solo il Python indicato in .python-version (3.12)
       - name: uv
-        uses: astral-sh/setup-uv@v6
+        uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e # v6
         with:
           enable-cache: true
           cache-dependency-glob: ai-agent/uv.lock
@@ -127,3 +131,31 @@ jobs:
         run: |
           uv run ruff check .
           uv run ruff format --check .
+
+  audit:
+    name: Vulnerabilità note nelle dipendenze
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+
+      - name: PHP 8.4
+        uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # v2
+        with:
+          php-version: '8.4'
+          coverage: none
+
+      - name: Composer
+        run: composer audit --locked --no-interaction
+
+      - name: npm
+        run: npm audit
+
+      - name: uv
+        uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e # v6
+
+      - name: Python
+        working-directory: ai-agent
+        run: |
+          uv export --locked --no-dev --no-hashes --no-emit-project -o requirements-audit.txt
+          uvx pip-audit --no-deps --disable-pip -r requirements-audit.txt

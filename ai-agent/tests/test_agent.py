@@ -124,3 +124,17 @@ def test_follow_up_question_can_cite_prices_found_in_previous_turns(settings, cl
     second = agent.chat("e quanto costa?", conversation_id=first.conversation_id)
 
     assert second.reply == "Costa 480 €."
+
+
+def test_old_conversations_are_forgotten(settings, client):
+    model = scripted(AIMessage("Prima risposta."), AIMessage("Seconda risposta."))
+    agent = ShoppingAgent(settings, model=model, client=client)
+    old = agent.chat("Ciao").conversation_id
+    config = {"configurable": {"thread_id": old}}
+    assert agent._checkpointer.get_tuple(config) is not None
+
+    agent._last_used[old] -= ShoppingAgent.CONVERSATION_TTL_SECONDS + 1
+    agent.chat("Ciao di nuovo")
+
+    assert agent._checkpointer.get_tuple(config) is None
+    assert old not in agent._last_used

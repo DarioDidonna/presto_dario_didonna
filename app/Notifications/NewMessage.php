@@ -3,6 +3,8 @@
 namespace App\Notifications;
 
 use App\Models\Message;
+use App\Notifications\Concerns\RetriesDelivery;
+use App\Support\MailText;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -16,7 +18,7 @@ use Illuminate\Support\Str;
  */
 class NewMessage extends Notification implements ShouldQueue
 {
-    use Queueable, SerializesModels;
+    use Queueable, RetriesDelivery, SerializesModels;
 
     public bool $deleteWhenMissingModels = true;
 
@@ -57,8 +59,8 @@ class NewMessage extends Notification implements ShouldQueue
         return (new MailMessage)
             ->subject(__('ui.messages_mail_subject', ['name' => $sender]))
             ->greeting(__('ui.review_mail_greeting', ['name' => $notifiable->name]))
-            ->line(__('ui.messages_mail_line', ['name' => $sender]))
-            ->line('«'.Str::limit($this->message->body, 300).'»')
+            ->line(__('ui.messages_mail_line', ['name' => MailText::plain($sender)]))
+            ->line('«'.MailText::plain(Str::limit($this->message->body, 300)).'»')
             ->action(__('ui.messages_mail_action'), route('conversations.show', $this->message->purchase_request_id));
     }
 }

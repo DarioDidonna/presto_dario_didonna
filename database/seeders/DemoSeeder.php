@@ -72,6 +72,9 @@ class DemoSeeder extends Seeder
 
     public function run(): void
     {
+        // Account con password nota, anche da revisore: mai in produzione, nemmeno lanciando il seeder a mano
+        throw_if(app()->isProduction(), \RuntimeException::class, 'DemoSeeder non disponibile in produzione.');
+
         $this->call(CategoriesSeeder::class);
 
         $demo = $this->user('Utente Demo', 'demo@presto.it');

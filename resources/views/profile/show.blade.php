@@ -255,6 +255,38 @@
                             <p class="text-muted-custom fs-7 mb-0">{{ __('ui.no_ads_yet') }}</p>
                         @endforelse
                     </div>
+
+                    {{-- GDPR: copia dei propri dati e cancellazione dell'account --}}
+                    <div class="p-4 rounded-3 border border-secondary-subtle bg-navbar-card shadow-lg mt-4">
+                        <h2 class="h6 text-white text-uppercase tracking-wide fw-bold mb-3">
+                            <i class="bi bi-shield-lock me-2 text-neon-cyan"></i>{{ __('ui.your_data_title') }}
+                        </h2>
+                        <div class="d-flex flex-wrap gap-2">
+                            <a href="{{ route('profile.export') }}" class="btn btn-outline-neon-cyan btn-sm">
+                                <i class="bi bi-download me-1"></i>{{ __('ui.account_export') }}
+                            </a>
+                            <button type="button" class="btn btn-outline-danger btn-sm" data-bs-toggle="collapse" data-bs-target="#deleteAccountForm"
+                                aria-expanded="{{ $errors->deleteAccount->any() ? 'true' : 'false' }}" aria-controls="deleteAccountForm">
+                                <i class="bi bi-trash me-1"></i>{{ __('ui.account_delete') }}
+                            </button>
+                        </div>
+
+                        <form action="{{ route('profile.destroy') }}" method="POST" id="deleteAccountForm"
+                            class="collapse mt-3 {{ $errors->deleteAccount->any() ? 'show' : '' }}">
+                            @csrf
+                            @method('DELETE')
+                            <p class="text-muted-custom fs-7">{{ __('ui.account_delete_warning') }}</p>
+                            <label for="delete_password" class="form-label text-white fs-7">{{ __('ui.current_password') }}</label>
+                            <div class="input-group input-group-sm">
+                                <input type="password" name="password" id="delete_password" required autocomplete="current-password"
+                                    class="form-control bg-dark border-secondary text-white @error('password', 'deleteAccount') is-invalid @enderror">
+                                <button type="submit" class="btn btn-danger fw-bold">{{ __('ui.account_delete_button') }}</button>
+                                @error('password', 'deleteAccount')
+                                    <div class="invalid-feedback font-monospace fs-8">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </form>
+                    </div>
                 </div>
 
             </div>
