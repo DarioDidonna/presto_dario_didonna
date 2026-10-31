@@ -9,8 +9,11 @@ use App\View\Composers\FooterStatusComposer;
 use App\View\Composers\MarketStatsComposer;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Auth\Notifications\ResetPassword;
+use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Http\Request;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
@@ -31,6 +34,22 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Un limite con nome per ogni azione: i "throttle:N,M" senza nome condividono un solo contatore per utente,
+        // e bastavano pochi caricamenti o verifiche per bloccare la candidatura o la cancellazione dell'account
+        foreach ([
+            'revisor-request' => Limit::perHour(3),
+            'revisor-confirm' => Limit::perMinute(10),
+            'avatar' => Limit::perMinute(10),
+            'profile-export' => Limit::perMinute(5),
+            'profile-destroy' => Limit::perMinute(5),
+            'checkout' => Limit::perMinute(5),
+            'review' => Limit::perMinute(10),
+            'verification' => Limit::perMinute(6),
+            'agent-api' => Limit::perMinute(120),
+        ] as $name => $limit) {
+            RateLimiter::for($name, fn (Request $request) => (clone $limit)->by($request->user()?->id ?: $request->ip()));
+        }
+
         // In produzione anche il controllo sulle password già finite in un furto di dati (Have I Been Pwned riceve
         // solo i primi 5 caratteri dell'hash, mai la password)
         Password::defaults(fn () => $this->app->isProduction() ? Password::min(12)->uncompromised() : Password::min(8));

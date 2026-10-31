@@ -270,4 +270,20 @@ class SecurityTest extends TestCase
         $this->expectException(\RuntimeException::class);
         (new DemoSeeder)->run();
     }
+
+    public function test_rate_limit_of_one_action_does_not_block_the_others(): void
+    {
+        Mail::fake();
+        $user = User::factory()->create(['password' => 'Password123!']);
+
+        foreach (range(1, 5) as $n) {
+            $this->actingAs($user)->get(route('profile.export'))->assertOk();
+        }
+        $this->actingAs($user)->get(route('profile.export'))->assertStatus(429);
+
+        // Le altre azioni hanno il loro contatore
+        $this->actingAs($user)->post(route('become.revisor'))->assertRedirect(route('homepage'));
+        $this->actingAs($user)->delete(route('profile.destroy'), ['password' => 'sbagliata'])
+            ->assertSessionHasErrorsIn('deleteAccount', 'password');
+    }
 }

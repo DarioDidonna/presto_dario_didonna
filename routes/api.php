@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Route;
 
 // API interne per l'agente AI (ai-agent/): sola lettura, protette da token, con limite di richieste
 Route::prefix('agent')
-    ->middleware([VerifyAgentToken::class, 'throttle:120,1'])
+    ->middleware([VerifyAgentToken::class, 'throttle:agent-api'])
     ->name('api.agent.')
     ->group(function () {
         Route::get('categories', [AgentController::class, 'categories'])->name('categories');
